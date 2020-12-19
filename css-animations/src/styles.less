@@ -1,0 +1,329 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  align-items: center;
+  background-color: white;
+  cursor: default;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-wrap: wrap;
+  font-family: monospace;
+  font-size: 18px;
+  height: 100vh;
+  justify-content: center;
+  overflow: auto;
+  padding: 5px;
+}
+
+.container {
+  align-items: center;
+  background-color: darken(white, 10%);
+  border: 1px solid darken(white, 15%);
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  height: 200px;
+  justify-content: center;
+  margin: 10px;
+  padding: 10px;
+  width: 200px;
+}
+
+.description {
+  color: darken(white, 50%);
+  font-size: 1em;
+  text-align: center;
+  width: 100%;
+}
+
+// ---------------------------
+// Example 1: Transition
+// ---------------------------
+
+#example-1 {
+  .my-element {
+    align-items: center;
+    border-radius: 100%;
+    border: 1px solid black;
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    transition-delay: 0.5s; // delay before start animation
+    transition-duration: 0.5s;
+    transition-property: all;
+    transition-timing-function: ease-in; // type of animation
+    width: 100px;
+  }
+
+  &:hover {
+    .my-element {
+      background-color: #777;
+      height: 120px;
+      width: 120px;
+    }
+  }
+}
+
+// ---------------------------
+// Example 2: Transform
+// ---------------------------
+
+#example-2 {
+  .my-element {
+    align-items: center;
+    border: 1px solid black;
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    transition: all 1s linear;
+    width: 100px;
+  }
+
+  &:hover {
+    .my-element {
+      transform: skewX(40deg) rotate(-41deg) translate(5px, 10px) scale(1.2);
+      // skew: similar to rotate
+    }
+  }
+}
+
+// ---------------------------
+// Example 3: Translate
+// ---------------------------
+
+#example-3 {
+  perspective: 100px; // required for translateZ tranform. trasnlate distance
+  perspective-origin: top left; // translate direction
+
+  .my-element {
+    align-items: center;
+    border: 1px solid black;
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    transition: all 0.1s linear;
+    width: 100px;
+  }
+
+  &:hover {
+    .my-element {
+      transform: translateZ(30px);
+    }
+  }
+}
+
+// ---------------------------
+// Example 4: Transform
+// ---------------------------
+
+#example-4 {
+  .my-element {
+    align-items: center;
+    border: 1px solid black;
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    transition: all 0.1s linear;
+    width: 100px;
+  }
+
+  &:hover {
+    .my-element {
+      transform: scale(1.2, 0.4);
+    }
+  }
+}
+
+// ---------------------------
+// Example 5: Transform initial point
+// ---------------------------
+
+#example-5 {
+  .my-element {
+    align-items: center;
+    border: 1px solid black;
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    transition: all 0.1s linear;
+    width: 100px;
+  }
+
+  &:hover {
+    .my-element {
+      transform-origin: left top; // change initial position of transformed elements
+      transform: rotateZ(-45deg);
+      // rotate: 2d rotation
+      // rotateX,Y,X: 3d rotation on some axis
+    }
+  }
+}
+
+// ---------------------------
+// Example 6: Animations
+// ---------------------------
+
+#example-6 {
+  .my-element {
+    align-items: center;
+    animation-delay: 1s; // delay to start animation
+    animation-direction: alternate; // where animation starts, at the begining or the end. (normal || reverse || alternate)
+    animation-duration: 2s;
+    // animation-fill-mode: forwards; // how the element should be when the animation finishes
+    animation-iteration-count: infinite; // infinite animations
+    // animation-iteration-count: 5; // times to repeat animation
+    animation-name: anim-example-6;
+    animation-timing-function: ease-in;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    justify-content: center;
+    position: relative;
+    width: 100px;
+  }
+
+  &:hover {
+    .my-element {
+      animation-play-state: paused; // modify animation's state
+      &:after {
+        content: "paused";
+      }
+    }
+  }
+}
+
+// animation-name
+@keyframes anim-example-6 {
+  // progress
+  0% {
+    transform: translateY(5px) scale(1, 0.9);
+    // top: 5px;
+    // opacity: 1;
+  }
+  50% {
+    transform: translateY(20px);
+    // top: 20px;
+    // opacity: 0;
+  }
+  100% {
+    transform: translateY(5px) scale(1, 0.9);
+    // top: 5px;
+    // opacity: 1;
+  }
+}
+
+// ---------------------------
+// Example 7: Multiple animations
+// ---------------------------
+
+#example-7 {
+  .my-element {
+    align-items: center;
+    animation-duration: 3s, 0.5s;
+    animation-iteration-count: infinite;
+    animation-name: anim-example-7, anim-example-6;
+    animation-timing-function: linear, ease-in-out;
+    border-radius: 100%;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    justify-content: center;
+    position: relative;
+    width: 100px;
+  }
+}
+
+// animation-name
+@keyframes anim-example-7 {
+  // progress
+  from {
+    left: -40px;
+  }
+  50% {
+    left: 40px;
+  }
+  to {
+    left: -40px;
+  }
+}
+
+// ---------------------------
+// Example 8: Animations listeners
+// ---------------------------
+
+#example-8 {
+  .my-element {
+    align-items: center;
+    animation-duration: 3s, 0.5s;
+    animation-iteration-count: alternate;
+    animation-name: anim-example-8;
+    animation-timing-function: linear, ease-in-out;
+    border-radius: 100%;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    width: 100px;
+  }
+}
+
+// animation-name
+@keyframes anim-example-8 {
+  // progress
+  from {
+    left: -40px;
+  }
+  50% {
+    left: 40px;
+  }
+  to {
+    left: -40px;
+  }
+}
+
+// ---------------------------
+// Example 9: Animations with JS
+// ---------------------------
+
+#example-9 {
+  .my-element {
+    align-items: center;
+    border-radius: 100%;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    width: 100px;
+  }
+
+  .btn {
+    background: black;
+    border-radius: 5px;
+    border: none;
+    box-shadow: inset 0 -0.2em rgba(0, 0, 0, 0.2);
+    color: white;
+    cursor: pointer;
+    outline: 0;
+    padding: 0.6em 0.8em 0.8em;
+    text-align: center;
+    transition: 0.2s;
+    will-change: transform;
+  }
+
+  .btn:active {
+    transform: scale(0.9);
+  }
+}

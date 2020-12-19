@@ -1,0 +1,49 @@
+{
+  "name": "css-animations",
+  "version": "1.0.0",
+  "description": "CSS Animations examples",
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "gulp"
+  ],
+  "homepage": "https://github.com/diegofrayo/css-animations#readme",
+  "bugs": {
+    "email": "diegofrayo@gmail.com",
+    "url": "https://github.com/diegofrayo/css-animations/issues"
+  },
+  "license": "ISC",
+  "author": {
+    "name": "Diego Rayo",
+    "email": "diegofrayo@gmail.com",
+    "url": "https://diegofrayo.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegofrayo/css-animations.git"
+  },
+  "scripts": {
+    "start": "gulp",
+    "build": "gulp build-production"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "browser-sync": "^2.24.4",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-htmlmin": "~0.1.2",
+    "gulp-less": "^3.0.3",
+    "gulp-load-plugins": "~0.4.0",
+    "gulp-minify-css": "~0.3.0",
+    "gulp-rename": "~1.1.0",
+    "gulp-replace": "^0.5.4",
+    "gulp-uglify": "~0.2.1",
+    "gulp-util": "^3.0.7"
+  },
+  "engines": {
+    "node": ">=6.11.0"
+  },
+  "private": true
+}
