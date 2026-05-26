@@ -5,13 +5,14 @@ import type ReactTypes from "@diegofrayo-pkg/types/react";
 
 import { APPS_COMPONENTS } from "~/features/apps";
 
-import { APPS_REPOSITORY } from "../apps-repository";
-import { useDesktop } from "../desktop.hook";
+import { APPS_REPOSITORY } from "../constants/apps-repository";
+import { useDesktop } from "../context/desktop.hook";
 import DesktopIcon from "./desktop-icon";
 import Taskbar from "./taskbar";
 import Window from "./window";
 
 function Desktop(): ReactTypes.JSXElement {
+	// --- HOOKS ---
 	const { openedApps } = useDesktop();
 
 	// --- STYLES ---
@@ -27,21 +28,28 @@ function Desktop(): ReactTypes.JSXElement {
 	return (
 		<main className={classes.root}>
 			<section className={classes.desktop}>
-				<div className={classes.iconsArea}>
-					{Object.values(APPS_REPOSITORY).map((appConfig) => (
-						<DesktopIcon key={appConfig.id} appConfig={appConfig} />
-					))}
-				</div>
 				<div className={classes.windowsArea}>
 					{Object.values(openedApps).map((openedApp) => {
 						const AppComponent = APPS_COMPONENTS[openedApp.id];
 						if (!AppComponent) return null;
+
 						return (
-							<Window key={openedApp.id} openedApp={openedApp}>
+							<Window
+								key={openedApp.id}
+								openedApp={openedApp}
+							>
 								<AppComponent />
 							</Window>
 						);
 					})}
+				</div>
+				<div className={classes.iconsArea}>
+					{Object.values(APPS_REPOSITORY).map((appConfig) => (
+						<DesktopIcon
+							key={appConfig.id}
+							appConfig={appConfig}
+						/>
+					))}
 				</div>
 			</section>
 			<Taskbar />

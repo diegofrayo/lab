@@ -1,11 +1,11 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import cn from "@diegofrayo-pkg/cn";
 import type ReactTypes from "@diegofrayo-pkg/types/react";
 
-import { useDesktop } from "../desktop.hook";
+import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 
 type WindowProps = {
@@ -14,12 +14,14 @@ type WindowProps = {
 };
 
 function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNullable {
+	// --- HOOKS ---
 	const { closeApp, minimizeApp, maximizeApp, focusApp, moveWindow } = useDesktop();
 
-	// --- REFS ---
+	// --- STATES & REFS ---
 	const isDragging = useRef(false);
 	const dragStart = useRef({ mouseX: 0, mouseY: 0, windowX: 0, windowY: 0 });
 
+	// --- COMPUTED STATES ---
 	const { id, appConfig, windowConfig, isFocused, status } = openedApp;
 
 	// --- STYLES ---
@@ -29,7 +31,7 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 			isFocused ? "z-50 shadow-black/30" : "z-10 shadow-black/10",
 		),
 		titleBar: cn(
-			"flex cursor-grab select-none items-center justify-between px-3 py-2",
+			"flex cursor-grab items-center justify-between px-3 py-2 select-none",
 			isFocused ? "bg-gray-200" : "bg-gray-100",
 		),
 		titleInfo: cn("flex items-center gap-2 text-sm font-medium text-gray-700"),
@@ -114,19 +116,34 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 				width: windowConfig.width,
 				height: windowConfig.height,
 			}}
-			onMouseDown={handleContainerMouseDown}
 			role="dialog"
 			aria-label={appConfig.name}
+			onMouseDown={handleContainerMouseDown}
 		>
-			<header className={classes.titleBar} onMouseDown={handleTitleBarMouseDown}>
+			<header
+				className={classes.titleBar}
+				onMouseDown={handleTitleBarMouseDown}
+			>
 				<div className={classes.titleInfo}>
 					<span className={classes.titleIcon}>{appConfig.icon}</span>
 					<span>{appConfig.name}</span>
 				</div>
 				<div className={classes.titleButtons}>
-					<button className={classes.btnMinimize} onClick={handleMinimizeClick} aria-label="Minimize" />
-					<button className={classes.btnMaximize} onClick={handleMaximizeClick} aria-label="Maximize" />
-					<button className={classes.btnClose} onClick={handleCloseClick} aria-label="Close" />
+					<button
+						className={classes.btnMinimize}
+						onClick={handleMinimizeClick}
+						aria-label="Minimize"
+					/>
+					<button
+						className={classes.btnMaximize}
+						onClick={handleMaximizeClick}
+						aria-label="Maximize"
+					/>
+					<button
+						className={classes.btnClose}
+						onClick={handleCloseClick}
+						aria-label="Close"
+					/>
 				</div>
 			</header>
 			<section className={classes.content}>{children}</section>

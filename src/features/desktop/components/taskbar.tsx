@@ -3,10 +3,11 @@
 import cn from "@diegofrayo-pkg/cn";
 import type ReactTypes from "@diegofrayo-pkg/types/react";
 
-import { useDesktop } from "../desktop.hook";
+import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 
 function Taskbar(): ReactTypes.JSXElement {
+	// --- HOOKS ---
 	const { openedApps } = useDesktop();
 
 	// --- STYLES ---
@@ -23,18 +24,26 @@ function Taskbar(): ReactTypes.JSXElement {
 				<span className={classes.emptyLabel}>No open apps</span>
 			) : (
 				Object.values(openedApps).map((openedApp) => (
-					<TaskbarButton key={openedApp.id} openedApp={openedApp} />
+					<TaskbarButton
+						key={openedApp.id}
+						openedApp={openedApp}
+					/>
 				))
 			)}
 		</nav>
 	);
 }
 
+export default Taskbar;
+
+// --- COMPONENTS ---
+
 type TaskbarButtonProps = {
 	openedApp: OpenedApp;
 };
 
 function TaskbarButton({ openedApp }: TaskbarButtonProps): ReactTypes.JSXElement {
+	// --- HOOKS ---
 	const { minimizeApp, maximizeApp, focusApp } = useDesktop();
 
 	// --- STYLES ---
@@ -61,11 +70,13 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): ReactTypes.JSXElement
 	}
 
 	return (
-		<button className={classes.button} onClick={handleClick} aria-label={openedApp.appConfig.name}>
+		<button
+			className={classes.button}
+			onClick={handleClick}
+			aria-label={openedApp.appConfig.name}
+		>
 			<span className={classes.icon}>{openedApp.appConfig.icon}</span>
 			<span>{openedApp.appConfig.name}</span>
 		</button>
 	);
 }
-
-export default Taskbar;
