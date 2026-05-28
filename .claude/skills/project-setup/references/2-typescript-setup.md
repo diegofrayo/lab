@@ -74,3 +74,7 @@ Installs TypeScript v6+ and configures a strict `tsconfig.json`.
     "exclude": ["node_modules"]
   }
   ```
+1. Create these types definitions on: `src/types/globals.d.ts`
+  ```ts
+    declare module "*.css";
+  ```

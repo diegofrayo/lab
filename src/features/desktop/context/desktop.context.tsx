@@ -37,9 +37,14 @@ export function DesktopProvider({ children }: DesktopProviderProps): ReactTypes.
 			const newApp: OpenedApp = {
 				id: targetAppId,
 				appConfig,
-				status: "MAXIMIZED",
+				status: "VISIBLE",
 				isFocused: true,
-				windowConfig: { x: 100 + offset, y: 80 + offset, width: 600, height: 420 },
+				windowConfig: {
+					x: 100 + offset,
+					y: 80 + offset,
+					width: appConfig.windowConfig?.width || 600,
+					height: appConfig.windowConfig?.height || 420,
+				},
 			};
 
 			return {

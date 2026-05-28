@@ -6,7 +6,7 @@ Installs Husky + lint-staged and configures a pre-commit hook that runs type-che
 
 - Install dev dependencies:
   ```sh
-  pnpm i -D husky lint-staged
+  pnpm i -D husky lint-staged@16.4.0
   ```
 - Add to `package.json` scripts (if not already present from step 1):
   ```json

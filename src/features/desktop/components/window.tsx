@@ -23,6 +23,7 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 
 	// --- COMPUTED STATES ---
 	const { id, appConfig, windowConfig, isFocused, status } = openedApp;
+	const isMaximized = status === "MAXIMIZED";
 
 	// --- STYLES ---
 	const classes = {
@@ -31,8 +32,9 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 			isFocused ? "z-50 shadow-black/30" : "z-10 shadow-black/10",
 		),
 		titleBar: cn(
-			"flex cursor-grab items-center justify-between px-3 py-2 select-none",
+			"flex items-center justify-between px-3 py-2 select-none",
 			isFocused ? "bg-gray-200" : "bg-gray-100",
+			isMaximized ? "cursor-default" : "cursor-grab",
 		),
 		titleInfo: cn("flex items-center gap-2 text-sm font-medium text-gray-700"),
 		titleIcon: cn("text-base"),
@@ -80,6 +82,25 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 		maximizeApp(id);
 	}
 
+	// --- UTILS ---
+	function getWindowStyles(): ReactTypes.Styles {
+		if (isMaximized) {
+			return {
+				left: 0,
+				top: 0,
+				width: "100%",
+				height: "100%",
+			};
+		}
+
+		return {
+			left: windowConfig.x,
+			top: windowConfig.y,
+			width: windowConfig.width,
+			height: windowConfig.height,
+		};
+	}
+
 	// --- EFFECTS ---
 	useEffect(
 		function setupDragListeners() {
@@ -110,12 +131,7 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 	return (
 		<div
 			className={classes.container}
-			style={{
-				left: windowConfig.x,
-				top: windowConfig.y,
-				width: windowConfig.width,
-				height: windowConfig.height,
-			}}
+			style={getWindowStyles()}
 			role="dialog"
 			aria-label={appConfig.name}
 			onMouseDown={handleContainerMouseDown}

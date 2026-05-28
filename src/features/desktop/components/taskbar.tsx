@@ -49,7 +49,7 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): ReactTypes.JSXElement
 	// --- STYLES ---
 	const classes = {
 		button: cn(
-			"flex h-8 items-center gap-2 rounded px-3 text-sm transition-colors",
+			"flex h-8 cursor-pointer items-center gap-2 rounded px-3 text-sm transition-colors",
 			openedApp.isFocused
 				? "bg-white/20 text-white"
 				: "text-white/70 hover:bg-white/10 hover:text-white",

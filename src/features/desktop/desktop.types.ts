@@ -15,7 +15,7 @@ export type AppsRepository = Record<string, AppConfig>;
 export type OpenedApp = {
 	id: string;
 	appConfig: AppConfig;
-	status: "MAXIMIZED" | "MINIMIZED";
+	status: "MAXIMIZED" | "MINIMIZED" | "VISIBLE";
 	isFocused: boolean;
 	windowConfig: NonNullable<AppConfig["windowConfig"]>;
 };
