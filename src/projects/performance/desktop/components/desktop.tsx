@@ -3,7 +3,7 @@
 import cn from "@diegofrayo-pkg/cn";
 import type ReactTypes from "@diegofrayo-pkg/types/react";
 
-import { APPS_COMPONENTS } from "~/features/apps";
+import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
 import { useDesktop } from "../context/desktop.hook";

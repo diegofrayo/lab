@@ -1,12 +1,12 @@
 {
-	"name": "pow",
+	"name": "lab",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"===== SETUP =====": "",
 		"husky:install": "husky",
 		"===== DEV =====": "",
-		"dev": "portless --lan pow next dev",
+		"dev": "portless --lan lab next dev",
 		"build:ts": "tsc --noEmit",
 		"===== PROD =====": "",
 		"build": "next build",
