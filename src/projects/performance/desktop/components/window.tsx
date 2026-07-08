@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import type { CSSProperties, JSX } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
-import type ReactTypes from "@diegofrayo-pkg/types/react";
+import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
@@ -13,7 +13,7 @@ type WindowProps = {
 	children: ReactNode;
 };
 
-function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNullable {
+function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	// --- HOOKS ---
 	const { closeApp, minimizeApp, maximizeApp, focusApp, moveWindow } = useDesktop();
 
@@ -52,7 +52,7 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 	};
 
 	// --- HANDLERS ---
-	function handleTitleBarMouseDown(e: ReactTypes.Events.OnClickEvent<HTMLElement>): void {
+	function handleTitleBarMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
 		isDragging.current = true;
 		dragStart.current = {
 			mouseX: e.clientX,
@@ -67,23 +67,23 @@ function Window({ openedApp, children }: WindowProps): ReactTypes.JSXElementNull
 		focusApp(id);
 	}
 
-	function handleCloseClick(e: ReactTypes.Events.OnClickEvent<HTMLButtonElement>): void {
+	function handleCloseClick(e: React.MouseEvent<HTMLButtonElement>): void {
 		e.stopPropagation();
 		closeApp(id);
 	}
 
-	function handleMinimizeClick(e: ReactTypes.Events.OnClickEvent<HTMLButtonElement>): void {
+	function handleMinimizeClick(e: React.MouseEvent<HTMLButtonElement>): void {
 		e.stopPropagation();
 		minimizeApp(id);
 	}
 
-	function handleMaximizeClick(e: ReactTypes.Events.OnClickEvent<HTMLButtonElement>): void {
+	function handleMaximizeClick(e: React.MouseEvent<HTMLButtonElement>): void {
 		e.stopPropagation();
 		maximizeApp(id);
 	}
 
 	// --- UTILS ---
-	function getWindowStyles(): ReactTypes.Styles {
+	function getWindowStyles(): CSSProperties {
 		if (isMaximized) {
 			return {
 				left: 0,

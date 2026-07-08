@@ -1,12 +1,13 @@
 "use client";
 
-import cn from "@diegofrayo-pkg/cn";
-import type ReactTypes from "@diegofrayo-pkg/types/react";
+import type { JSX } from "react";
+
+import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 
-function Taskbar(): ReactTypes.JSXElement {
+function Taskbar(): JSX.Element {
 	// --- HOOKS ---
 	const { openedApps } = useDesktop();
 
@@ -42,7 +43,7 @@ type TaskbarButtonProps = {
 	openedApp: OpenedApp;
 };
 
-function TaskbarButton({ openedApp }: TaskbarButtonProps): ReactTypes.JSXElement {
+function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 	// --- HOOKS ---
 	const { minimizeApp, maximizeApp, focusApp } = useDesktop();
 

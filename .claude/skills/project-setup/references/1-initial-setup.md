@@ -11,7 +11,7 @@ Sets up the base project using TanStack Start with pnpm, Tailwind CSS, and core 
 - Install `react` and `react-dom` v19+. (Skip if it is already installed)
 - Install runtime dependencies:
   ```sh
-  pnpm i @base-ui/react class-variance-authority classnames lucide-react remeda tailwind-merge sonner
+  pnpm i @base-ui/react class-variance-authority cnfast lucide-react remeda
   ```
 - Install dev dependencies:
   ```sh
@@ -22,7 +22,7 @@ Sets up the base project using TanStack Start with pnpm, Tailwind CSS, and core 
   "===== SETUP =====": "",
   "husky:install": "husky",
   "===== DEV =====": "",
-  "dev": "portless <project-name> next dev",
+  "dev": "portless --lan <project-name> next dev",
   "build:ts": "tsc --noEmit",
   "===== PROD =====": "",
   "build": "next build",
@@ -33,25 +33,6 @@ Sets up the base project using TanStack Start with pnpm, Tailwind CSS, and core 
   ```
 - Create a `.gitignore` file. (Skip if it is already exists)
   ```
-  # --- Tan stack start project ---
-
-  # Dependencies
-  node_modules
-
-  # Build outputs
-  dist
-  .output
-  .vinxi
-
-  # Generated files
-  src/routeTree.gen.ts
-  .tanstack
-
-  # OS
-  .DS_Store
-
-  # --- Next.js project ---
-
   # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
   # dependencies

@@ -1,7 +1,8 @@
-import cn from "@diegofrayo-pkg/cn";
-import type ReactTypes from "@diegofrayo-pkg/types/react";
+import type { JSX } from "react";
 
-function LoginApp(): ReactTypes.JSXElement {
+import cn from "~/lib/cn";
+
+function LoginApp(): JSX.Element {
 	// --- STYLES ---
 	const classes = {
 		title: cn("text-2xl font-semibold text-gray-800"),

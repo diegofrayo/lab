@@ -1,8 +1,8 @@
 "use client";
 
-import cn from "@diegofrayo-pkg/cn";
-import type ReactTypes from "@diegofrayo-pkg/types/react";
+import type { JSX } from "react";
 
+import cn from "~/lib/cn";
 import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
@@ -11,7 +11,7 @@ import DesktopIcon from "./desktop-icon";
 import Taskbar from "./taskbar";
 import Window from "./window";
 
-function Desktop(): ReactTypes.JSXElement {
+function Desktop(): JSX.Element {
 	// --- HOOKS ---
 	const { openedApps } = useDesktop();
 

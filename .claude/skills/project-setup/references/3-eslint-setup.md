@@ -10,13 +10,14 @@ Installs ESLint and creates the flat config (`eslint.config.mts`) with JS, TS, R
   ```
 - Create `eslint.config.mts` at the project root:
   ```ts
+  import globals from "globals";
   import js from "@eslint/js";
+  import nextTs from "eslint-config-next/typescript";
+  import nextVitals from "eslint-config-next/core-web-vitals";
   import pluginReact from "eslint-plugin-react";
   import reactHooks from "eslint-plugin-react-hooks";
-  import { defineConfig, globalIgnores } from "eslint/config";
-  import globals from "globals";
   import tseslint from "typescript-eslint";
-
+  import { defineConfig, globalIgnores } from "eslint/config";
   import css from "@eslint/css";
 
   const JAVASCRIPT_CONFIG = {
@@ -64,10 +65,16 @@ Installs ESLint and creates the flat config (`eslint.config.mts`) with JS, TS, R
   };
 
   export default defineConfig([
+    ...nextVitals,
+    ...nextTs,
+
     JAVASCRIPT_CONFIG,
     TYPESCRIPT_CONFIG,
     CSS_CONFIG,
     REACT_CONFIG,
-    globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+
+	  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+
+    { settings: { react: { version: "19" } } },
   ]);
   ```

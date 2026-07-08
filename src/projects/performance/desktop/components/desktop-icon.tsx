@@ -1,7 +1,8 @@
 "use client";
 
-import cn from "@diegofrayo-pkg/cn";
-import type ReactTypes from "@diegofrayo-pkg/types/react";
+import type { JSX } from "react";
+
+import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { AppConfig } from "../desktop.types";
@@ -10,7 +11,7 @@ type DesktopIconProps = {
 	appConfig: AppConfig;
 };
 
-function DesktopIcon({ appConfig }: DesktopIconProps): ReactTypes.JSXElement {
+function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 	// --- HOOKS ---
 	const { openApp } = useDesktop();
 

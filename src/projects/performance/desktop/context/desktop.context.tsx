@@ -1,8 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useState, type ReactNode } from "react";
-
-import type ReactTypes from "@diegofrayo-pkg/types/react";
+import type { JSX } from "react";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
 import type { OpenedApp, OpenedApps } from "../desktop.types";
@@ -13,7 +12,7 @@ type DesktopProviderProps = {
 	children: ReactNode;
 };
 
-export function DesktopProvider({ children }: DesktopProviderProps): ReactTypes.JSXElement {
+export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element {
 	const [openedApps, setOpenedApps] = useState<OpenedApps>({});
 
 	const openApp = useCallback((targetAppId: string): void => {

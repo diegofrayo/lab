@@ -10,8 +10,6 @@ A React component should follow this structure and conventions:
 ```tsx
 import { useEffect, useRef, useState } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
-
 import {
 	Box,
 	Button,
@@ -76,8 +74,6 @@ function MyComponent({ viewMode, lang, onViewModeChange, onLangChange }: MyCompo
 
 - Include section comments like `// --- EFFECTS ---` and follow their order strictly
 - Omit sections that have no content — never leave an empty section
-- Use `cn` from `@diegofrayo-pkg/cn` for class name composition
-- Use primitive components from `~/components/primitive` instead of raw HTML elements. If a needed primitive is missing, flag it but use the raw element as fallback.
 - Use `type` instead of `interface` for props definitions
 - Handlers must start with `handle` and end with the event type: `handleDownloadClick`, `handleNameChange`
 - Always name the `useEffect` callback function: `useEffect(function myEffectName() { ... }, [])`
@@ -85,7 +81,27 @@ function MyComponent({ viewMode, lang, onViewModeChange, onLangChange }: MyCompo
 - Never use `cn(...)` directly inside a `className` prop — always define the value in `classes` and reference it: `className={classes.foo}`
 - Never pass inline functions as props (e.g. `onClick={() => doSomething()}`); always define them as named functions in `// --- HANDLERS ---` or `// --- UTILS ---` and reference them by name
 - If the JSX contains a ternary that renders two different elements (e.g. `flag ? <A /> : <B />`), extract it into its own component. Short-circuit expressions (`flag && <A />`) do not need extraction
-- Utility functions rule — if a helper function doesn't close over component state or refs, define it as a pure function outside the component (like the buildWhatsAppUrl style utils at the bottom of the file). If it does need component-scoped data, place it inside under // --- UTILS ---.
+- Extract complex JSX conditions into named boolean variables: Inline conditions with more than one clause are hard to scan. Extract them into a `const` with a name that describes what it means, not what it checks. Any short-circuit guard with two or more clauses must be extracted to a named const in `// --- COMPUTED STATES ---`. Single-clause guards (`{isLoading && <Spinner />}`) may stay inline.
+
+  **Before:**
+
+  ```tsx
+  {
+  	myArray.length > 0 && title !== undefined && <InlineText>Deck</InlineText>;
+  }
+  ```
+
+  **After:**
+
+  ```tsx
+  const hasDeckTitle = myArray.length > 0 && title !== undefined;
+
+  {
+  	hasDeckTitle && <InlineText>Deck</InlineText>;
+  }
+  ```
+
+- Utility functions rule — if a helper function doesn't close over component state or refs, define it as a pure function outside the component (like the buildWhatsAppUrl style utils at the bottom of the file). If it does need component-scoped data, place it inside under `// --- UTILS ---`.
 - Never attach `onClick` to a `<div>`. Use `<button>` or `<a>` instead. If a `<div>` is unavoidable, add `role="button"`, `tabIndex={0}`, and a `onKeyDown` handler to maintain accessibility.
 - In JSX short-circuit expressions, always guard with a real boolean — never rely on the truthiness of a non-boolean value. `{count && <X />}` renders `"0"` when `count` is `0`; use `{count > 0 && <X />}` or `{Boolean(count) && <X />}` instead.
 - All `useRef` calls must include an explicit type argument: `useRef<HTMLDivElement>(null)`, never `useRef(null)`.
@@ -98,6 +114,7 @@ function MyComponent({ viewMode, lang, onViewModeChange, onLangChange }: MyCompo
 - When creating a new Next.js page, split it into two folders: a thin **framework-attached** entry under `src/app/` and a **framework-agnostic** implementation under `src/features/pages/`. The rule below uses `my-page` as an example — replace it with the real page slug.
 
   **Folder structure:**
+
   ```
   src/app/my-page/
     page.tsx                        → framework-attached entry. Renders the page UI and is the ONLY place allowed to

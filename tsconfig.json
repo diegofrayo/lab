@@ -21,7 +21,6 @@
 
 		// Modules
 		"paths": {
-			"@diegofrayo-pkg/*": ["./src/lib/@diegofrayo-pkg/*"],
 			"~/*": ["./src/*"]
 		},
 		"module": "esnext",

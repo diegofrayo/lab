@@ -20,6 +20,7 @@
 		"@tailwindcss/postcss": "^4.3.0",
 		"class-variance-authority": "^0.7.1",
 		"classnames": "^2.5.1",
+		"cnfast": "^0.0.8",
 		"lucide-react": "^1.16.0",
 		"next": "^15.3.2",
 		"react": "^19.0.0",

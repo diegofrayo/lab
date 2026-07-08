@@ -6,7 +6,8 @@
       "Bash(pnpm i *)",
       "Bash(npm run *)",
       "Bash(pnpm build:ts)",
-      "Bash(pnpm lint *)"
+      "Bash(pnpm lint *)",
+      "Bash(npx tsc *)"
     ]
   }
 }

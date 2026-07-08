@@ -1,11 +1,9 @@
-import type { ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 import type { Metadata } from "next";
-
-import type ReactTypes from "@diegofrayo-pkg/types/react";
 
 import "./globals.css";
 
-export default function RootLayout({ children }: { children: ReactNode }): ReactTypes.JSXElement {
+export default function RootLayout({ children }: { children: ReactNode }): JSX.Element {
 	return (
 		<html lang="en">
 			<body>{children}</body>
