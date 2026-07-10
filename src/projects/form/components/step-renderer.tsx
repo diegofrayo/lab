@@ -5,13 +5,6 @@ import Step2 from "../steps/step-2";
 import Step3 from "../steps/step-3";
 import Step4 from "../steps/step-4";
 
-const STEPS: Record<number, FunctionComponent> = {
-	1: Step1,
-	2: Step2,
-	3: Step3,
-	4: Step4,
-};
-
 type StepRendererProps = {
 	step: number;
 };
@@ -27,3 +20,12 @@ function StepRenderer({ step }: StepRendererProps): JSX.Element | null {
 }
 
 export default StepRenderer;
+
+// --- CONSTANTS ---
+
+const STEPS: Record<number, FunctionComponent> = {
+	1: Step1,
+	2: Step2,
+	3: Step3,
+	4: Step4,
+};

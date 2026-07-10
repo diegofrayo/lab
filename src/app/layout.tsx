@@ -18,6 +18,5 @@ export default function RootLayout({ children }: { children: ReactNode }): JSX.E
 }
 
 export const metadata: Metadata = {
-	title: "pow",
-	description: "pow app",
+	title: "Lab",
 };
