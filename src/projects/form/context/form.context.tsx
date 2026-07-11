@@ -1,12 +1,10 @@
 "use client";
 
-import { createContext, useCallback, useState, type ReactNode } from "react";
+import { createContext, useMemo, type ReactNode } from "react";
 import type { Dispatch, JSX, SetStateAction } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 export const FormContext = createContext<FormContextValue | null>(null);
-
-const TOTAL_STEPS = 4;
 
 type FormProviderProps = {
 	children: ReactNode;
@@ -26,43 +24,32 @@ export function FormProvider({ children }: FormProviderProps): JSX.Element {
 	const [currentStep, setCurrentStep] = useLocalStorage<number>("current-step", 1, {
 		initializeWithValue: false,
 	});
-	const [isCurrentFormValid, setIsCurrentFormValid] = useState(false);
 
-	// --- HANDLERS ---
-	const updateFormValues: FormContextValue["updateFormValues"] = useCallback(
-		function updateFormValues(newValues) {
-			setFormValues((currentValues) => ({ ...currentValues, ...newValues }));
-		},
-		[setFormValues],
-	);
-
-	return (
-		<FormContext.Provider
-			value={{
+	// --- COMPUTED STATES ---
+	const providerValue = useMemo<FormContextValue>(
+		function buildProviderValue() {
+			return {
+				totalSteps: 4,
 				currentStep,
-				totalSteps: TOTAL_STEPS,
 				setCurrentStep,
-				isCurrentFormValid,
-				setIsCurrentFormValid,
 				formValues,
-				updateFormValues,
-			}}
-		>
-			{children}
-		</FormContext.Provider>
+				setFormValues,
+			};
+		},
+		[currentStep, formValues, setFormValues, setCurrentStep],
 	);
+
+	return <FormContext.Provider value={providerValue}>{children}</FormContext.Provider>;
 }
 
 // --- TYPES ---
 
 export type FormContextValue = {
-	currentStep: number;
 	totalSteps: number;
+	currentStep: number;
 	setCurrentStep: Dispatch<SetStateAction<number>>;
-	isCurrentFormValid: boolean;
-	setIsCurrentFormValid: Dispatch<SetStateAction<boolean>>;
 	formValues: FormValues;
-	updateFormValues: (newValues: Partial<FormValues>) => void;
+	setFormValues: Dispatch<SetStateAction<FormValues>>;
 };
 
 export type FormValues = {

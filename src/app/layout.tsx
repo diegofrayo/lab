@@ -19,4 +19,8 @@ export default function RootLayout({ children }: { children: ReactNode }): JSX.E
 
 export const metadata: Metadata = {
 	title: "Lab",
+	robots: {
+		index: false,
+		follow: false,
+	},
 };

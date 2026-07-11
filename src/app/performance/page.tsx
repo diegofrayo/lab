@@ -1,11 +1,5 @@
-import type { JSX } from "react";
+import type { Metadata } from "next";
 
-import { Desktop, DesktopProvider } from "~/projects/performance/desktop";
+export { default } from "~/projects/performance";
 
-export default function Page(): JSX.Element {
-	return (
-		<DesktopProvider>
-			<Desktop />
-		</DesktopProvider>
-	);
-}
+export const metadata: Metadata = { title: "Lab - Performance" };

@@ -7,7 +7,7 @@ import type { RegisterOptions } from "react-hook-form";
 import cn from "~/lib/cn";
 
 import FormNavigationButtons from "../components/form-navigation-buttons";
-import ErrorMessage from "../components/primitive/error-message";
+import InputErrorMessage from "../components/input-error-message";
 import Input from "../components/primitive/input";
 import Label from "../components/primitive/label";
 import { useFormNavigation } from "../hooks/use-form-navigation";
@@ -22,9 +22,11 @@ function Step1(): JSX.Element {
 		formState: { errors, touchedFields, validatingFields, isValid },
 	} = useForm<Step1FormValues>({
 		mode: "onTouched",
-		// `values` (unlike `defaultValues`, which is read only once on init) keeps
-		// the form in sync when the stored values arrive from localStorage after
-		// mount — otherwise the form would stay empty.
+		/*
+		 *`values` (unlike `defaultValues`, which is read only once on init) keeps
+		 * the form in sync when the stored values arrive from localStorage after
+		 * mount — otherwise the form would stay empty.
+		 */
 		values: {
 			name: formValues.name,
 			lastName: formValues.lastName,
@@ -63,6 +65,8 @@ function Step1(): JSX.Element {
 		goToNextStep();
 	}
 
+	console.log("current form", { isValid });
+
 	return (
 		<form
 			className={classes.form}
@@ -82,7 +86,7 @@ function Step1(): JSX.Element {
 					data-state={nameState}
 					{...register("name", validations.name)}
 				/>
-				{errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+				{errors.name && <InputErrorMessage>{errors.name.message}</InputErrorMessage>}
 			</div>
 
 			<div className={classes.field}>
@@ -98,7 +102,7 @@ function Step1(): JSX.Element {
 					data-state={lastNameState}
 					{...register("lastName", validations.lastName)}
 				/>
-				{errors.lastName && <ErrorMessage>{errors.lastName.message}</ErrorMessage>}
+				{errors.lastName && <InputErrorMessage>{errors.lastName.message}</InputErrorMessage>}
 			</div>
 
 			<div className={classes.field}>
@@ -124,7 +128,7 @@ function Step1(): JSX.Element {
 						/>
 					)}
 				</div>
-				{errors.username && <ErrorMessage>{errors.username.message}</ErrorMessage>}
+				{errors.username && <InputErrorMessage>{errors.username.message}</InputErrorMessage>}
 				{isUsernameValid && <span className={classes.success}>This username is available</span>}
 			</div>
 

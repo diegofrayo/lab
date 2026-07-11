@@ -13,7 +13,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 	// --- STYLES ---
 	const classes = {
 		button: cn(
-			"rounded-none border-2 border-black bg-white px-4 py-2 text-sm font-bold text-black uppercase transition-all outline-none",
+			"cursor-pointer rounded-none border-2 border-black bg-white px-4 py-2 text-sm font-bold text-black uppercase transition-all outline-none",
 			"shadow-[4px_4px_0_0_#000]",
 
 			// Nudge the button into its shadow on hover/focus so it looks "pressed".

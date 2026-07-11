@@ -5,7 +5,7 @@ import FormNavigationButtons from "../components/form-navigation-buttons";
 function Step2(): JSX.Element {
 	return (
 		<div>
-			<p>Step 2</p>
+			<p>Step 2 - Work in progress...</p>
 
 			<FormNavigationButtons isCurrentFormValid={false} />
 		</div>
