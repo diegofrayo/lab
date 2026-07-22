@@ -1,47 +1,47 @@
 "use client";
 
-import type { JSX } from "react";
+import { type JSX } from "react";
 import { useForm } from "react-hook-form";
 
 import Form from "../components/form";
 import Input from "../components/primitive/input";
 import Label from "../components/primitive/label";
 import { useFormNavigation } from "../context/form.hook";
+import { useClearForm } from "../hooks/use-clear-form";
+import { usePersistInput } from "../hooks/use-persist-input";
 import { asyncCheck } from "../utils/async-validation";
-import { getFieldStatus, toDataState } from "../utils/form";
-import { formSchema, validateField } from "../utils/schema";
-import type { Step1Values, StepFormReturn } from "../utils/types";
+import { formSchema, getFieldStatus, toDataState, validateField } from "../utils/form";
+import type { FormInputName, Step1Values, StepFormReturn } from "../utils/types";
 
 function Step1(): JSX.Element {
 	// --- HOOKS ---
 	const {
 		register,
-		watch,
+		formValues,
 		formState: { errors, dirtyFields, isValidating },
 		onSubmit,
 	} = useStep1Form();
 
 	// --- COMPUTED STATES ---
-	const values = watch();
 	const nameStatus = getFieldStatus({
 		hasError: Boolean(errors.name),
 		isTouched: Boolean(dirtyFields.name),
-		hasValue: Boolean(values.name),
+		hasValue: Boolean(formValues.name),
 	});
 	const emailStatus = getFieldStatus({
 		hasError: Boolean(errors.email),
 		isTouched: Boolean(dirtyFields.email),
-		hasValue: Boolean(values.email),
+		hasValue: Boolean(formValues.email),
 	});
 	const usernameStatus = getFieldStatus({
 		hasError: Boolean(errors.username),
 		isTouched: Boolean(dirtyFields.username),
-		hasValue: Boolean(values.username),
+		hasValue: Boolean(formValues.username),
 	});
 
 	return (
 		<Form onSubmit={onSubmit}>
-			<Form.Elements>
+			<Form.Body>
 				<Form.Field>
 					<Label
 						htmlFor="name"
@@ -93,7 +93,7 @@ function Step1(): JSX.Element {
 						{usernameStatus === "VALID" ? "Username available" : errors.username?.message}
 					</Form.FieldMessage>
 				</Form.Field>
-			</Form.Elements>
+			</Form.Body>
 
 			<Form.Navigation isNextButtonDisabled={isValidating} />
 		</Form>
@@ -105,23 +105,31 @@ export default Step1;
 // --- CONTROLLER ---
 
 function useStep1Form(): StepFormReturn<Step1Values> {
-	const { formValues, updateFormValues, goToNextStep } = useFormNavigation();
+	const FORM_INPUTS_NAME: FormInputName[] = ["name", "email", "username"];
 
+	// --- HOOKS ---
+	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const form = useForm<Step1Values>({
 		mode: "onChange",
-		defaultValues: {
-			name: formValues.name ?? "",
-			email: formValues.email ?? "",
-			username: formValues.username ?? "",
-		},
+		defaultValues: getDefaultValues(FORM_INPUTS_NAME),
 	});
 
+	// --- HANDLERS ---
 	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
 		goToNextStep();
 	});
 
-	return { ...form, onSubmit };
+	// --- COMPUTED STATES ---
+	const formValues = form.watch();
+
+	// --- EFFECTS ---
+	usePersistInput("name", formValues.name);
+	usePersistInput("email", formValues.email);
+	usePersistInput("username", formValues.username);
+	useClearForm(FORM_INPUTS_NAME);
+
+	return { ...form, formValues, onSubmit };
 }
 
 // --- VALIDATION RULES ---
@@ -135,27 +143,23 @@ const NAME_RULES = {
 const EMAIL_RULES = {
 	validate: {
 		schema: (value: string): true | string => validateField(formSchema.shape.email, value),
-		availability: validateEmailAvailability,
+		availability: (value: string): Promise<true | string> | true => {
+			if (!value) return true;
+
+			console.log("validateEmailAvailability", value);
+			return asyncCheck("email", value, "This email is already taken");
+		},
 	},
 };
 
 const USERNAME_RULES = {
 	validate: {
 		schema: (value: string): true | string => validateField(formSchema.shape.username, value),
-		availability: validateUsernameAvailability,
+		availability: (value: string): Promise<true | string> | true => {
+			if (!value) return true;
+
+			console.log("validateUsernameAvailability", value);
+			return asyncCheck("username", value, "This username is already taken");
+		},
 	},
 };
-
-// --- UTILS ---
-
-function validateEmailAvailability(value: string): Promise<true | string> | true {
-	if (!value) return true;
-	console.log("validateEmailAvailability");
-	return asyncCheck("email", value, "This email is already taken");
-}
-
-function validateUsernameAvailability(value: string): Promise<true | string> | true {
-	if (!value) return true;
-	console.log("validateUsernameAvailability");
-	return asyncCheck("username", value, "This username is already taken");
-}

@@ -17,17 +17,15 @@ export function asyncCheck(
 	value: string,
 	errorMessage = "This value is already taken",
 ): Promise<true | string> {
-	counter += 1;
-	const current = counter;
-
 	return new Promise((resolve) => {
 		let result: true | string;
 
 		if (cache[key] === undefined) cache[key] = {};
 
 		if (cache[key][value] === undefined) {
-			result = current % 2 === 0 ? true : errorMessage;
+			result = counter % 2 === 0 ? true : errorMessage;
 			cache[key][value] = result;
+			counter += 1;
 
 			setTimeout(() => resolve(result), SIMULATED_LATENCY_MS);
 		} else {

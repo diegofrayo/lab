@@ -28,7 +28,7 @@ function FormRoot({ className, children, ...props }: FormProps): JSX.Element {
 }
 
 const Form = Object.assign(FormRoot, {
-	Elements: FormElements,
+	Body: FormBody,
 	Field: FormField,
 	FieldMessage: FormFieldMessage,
 	Navigation: FormNavigation,
@@ -38,17 +38,17 @@ export default Form;
 
 // --- COMPONENTS ---
 
-type FormElementsProps = React.ComponentPropsWithoutRef<"div">;
+type FormBodyProps = React.ComponentPropsWithoutRef<"div">;
 
-function FormElements({ className, children, ...props }: FormElementsProps): JSX.Element {
+function FormBody({ className, children, ...props }: FormBodyProps): JSX.Element {
 	// --- STYLES ---
 	const classes = {
-		elements: cn("flex flex-col gap-5", className),
+		Body: cn("flex flex-col gap-5", className),
 	};
 
 	return (
 		<div
-			className={classes.elements}
+			className={classes.Body}
 			{...props}
 		>
 			{children}

@@ -8,7 +8,7 @@ import cn from "~/lib/cn";
 
 import Form from "../components/form";
 import { useFormNavigation } from "../context/form.hook";
-import { formSchema } from "../utils/schema";
+import { formSchema } from "../utils/form";
 import type { StepFormReturn } from "../utils/types";
 
 function Step4(): JSX.Element {
@@ -24,9 +24,9 @@ function Step4(): JSX.Element {
 
 	return (
 		<Form onSubmit={onSubmit}>
-			<Form.Elements>
+			<Form.Body>
 				<p className={classes.placeholder}>Step 4 — review &amp; submit</p>
-			</Form.Elements>
+			</Form.Body>
 			<Form.Navigation nextButtonLabel="Submit" />
 		</Form>
 	);
@@ -53,5 +53,5 @@ function useStep4Form(): StepFormReturn {
 		toast.error(message || "Please complete all fields correctly");
 	});
 
-	return { ...form, onSubmit };
+	return { ...form, formValues: {}, onSubmit };
 }

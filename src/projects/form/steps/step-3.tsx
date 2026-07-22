@@ -22,9 +22,9 @@ function Step3(): JSX.Element {
 
 	return (
 		<Form onSubmit={onSubmit}>
-			<Form.Elements>
+			<Form.Body>
 				<p className={classes.placeholder}>Step 3 — coming soon</p>
-			</Form.Elements>
+			</Form.Body>
 			<Form.Navigation />
 		</Form>
 	);
@@ -43,5 +43,5 @@ function useStep3Form(): StepFormReturn {
 		goToNextStep();
 	});
 
-	return { ...form, onSubmit };
+	return { ...form, formValues: {}, onSubmit };
 }

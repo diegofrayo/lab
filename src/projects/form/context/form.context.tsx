@@ -15,6 +15,7 @@ export type FormContextValue = {
 	updateFormValues: (partial: Partial<FormValues>) => void;
 	goToNextStep: () => void;
 	goToPreviousStep: () => void;
+	getDefaultValues: (keys: (keyof FormValues)[]) => Partial<FormValues>;
 };
 
 type FormProviderProps = {
@@ -52,6 +53,19 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 		[setCurrentStep],
 	);
 
+	const getDefaultValues = useCallback(function getDefaultValues(keys: (keyof FormValues)[]) {
+		const values = keys.reduce((result, key) => {
+			return {
+				...result,
+				[key]: window.localStorage.getItem(key) ?? formValues[key] ?? "",
+			};
+		}, {});
+
+		// console.log("Getting default values", values);
+
+		return values;
+	}, []);
+
 	// --- COMPUTED STATES ---
 	const value = useMemo<FormContextValue>(
 		() => ({
@@ -60,8 +74,9 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 			updateFormValues,
 			goToNextStep,
 			goToPreviousStep,
+			getDefaultValues,
 		}),
-		[formValues, currentStep, updateFormValues, goToNextStep, goToPreviousStep],
+		[formValues, currentStep, updateFormValues, goToNextStep, goToPreviousStep, getDefaultValues],
 	);
 
 	return <FormContext.Provider value={value}>{children}</FormContext.Provider>;
