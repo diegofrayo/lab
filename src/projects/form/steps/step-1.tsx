@@ -21,7 +21,7 @@ function Step1(): JSX.Element {
 		handleSubmit,
 		formState: { errors, touchedFields, validatingFields, isValid },
 	} = useForm<Step1FormValues>({
-		mode: "onTouched",
+		mode: "onBlur",
 		/*
 		 *`values` (unlike `defaultValues`, which is read only once on init) keeps
 		 * the form in sync when the stored values arrive from localStorage after
@@ -65,7 +65,7 @@ function Step1(): JSX.Element {
 		goToNextStep();
 	}
 
-	console.log("current form", { isValid });
+	// console.log("current form", { isValid });
 
 	return (
 		<form
@@ -86,7 +86,7 @@ function Step1(): JSX.Element {
 					data-state={nameState}
 					{...register("name", validations.name)}
 				/>
-				{errors.name && <InputErrorMessage>{errors.name.message}</InputErrorMessage>}
+				<InputErrorMessage>{errors.name?.message}</InputErrorMessage>
 			</div>
 
 			<div className={classes.field}>
@@ -102,7 +102,7 @@ function Step1(): JSX.Element {
 					data-state={lastNameState}
 					{...register("lastName", validations.lastName)}
 				/>
-				{errors.lastName && <InputErrorMessage>{errors.lastName.message}</InputErrorMessage>}
+				<InputErrorMessage>{errors.lastName?.message}</InputErrorMessage>
 			</div>
 
 			<div className={classes.field}>
@@ -128,7 +128,7 @@ function Step1(): JSX.Element {
 						/>
 					)}
 				</div>
-				{errors.username && <InputErrorMessage>{errors.username.message}</InputErrorMessage>}
+				<InputErrorMessage>{errors.username?.message}</InputErrorMessage>
 				{isUsernameValid && <span className={classes.success}>This username is available</span>}
 			</div>
 
@@ -181,8 +181,17 @@ function useStep1Validations(): Record<keyof Step1FormValues, RegisterOptions<St
 			// Async availability check, debounced so it only runs once the user
 			// pauses typing. RHF awaits the returned promise and surfaces the
 			// rejection message as the field error.
-			validate: async (): Promise<boolean> => {
-				return true;
+			validate: async (value): Promise<boolean | string> => {
+				try {
+					console.log("Validating username...", value);
+					await new Promise((resolve) => setTimeout(resolve, 1000));
+					await checkUsernameAvailability();
+					return true;
+				} catch (error) {
+					console.log(error);
+					return "Username is not available.";
+				}
+
 				// try {
 				// 	return true;
 				// 	console.log("username value", value);
@@ -201,7 +210,6 @@ function useStep1Validations(): Record<keyof Step1FormValues, RegisterOptions<St
 
 // --- UTILS ---
 
-/*
 // Cycles between resolve/reject on each invocation: 1st call succeeds, 2nd
 // fails, 3rd succeeds, and so on indefinitely. The counter lives at module
 // scope so the alternation persists across calls (and across re-renders).
@@ -210,6 +218,7 @@ let usernameCheckCount = 0;
 function checkUsernameAvailability(): Promise<boolean> {
 	usernameCheckCount += 1;
 	const isAvailable = usernameCheckCount % 2 === 1;
+	console.log({ isAvailable, usernameCheckCount });
 
 	return new Promise((resolve, reject) => {
 		if (isAvailable) {
@@ -219,4 +228,3 @@ function checkUsernameAvailability(): Promise<boolean> {
 		}
 	});
 }
-*/

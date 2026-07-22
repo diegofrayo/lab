@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import { Button as LibraryButton } from "@base-ui/react/button";
 
 import cn from "~/lib/cn";
 
@@ -26,7 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 	};
 
 	return (
-		<button
+		<LibraryButton
 			ref={ref}
 			type={type}
 			className={classes.button}

@@ -31,8 +31,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 			// tracks the field's state without the consumer passing extra classes.
 			"data-[state=valid]:border-green-600 data-[state=valid]:shadow-[4px_4px_0_0_var(--color-green-600)] data-[state=valid]:focus-visible:shadow-[2px_2px_0_0_var(--color-green-600)]",
 			"data-[state=invalid]:border-red-600 data-[state=invalid]:shadow-[4px_4px_0_0_var(--color-red-600)] data-[state=invalid]:focus-visible:shadow-[2px_2px_0_0_var(--color-red-600)]",
+
+			// Disabled state
 			"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none",
+
+			// Responsiveness styling
 			"md:text-sm",
+
 			className,
 		),
 	};

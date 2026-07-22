@@ -19,6 +19,7 @@ const Label = forwardRef<HTMLLabelElement, LabelProps>(function Label(
 			// consumer only needs to toggle a single prop.
 			"data-[state=valid]:text-green-600",
 			"data-[state=invalid]:text-red-600",
+
 			className,
 		),
 	};

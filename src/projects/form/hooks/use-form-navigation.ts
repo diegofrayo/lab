@@ -34,13 +34,13 @@ export function useFormNavigation(): UseFormNavigationReturn {
 		[setFormValues],
 	);
 
-	console.log("context", {
-		currentStep,
-		totalSteps,
-		formValues,
-		isLastStep,
-		isPreviousStepEnabled,
-	});
+	// console.log("context", {
+	// 	currentStep,
+	// 	totalSteps,
+	// 	formValues,
+	// 	isLastStep,
+	// 	isPreviousStepEnabled,
+	// });
 
 	return {
 		currentStep,

@@ -13,6 +13,8 @@ const InputErrorMessage = forwardRef<HTMLSpanElement, InputErrorMessageProps>(
 			InputErrorMessage: cn("text-sm text-red-600", className),
 		};
 
+		if (!props.children) return null;
+
 		return (
 			<span
 				ref={ref}
