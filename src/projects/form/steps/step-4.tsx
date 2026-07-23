@@ -8,7 +8,7 @@ import cn from "~/lib/cn";
 
 import Form from "../components/form";
 import { useFormNavigation } from "../context/form.hook";
-import { formSchema } from "../utils/form";
+import { fullFormSchema } from "../utils/form";
 import type { StepFormReturn } from "../utils/types";
 
 function Step4(): JSX.Element {
@@ -42,7 +42,7 @@ function useStep4Form(): StepFormReturn {
 	const form = useForm();
 
 	const onSubmit = form.handleSubmit(function handleFinalSubmit() {
-		const result = formSchema.safeParse(formValues);
+		const result = fullFormSchema.safeParse(formValues);
 
 		if (result.success) {
 			toast.success("Form submitted successfully!");

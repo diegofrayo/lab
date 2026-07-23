@@ -10,7 +10,7 @@ import Label from "../components/primitive/label";
 import Select from "../components/primitive/select";
 import type { SelectOption } from "../components/primitive/select";
 import { useFormNavigation } from "../context/form.hook";
-import { useClearForm } from "../hooks/use-clear-form";
+import { useFormSubmitted } from "../hooks/use-form-submitted";
 import { usePersistInput } from "../hooks/use-persist-input";
 import { formSchema, getFieldStatus, validateField } from "../utils/form";
 import type { FormInputName, Step2Values, StepFormReturn } from "../utils/types";
@@ -21,82 +21,80 @@ function Step2(): JSX.Element {
 		control,
 		formValues,
 		formState: { errors, touchedFields, dirtyFields },
-		departamentoOptions,
-		ciudadOptions,
-		handleDepartamentoChange,
+		stateOptions,
+		cityOptions,
+		handleStateChange,
 		onSubmit,
 	} = useStep2Form();
 
 	// --- COMPUTED STATES ---
-	const departamentoStatus = getFieldStatus({
-		hasError: Boolean(errors.departamento),
-		isTouched: Boolean(dirtyFields.departamento) || Boolean(touchedFields.departamento),
-		hasValue: Boolean(formValues.departamento),
+	const stateStatus = getFieldStatus({
+		hasError: Boolean(errors.state),
+		isTouched: Boolean(dirtyFields.state) || Boolean(touchedFields.state),
+		hasValue: Boolean(formValues.state),
 	});
-	const ciudadStatus = getFieldStatus({
-		hasError: Boolean(errors.ciudad),
-		isTouched: Boolean(dirtyFields.ciudad) || Boolean(touchedFields.ciudad),
-		hasValue: Boolean(formValues.ciudad),
+	const cityStatus = getFieldStatus({
+		hasError: Boolean(errors.city),
+		isTouched: Boolean(dirtyFields.city) || Boolean(touchedFields.city),
+		hasValue: Boolean(formValues.city),
 	});
-	const isCiudadDisabled = ciudadOptions.length === 0;
+	const isCityDisabled = cityOptions.length === 0;
 
 	return (
 		<Form onSubmit={onSubmit}>
 			<Form.Body>
 				<Form.Field>
 					<Label
-						htmlFor="departamento"
-						data-state={departamentoStatus}
+						htmlFor="state"
+						data-state={stateStatus}
 					>
-						Departamento
+						State
 					</Label>
 					<Controller
-						name="departamento"
+						name="state"
 						control={control}
-						rules={DEPARTAMENTO_RULES}
+						rules={STATE_RULES}
 						render={({ field }) => {
-							function handleDepartamentoValueChange(value: string | null): void {
+							function handleStateValueChange(value: string | null): void {
 								field.onChange(value);
-								handleDepartamentoChange(value);
+								handleStateChange(value);
 							}
 
 							return (
 								<Select
-									id="departamento"
-									data-state={departamentoStatus}
-									items={departamentoOptions}
-									placeholder="Select a departamento"
+									id="state"
+									data-state={stateStatus}
+									items={stateOptions}
+									placeholder="Select a state"
 									value={field.value || null}
 									ref={field.ref}
 									onBlur={field.onBlur}
-									onValueChange={handleDepartamentoValueChange}
+									onValueChange={handleStateValueChange}
 								/>
 							);
 						}}
 					/>
-					<Form.FieldMessage status={departamentoStatus}>
-						{errors.departamento?.message}
-					</Form.FieldMessage>
+					<Form.FieldMessage status={stateStatus}>{errors.state?.message}</Form.FieldMessage>
 				</Form.Field>
 
 				<Form.Field>
 					<Label
-						htmlFor="ciudad"
-						data-state={ciudadStatus}
+						htmlFor="city"
+						data-state={cityStatus}
 					>
-						Ciudad
+						City
 					</Label>
 					<Controller
-						name="ciudad"
+						name="city"
 						control={control}
-						rules={CIUDAD_RULES}
+						rules={CITY_RULES}
 						render={({ field }) => (
 							<Select
-								id="ciudad"
-								data-state={ciudadStatus}
-								items={ciudadOptions}
-								placeholder="Select a ciudad"
-								disabled={isCiudadDisabled}
+								id="city"
+								data-state={cityStatus}
+								items={cityOptions}
+								placeholder="Select a city"
+								disabled={isCityDisabled}
 								value={field.value || null}
 								ref={field.ref}
 								onBlur={field.onBlur}
@@ -104,7 +102,7 @@ function Step2(): JSX.Element {
 							/>
 						)}
 					/>
-					<Form.FieldMessage status={ciudadStatus}>{errors.ciudad?.message}</Form.FieldMessage>
+					<Form.FieldMessage status={cityStatus}>{errors.city?.message}</Form.FieldMessage>
 				</Form.Field>
 			</Form.Body>
 
@@ -119,16 +117,16 @@ export default Step2;
 
 type UseStep2FormReturn = StepFormReturn<Step2Values> & {
 	control: Control<Step2Values>;
-	departamentoOptions: SelectOption[];
-	ciudadOptions: SelectOption[];
-	handleDepartamentoChange: (departamentoId: string | null) => void;
+	stateOptions: SelectOption[];
+	cityOptions: SelectOption[];
+	handleStateChange: (stateId: string | null) => void;
 };
 
 function useStep2Form(): UseStep2FormReturn {
 	// --- HOOKS ---
-	const { departamentoOptions, getCiudadesOptions } = useColombiaLocations();
+	const { stateOptions, getCitiesOptions } = useColombiaLocations();
 	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
-	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["departamento", "ciudad"], []);
+	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["state", "city"], []);
 	const DEFAULT_VALUES = useMemo(() => getDefaultValues(FORM_INPUTS_NAME), [FORM_INPUTS_NAME]);
 	const form = useForm<Step2Values>({
 		mode: "onChange",
@@ -136,60 +134,59 @@ function useStep2Form(): UseStep2FormReturn {
 	});
 
 	// --- STATES & REFS ---
-	const [ciudadOptions, setCiudadOptions] = useState<SelectOption[]>([]);
+	const [cityOptions, setCityOptions] = useState<SelectOption[]>([]);
 
 	// --- HANDLERS ---
 	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
-		goToNextStep();
 	});
 
-	function handleDepartamentoChange(departamentoId: string | null): void {
-		form.setValue("ciudad", "", { shouldValidate: true, shouldDirty: true });
-		setCiudadOptions(departamentoId ? getCiudadesOptions(departamentoId) : []);
+	function handleStateChange(stateId: string | null): void {
+		form.setValue("city", "", { shouldValidate: true, shouldDirty: true });
+		setCityOptions(stateId ? getCitiesOptions(stateId) : []);
 	}
 
 	// --- COMPUTED STATES ---
 	const formValues = form.watch();
 
 	// --- EFFECTS ---
-	usePersistInput("departamento", formValues.departamento);
-	usePersistInput("ciudad", formValues.ciudad);
-	useClearForm(FORM_INPUTS_NAME);
+	usePersistInput("state", formValues.state);
+	usePersistInput("city", formValues.city);
+	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
 
 	useEffect(
-		function restoreCiudadOptions() {
-			const departamentoId = form.getValues("departamento");
+		function restoreCityOptions() {
+			const stateId = form.getValues("state");
 
-			if (!departamentoId) return;
+			if (!stateId) return;
 
-			setCiudadOptions(getCiudadesOptions(departamentoId));
+			setCityOptions(getCitiesOptions(stateId));
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[departamentoOptions],
+		[stateOptions],
 	);
 
 	return {
 		...form,
 		formValues,
 		onSubmit,
-		departamentoOptions,
-		ciudadOptions,
-		handleDepartamentoChange,
+		stateOptions,
+		cityOptions,
+		handleStateChange,
 	};
 }
 
 // --- VALIDATION RULES ---
 
-const DEPARTAMENTO_RULES = {
+const STATE_RULES = {
 	validate: {
-		schema: (value: string): string | true => validateField(formSchema.shape.departamento, value),
+		schema: (value: string): string | true => validateField(formSchema.shape.state, value),
 	},
 };
 
-const CIUDAD_RULES = {
+const CITY_RULES = {
 	validate: {
-		schema: (value: string): string | true => validateField(formSchema.shape.ciudad, value),
+		schema: (value: string): string | true => validateField(formSchema.shape.city, value),
 	},
 };
 
@@ -197,48 +194,48 @@ const CIUDAD_RULES = {
 
 const COLOMBIA_STORAGE_KEY = "data:colombia-locations";
 
-type ColombiaDepartamento = {
+type RawColombiaStateItem = {
 	id: number;
 	departamento: string;
 	ciudades: string[];
 };
 
 type UseColombiaLocationsReturn = {
-	departamentoOptions: SelectOption[];
-	getCiudadesOptions: (departamentoId: string) => SelectOption[];
+	stateOptions: SelectOption[];
+	getCitiesOptions: (stateId: string) => SelectOption[];
 };
 
 /**
- * Loads the Colombia departamentos/ciudades dataset once and caches it in
+ * Loads the Colombia states/cities dataset once and caches it in
  * `localStorage`. The dataset itself is never kept in memory (no state or
- * module-level variable holds the full array) — every ciudades lookup reads
+ * module-level variable holds the full array) — every cities lookup reads
  * it back from storage on demand, and the cache is cleared when step 2
  * unmounts.
  */
 function useColombiaLocations(): UseColombiaLocationsReturn {
 	// --- STATES & REFS ---
-	const [departamentoOptions, setDepartamentoOptions] = useState<SelectOption[]>([]);
+	const [stateOptions, setStateOptions] = useState<SelectOption[]>([]);
 
 	// --- UTILS ---
-	function getCiudadesOptions(departamentoId: string): SelectOption[] {
-		const departamentos = readColombiaDataFromStorage();
-		const departamento = departamentos.find((item) => String(item.id) === departamentoId);
+	function getCitiesOptions(stateId: string): SelectOption[] {
+		const states = readColombiaDataFromStorage();
+		const state = states.find((item) => String(item.id) === stateId);
 
-		return (departamento?.ciudades ?? []).map(toCiudadOption);
+		return (state?.ciudades ?? []).map(toCityOption);
 	}
 
-	async function loadDepartamentosData(): Promise<void> {
+	async function loadStatesData(): Promise<void> {
 		try {
-			const departamentos = await fetchColombiaData();
-			setDepartamentoOptions(departamentos.map(toDepartamentoOption));
+			const states = await fetchColombiaData();
+			setStateOptions(states.map(toStateOption));
 		} catch (error) {
 			toast.error("Something went wrong loading the items, please try again.");
 		}
 	}
 
 	// --- EFFECTS ---
-	useEffect(function loadDepartamentos() {
-		loadDepartamentosData(); // eslint-disable-line react-hooks/set-state-in-effect
+	useEffect(function loadStates() {
+		loadStatesData(); // eslint-disable-line react-hooks/set-state-in-effect
 	}, []);
 
 	useEffect(function clearColombiaStorageOnUnmount() {
@@ -247,10 +244,10 @@ function useColombiaLocations(): UseColombiaLocationsReturn {
 		};
 	}, []);
 
-	return { departamentoOptions, getCiudadesOptions };
+	return { stateOptions, getCitiesOptions };
 }
 
-async function fetchColombiaData(): Promise<ColombiaDepartamento[]> {
+async function fetchColombiaData(): Promise<RawColombiaStateItem[]> {
 	const cached = readColombiaDataFromStorage();
 
 	if (cached.length > 0) {
@@ -258,25 +255,25 @@ async function fetchColombiaData(): Promise<ColombiaDepartamento[]> {
 	}
 
 	const response = await fetch("/projects/form/json/colombia.min.json");
-	const departamentos = (await response.json()) as ColombiaDepartamento[];
+	const states = (await response.json()) as RawColombiaStateItem[];
 
-	window.localStorage.setItem(COLOMBIA_STORAGE_KEY, JSON.stringify(departamentos));
+	window.localStorage.setItem(COLOMBIA_STORAGE_KEY, JSON.stringify(states));
 
-	return departamentos;
+	return states;
 }
 
-function readColombiaDataFromStorage(): ColombiaDepartamento[] {
+function readColombiaDataFromStorage(): RawColombiaStateItem[] {
 	const raw = window.localStorage.getItem(COLOMBIA_STORAGE_KEY);
 
 	if (!raw) return [];
 
-	return JSON.parse(raw) as ColombiaDepartamento[];
+	return JSON.parse(raw) as RawColombiaStateItem[];
 }
 
-function toDepartamentoOption(departamento: ColombiaDepartamento): SelectOption {
-	return { label: departamento.departamento, value: String(departamento.id) };
+function toStateOption(state: RawColombiaStateItem): SelectOption {
+	return { label: state.departamento, value: String(state.id) };
 }
 
-function toCiudadOption(ciudad: string): SelectOption {
-	return { label: ciudad, value: ciudad };
+function toCityOption(city: string): SelectOption {
+	return { label: city, value: city };
 }

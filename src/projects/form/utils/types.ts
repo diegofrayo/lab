@@ -13,7 +13,10 @@ export type FormInputName = keyof FormValues;
 export type Step1Values = Pick<FormValues, "name" | "email" | "username">;
 
 /** The subset of values owned by step 2. */
-export type Step2Values = Pick<FormValues, "departamento" | "ciudad">;
+export type Step2Values = Pick<FormValues, "state" | "city">;
+
+/** The subset of values owned by step 3. */
+export type Step3Values = Pick<FormValues, "hasCollegeDegree" | "collegeName">;
 
 /** Total number of steps in the form. */
 export const TOTAL_STEPS = 4;

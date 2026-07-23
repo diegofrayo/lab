@@ -6,7 +6,7 @@ import cn from "~/lib/cn";
 
 import type { FieldStatus } from "../../utils/types";
 
-type LabelProps = React.ComponentPropsWithoutRef<"label"> & { "data-state": FieldStatus };
+type LabelProps = React.ComponentPropsWithoutRef<"label"> & { "data-state"?: FieldStatus };
 
 const Label = forwardRef<HTMLLabelElement, LabelProps>(function Label(
 	{ className, ...props },

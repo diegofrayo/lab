@@ -19,8 +19,36 @@ export const formSchema = z.object({
 		.min(3, "Username must be at least 3 characters")
 		.max(20, "Username must be at most 20 characters")
 		.regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, - and _"),
-	departamento: z.string().trim().min(1, "Departamento is required"),
-	ciudad: z.string().trim().min(1, "Ciudad is required"),
+	state: z.string().trim().min(1, "State is required"),
+	city: z.string().trim().min(1, "City is required"),
+	hasCollegeDegree: z.boolean(),
+	collegeName: z
+		.string()
+		.trim()
+		.min(1, "College name is required")
+		.max(60, "College name must be at most 60 characters"),
+});
+
+/**
+ * `formSchema` validates each field in isolation, so it can't express the
+ * "collegeName is required only when hasCollegeDegree is checked" rule
+ * (needed for the aggregate check in step 4). `superRefine` layers that
+ * cross-field rule on top without turning `formSchema` itself into a
+ * `ZodEffects`, which would break the `formSchema.shape.<field>` lookups
+ * other steps rely on for per-field validation.
+ */
+export const fullFormSchema = formSchema.superRefine((values, ctx) => {
+	if (values.hasCollegeDegree) {
+		const validationResult = validateField(formSchema.shape.collegeName, values.collegeName);
+
+		if (validationResult !== true) {
+			ctx.addIssue({
+				code: "custom",
+				message: validationResult,
+				path: ["collegeName"],
+			});
+		}
+	}
 });
 
 /**

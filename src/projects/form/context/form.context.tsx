@@ -6,7 +6,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { composeLocalStorageKeyForInput } from "../utils/form";
 import { TOTAL_STEPS } from "../utils/types";
-import type { FormValues, StepNumber } from "../utils/types";
+import type { FormInputName, FormValues, StepNumber } from "../utils/types";
 
 // --- TYPES ---
 
@@ -16,7 +16,7 @@ export type FormContextValue = {
 	updateFormValues: (partial: Partial<FormValues>) => void;
 	goToNextStep: () => void;
 	goToPreviousStep: () => void;
-	getDefaultValues: (keys: (keyof FormValues)[]) => Partial<FormValues>;
+	getDefaultValues: (keys: FormInputName[]) => Partial<FormValues>;
 };
 
 type FormProviderProps = {
@@ -57,16 +57,15 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 	const getDefaultValues = useCallback(
 		function getDefaultValues(keys: (keyof FormValues)[]) {
 			const values = keys.reduce((result, inputName) => {
+				const lsValue = parseLocalStorageValue(inputName);
+
 				return {
 					...result,
-					[inputName]:
-						(window.localStorage.getItem(composeLocalStorageKeyForInput(inputName)) ||
-							formValues[inputName]) ??
-						"",
+					[inputName]: lsValue ?? formValues[inputName] ?? "",
 				};
 			}, {});
 
-			console.log("Getting default values", values);
+			console.log("getDefaultValues:", values);
 
 			return values;
 		},
@@ -97,3 +96,14 @@ const STORAGE_KEYS = {
 	values: "form:values",
 	step: "form:step",
 };
+
+// --- UTILS ---
+
+function parseLocalStorageValue(inputName: FormInputName): string | boolean | null {
+	const rawValue = window.localStorage.getItem(composeLocalStorageKeyForInput(inputName));
+	if (rawValue === null) return rawValue;
+
+	const value = inputName === "hasCollegeDegree" ? rawValue === "true" : rawValue;
+
+	return value;
+}

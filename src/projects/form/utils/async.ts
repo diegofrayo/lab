@@ -23,7 +23,7 @@ export function asyncCheck(
 		if (cache[key] === undefined) cache[key] = {};
 
 		if (cache[key][value] === undefined) {
-			console.log("asyncCheck|fired", key, value);
+			console.log("asyncCheck|fired:", key, value);
 
 			result = counter % 2 === 0 ? true : errorMessage;
 			cache[key][value] = result;
@@ -31,7 +31,7 @@ export function asyncCheck(
 
 			setTimeout(() => resolve(result), SIMULATED_LATENCY_MS);
 		} else {
-			console.log("asyncCheck|cached", key, value);
+			console.log("asyncCheck|cached:", key, value);
 
 			result = cache[key][value];
 			resolve(result);

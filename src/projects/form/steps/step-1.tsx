@@ -7,7 +7,7 @@ import Form from "../components/form";
 import Input from "../components/primitive/input";
 import Label from "../components/primitive/label";
 import { useFormNavigation } from "../context/form.hook";
-import { useClearForm } from "../hooks/use-clear-form";
+import { useFormSubmitted } from "../hooks/use-form-submitted";
 import { usePersistInput } from "../hooks/use-persist-input";
 import { asyncCheck, debounce } from "../utils/async";
 import { formSchema, getFieldStatus, validateField } from "../utils/form";
@@ -126,7 +126,6 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 	// --- HANDLERS ---
 	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
-		goToNextStep();
 	});
 
 	// --- COMPUTED STATES ---
@@ -136,7 +135,7 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 	usePersistInput("name", formValues.name);
 	usePersistInput("email", formValues.email);
 	usePersistInput("username", formValues.username);
-	useClearForm(FORM_INPUTS_NAME);
+	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
 
 	return { ...form, formValues, onSubmit };
 }
