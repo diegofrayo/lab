@@ -3,6 +3,8 @@
 import { type JSX } from "react";
 import { useForm } from "react-hook-form";
 
+import cn from "~/lib/cn";
+
 import Form from "../components/form";
 import Input from "../components/primitive/input";
 import Label from "../components/primitive/label";
@@ -10,7 +12,7 @@ import { useFormNavigation } from "../context/form.hook";
 import { useClearForm } from "../hooks/use-clear-form";
 import { usePersistInput } from "../hooks/use-persist-input";
 import { asyncCheck } from "../utils/async-validation";
-import { formSchema, getFieldStatus, toDataState, validateField } from "../utils/form";
+import { formSchema, getFieldStatus, validateField } from "../utils/form";
 import type { FormInputName, Step1Values, StepFormReturn } from "../utils/types";
 
 function Step1(): JSX.Element {
@@ -18,26 +20,37 @@ function Step1(): JSX.Element {
 	const {
 		register,
 		formValues,
-		formState: { errors, dirtyFields, isValidating },
+		formState: { errors, isValidating, validatingFields, touchedFields, dirtyFields },
 		onSubmit,
 	} = useStep1Form();
 
 	// --- COMPUTED STATES ---
+	const isCheckingUsername = validatingFields.username;
+	const isCheckingEmail = validatingFields.email;
 	const nameStatus = getFieldStatus({
 		hasError: Boolean(errors.name),
-		isTouched: Boolean(dirtyFields.name),
+		isTouched: Boolean(touchedFields.name) || Boolean(dirtyFields.name),
 		hasValue: Boolean(formValues.name),
 	});
 	const emailStatus = getFieldStatus({
 		hasError: Boolean(errors.email),
-		isTouched: Boolean(dirtyFields.email),
+		isTouched: Boolean(touchedFields.email) || Boolean(dirtyFields.email),
 		hasValue: Boolean(formValues.email),
+		isValidating: isCheckingEmail,
 	});
 	const usernameStatus = getFieldStatus({
 		hasError: Boolean(errors.username),
-		isTouched: Boolean(dirtyFields.username),
+		isTouched: Boolean(touchedFields.username) || Boolean(dirtyFields.username),
 		hasValue: Boolean(formValues.username),
+		isValidating: isCheckingUsername,
 	});
+
+	// --- STYLES ---
+	const classes = {
+		spinner: cn(
+			"absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin rounded-full border-2 border-black border-t-transparent",
+		),
+	};
 
 	return (
 		<Form onSubmit={onSubmit}>
@@ -45,14 +58,14 @@ function Step1(): JSX.Element {
 				<Form.Field>
 					<Label
 						htmlFor="name"
-						data-state={toDataState(nameStatus)}
+						data-state={nameStatus}
 					>
 						Name
 					</Label>
 					<Input
 						id="name"
-						data-state={toDataState(nameStatus)}
-						aria-invalid={nameStatus === "INVALID"}
+						data-state={nameStatus}
+						aria-invalid={nameStatus === "invalid"}
 						{...register("name", NAME_RULES)}
 					/>
 					<Form.FieldMessage status={nameStatus}>{errors.name?.message}</Form.FieldMessage>
@@ -61,36 +74,55 @@ function Step1(): JSX.Element {
 				<Form.Field>
 					<Label
 						htmlFor="email"
-						data-state={toDataState(emailStatus)}
+						data-state={emailStatus}
 					>
 						Email
 					</Label>
-					<Input
-						id="email"
-						data-state={toDataState(emailStatus)}
-						aria-invalid={emailStatus === "INVALID"}
-						{...register("email", EMAIL_RULES)}
-					/>
+					<div className="relative">
+						<Input
+							id="email"
+							data-state={emailStatus}
+							aria-invalid={emailStatus === "invalid"}
+							{...register("email", EMAIL_RULES)}
+						/>
+						{isCheckingEmail && (
+							<span
+								className={classes.spinner}
+								role="status"
+								aria-label="Checking email availability"
+							/>
+						)}
+					</div>
 					<Form.FieldMessage status={emailStatus}>
-						{emailStatus === "VALID" ? "Email available" : errors.email?.message}
+						{emailStatus === "valid" ? "Email available" : errors.email?.message}
 					</Form.FieldMessage>
 				</Form.Field>
 
 				<Form.Field>
 					<Label
 						htmlFor="username"
-						data-state={toDataState(usernameStatus)}
+						data-state={usernameStatus}
 					>
 						Username
 					</Label>
-					<Input
-						id="username"
-						data-state={toDataState(usernameStatus)}
-						aria-invalid={usernameStatus === "INVALID"}
-						{...register("username", USERNAME_RULES)}
-					/>
+					<div className="relative">
+						<Input
+							id="username"
+							data-state={usernameStatus}
+							aria-invalid={usernameStatus === "invalid"}
+							{...register("username", USERNAME_RULES)}
+						/>
+						{isCheckingUsername && (
+							<span
+								className={classes.spinner}
+								role="status"
+								aria-label="Checking username availability"
+							/>
+						)}
+					</div>
+
 					<Form.FieldMessage status={usernameStatus}>
-						{usernameStatus === "VALID" ? "Username available" : errors.username?.message}
+						{usernameStatus === "valid" ? "Username available" : errors.username?.message}
 					</Form.FieldMessage>
 				</Form.Field>
 			</Form.Body>
@@ -146,7 +178,6 @@ const EMAIL_RULES = {
 		availability: (value: string): Promise<true | string> | true => {
 			if (!value) return true;
 
-			console.log("validateEmailAvailability", value);
 			return asyncCheck("email", value, "This email is already taken");
 		},
 	},
@@ -158,7 +189,6 @@ const USERNAME_RULES = {
 		availability: (value: string): Promise<true | string> | true => {
 			if (!value) return true;
 
-			console.log("validateUsernameAvailability", value);
 			return asyncCheck("username", value, "This username is already taken");
 		},
 	},

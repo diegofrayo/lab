@@ -27,4 +27,4 @@ export type StepFormReturn<T extends FieldValues = FieldValues> = UseFormReturn<
 	formValues: T;
 };
 
-export type FieldStatus = "NEUTRAL" | "VALID" | "INVALID";
+export type FieldStatus = "neutral" | "valid" | "invalid";

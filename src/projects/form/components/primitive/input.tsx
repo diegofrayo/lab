@@ -5,7 +5,9 @@ import { Input as BaseInput } from "@base-ui/react/input";
 
 import cn from "~/lib/cn";
 
-type InputProps = BaseInput.Props;
+import type { FieldStatus } from "../../utils/types";
+
+type InputProps = BaseInput.Props & { "data-state": FieldStatus };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 	{ className, ...props },

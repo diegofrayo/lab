@@ -88,12 +88,12 @@ function FormFieldMessage({
 	const classes = {
 		message: cn(
 			"text-sm font-bold",
-			{ "text-green-600": status === "VALID", "text-red-600": status === "INVALID" },
+			{ "text-green-600": status === "valid", "text-red-600": status === "invalid" },
 			className,
 		),
 	};
 
-	if (!children || status === "NEUTRAL") return null;
+	if (!children || status === "neutral") return null;
 
 	return (
 		<span
