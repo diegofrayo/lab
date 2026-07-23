@@ -19,6 +19,8 @@ export const formSchema = z.object({
 		.min(3, "Username must be at least 3 characters")
 		.max(20, "Username must be at most 20 characters")
 		.regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, - and _"),
+	departamento: z.string().trim().min(1, "Departamento is required"),
+	ciudad: z.string().trim().min(1, "Ciudad is required"),
 });
 
 /**
@@ -34,10 +36,10 @@ export function getFieldStatus({
 	hasError: boolean;
 	isTouched: boolean;
 	hasValue: boolean;
-	isValidating?: boolean | undefined;
+	isValidating?: boolean;
 }): FieldStatus {
 	if (hasError) return "invalid";
-	if (isTouched && hasValue && isValidating !== true) return "valid";
+	if (isTouched && hasValue && !isValidating) return "valid";
 	return "neutral";
 }
 
@@ -50,4 +52,8 @@ export function getFieldStatus({
 export function validateField(fieldSchema: z.ZodType, value: unknown): true | string {
 	const result = fieldSchema.safeParse(value);
 	return result.success ? true : (result.error.issues[0]?.message ?? "Invalid value");
+}
+
+export function composeLocalStorageKeyForInput(inputName: string): string {
+	return `input:${inputName}`;
 }

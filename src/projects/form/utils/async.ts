@@ -38,3 +38,20 @@ export function asyncCheck(
 		}
 	});
 }
+
+export function debounce<Args extends unknown[], Return>(
+	func: (...args: Args) => Return,
+	delay: number,
+): (...args: Args) => Promise<Return> {
+	let timer: ReturnType<typeof setTimeout>;
+
+	return function (this: unknown, ...args: Args) {
+		clearTimeout(timer);
+
+		return new Promise((resolve) => {
+			timer = setTimeout(() => {
+				resolve(func.apply(this, args));
+			}, delay);
+		});
+	};
+}

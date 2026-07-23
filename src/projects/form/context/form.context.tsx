@@ -4,6 +4,7 @@ import { createContext, useCallback, useMemo } from "react";
 import type { JSX, ReactNode } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
+import { composeLocalStorageKeyForInput } from "../utils/form";
 import { TOTAL_STEPS } from "../utils/types";
 import type { FormValues, StepNumber } from "../utils/types";
 
@@ -53,18 +54,24 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 		[setCurrentStep],
 	);
 
-	const getDefaultValues = useCallback(function getDefaultValues(keys: (keyof FormValues)[]) {
-		const values = keys.reduce((result, key) => {
-			return {
-				...result,
-				[key]: window.localStorage.getItem(key) ?? formValues[key] ?? "",
-			};
-		}, {});
+	const getDefaultValues = useCallback(
+		function getDefaultValues(keys: (keyof FormValues)[]) {
+			const values = keys.reduce((result, inputName) => {
+				return {
+					...result,
+					[inputName]:
+						(window.localStorage.getItem(composeLocalStorageKeyForInput(inputName)) ||
+							formValues[inputName]) ??
+						"",
+				};
+			}, {});
 
-		// console.log("Getting default values", values);
+			console.log("Getting default values", values);
 
-		return values;
-	}, []);
+			return values;
+		},
+		[formValues],
+	);
 
 	// --- COMPUTED STATES ---
 	const value = useMemo<FormContextValue>(

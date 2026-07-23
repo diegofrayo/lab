@@ -1,6 +1,6 @@
 "use client";
 
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 
 import cn from "~/lib/cn";
 
@@ -32,6 +32,7 @@ const Form = Object.assign(FormRoot, {
 	Field: FormField,
 	FieldMessage: FormFieldMessage,
 	Navigation: FormNavigation,
+	FieldWithLoader: FieldWithLoader,
 });
 
 export default Form;
@@ -145,6 +146,26 @@ function FormNavigation({
 			>
 				{nextButtonLabel}
 			</Button>
+		</div>
+	);
+}
+
+type FieldWithLoaderProps = {
+	children: ReactNode;
+	isLoading: boolean;
+};
+
+function FieldWithLoader({ isLoading, children }: FieldWithLoaderProps): JSX.Element {
+	return (
+		<div className="relative">
+			{children}
+			{isLoading && (
+				<span
+					className="absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin rounded-full border-2 border-black border-t-transparent"
+					role="status"
+					aria-label="Checking email availability"
+				/>
+			)}
 		</div>
 	);
 }

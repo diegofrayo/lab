@@ -1,9 +1,7 @@
 "use client";
 
-import { type JSX } from "react";
+import { useMemo, type JSX } from "react";
 import { useForm } from "react-hook-form";
-
-import cn from "~/lib/cn";
 
 import Form from "../components/form";
 import Input from "../components/primitive/input";
@@ -11,7 +9,7 @@ import Label from "../components/primitive/label";
 import { useFormNavigation } from "../context/form.hook";
 import { useClearForm } from "../hooks/use-clear-form";
 import { usePersistInput } from "../hooks/use-persist-input";
-import { asyncCheck } from "../utils/async-validation";
+import { asyncCheck, debounce } from "../utils/async";
 import { formSchema, getFieldStatus, validateField } from "../utils/form";
 import type { FormInputName, Step1Values, StepFormReturn } from "../utils/types";
 
@@ -25,32 +23,25 @@ function Step1(): JSX.Element {
 	} = useStep1Form();
 
 	// --- COMPUTED STATES ---
-	const isCheckingUsername = validatingFields.username;
-	const isCheckingEmail = validatingFields.email;
+	const isCheckingUsername = Boolean(validatingFields.username);
+	const isCheckingEmail = Boolean(validatingFields.email);
 	const nameStatus = getFieldStatus({
 		hasError: Boolean(errors.name),
-		isTouched: Boolean(touchedFields.name) || Boolean(dirtyFields.name),
+		isTouched: Boolean(dirtyFields.name) || Boolean(touchedFields.name),
 		hasValue: Boolean(formValues.name),
 	});
 	const emailStatus = getFieldStatus({
 		hasError: Boolean(errors.email),
-		isTouched: Boolean(touchedFields.email) || Boolean(dirtyFields.email),
+		isTouched: Boolean(dirtyFields.email) || Boolean(touchedFields.email),
 		hasValue: Boolean(formValues.email),
 		isValidating: isCheckingEmail,
 	});
 	const usernameStatus = getFieldStatus({
 		hasError: Boolean(errors.username),
-		isTouched: Boolean(touchedFields.username) || Boolean(dirtyFields.username),
+		isTouched: Boolean(dirtyFields.username) || Boolean(touchedFields.username),
 		hasValue: Boolean(formValues.username),
 		isValidating: isCheckingUsername,
 	});
-
-	// --- STYLES ---
-	const classes = {
-		spinner: cn(
-			"absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin rounded-full border-2 border-black border-t-transparent",
-		),
-	};
 
 	return (
 		<Form onSubmit={onSubmit}>
@@ -78,21 +69,14 @@ function Step1(): JSX.Element {
 					>
 						Email
 					</Label>
-					<div className="relative">
+					<Form.FieldWithLoader isLoading={isCheckingEmail}>
 						<Input
 							id="email"
 							data-state={emailStatus}
 							aria-invalid={emailStatus === "invalid"}
 							{...register("email", EMAIL_RULES)}
 						/>
-						{isCheckingEmail && (
-							<span
-								className={classes.spinner}
-								role="status"
-								aria-label="Checking email availability"
-							/>
-						)}
-					</div>
+					</Form.FieldWithLoader>
 					<Form.FieldMessage status={emailStatus}>
 						{emailStatus === "valid" ? "Email available" : errors.email?.message}
 					</Form.FieldMessage>
@@ -105,21 +89,14 @@ function Step1(): JSX.Element {
 					>
 						Username
 					</Label>
-					<div className="relative">
+					<Form.FieldWithLoader isLoading={isCheckingUsername}>
 						<Input
 							id="username"
 							data-state={usernameStatus}
 							aria-invalid={usernameStatus === "invalid"}
 							{...register("username", USERNAME_RULES)}
 						/>
-						{isCheckingUsername && (
-							<span
-								className={classes.spinner}
-								role="status"
-								aria-label="Checking username availability"
-							/>
-						)}
-					</div>
+					</Form.FieldWithLoader>
 
 					<Form.FieldMessage status={usernameStatus}>
 						{usernameStatus === "valid" ? "Username available" : errors.username?.message}
@@ -137,13 +114,13 @@ export default Step1;
 // --- CONTROLLER ---
 
 function useStep1Form(): StepFormReturn<Step1Values> {
-	const FORM_INPUTS_NAME: FormInputName[] = ["name", "email", "username"];
-
 	// --- HOOKS ---
 	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["name", "email", "username"], []);
+	const DEFAULT_VALUES = useMemo(() => getDefaultValues(FORM_INPUTS_NAME), [FORM_INPUTS_NAME]);
 	const form = useForm<Step1Values>({
 		mode: "onChange",
-		defaultValues: getDefaultValues(FORM_INPUTS_NAME),
+		defaultValues: DEFAULT_VALUES,
 	});
 
 	// --- HANDLERS ---
@@ -168,28 +145,36 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 
 const NAME_RULES = {
 	validate: {
-		schema: (value: string): true | string => validateField(formSchema.shape.name, value),
+		schema: (value: string): string | true => validateField(formSchema.shape.name, value),
 	},
 };
 
 const EMAIL_RULES = {
 	validate: {
-		schema: (value: string): true | string => validateField(formSchema.shape.email, value),
-		availability: (value: string): Promise<true | string> | true => {
-			if (!value) return true;
-
-			return asyncCheck("email", value, "This email is already taken");
+		schema: (value: string): string | true => validateField(formSchema.shape.email, value),
+		availability: async (value: string): Promise<true | string> => {
+			return await checkEmailAvailability(value);
 		},
 	},
 };
 
 const USERNAME_RULES = {
 	validate: {
-		schema: (value: string): true | string => validateField(formSchema.shape.username, value),
-		availability: (value: string): Promise<true | string> | true => {
-			if (!value) return true;
-
-			return asyncCheck("username", value, "This username is already taken");
+		schema: (value: string): string | true => validateField(formSchema.shape.username, value),
+		availability: async (value: string): Promise<true | string> => {
+			return await checkUsernameAvailability(value);
 		},
 	},
 };
+
+const checkEmailAvailability = debounce((value: string): Promise<true | string> | true => {
+	if (!value) return true;
+
+	return asyncCheck("email", value, "This email is already taken");
+}, 500);
+
+const checkUsernameAvailability = debounce((value: string): Promise<true | string> | true => {
+	if (!value) return true;
+
+	return asyncCheck("username", value, "This username is already taken");
+}, 500);
