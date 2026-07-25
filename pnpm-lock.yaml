@@ -38,9 +38,6 @@ importers:
       react-hook-form:
         specifier: ^7.81.0
         version: 7.81.0(react@19.2.6)
-      remeda:
-        specifier: ^2.36.0
-        version: 2.36.0
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1820,9 +1817,6 @@ packages:
   regexp.prototype.flags@1.5.4:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
-
-  remeda@2.36.0:
-    resolution: {integrity: sha512-1xbb+9V0ENodsrMdXZAX1M/m5aK+RkqEEypaSbzvUAGFrDq88WpxVf+FlPKHpRCs/qR92bsgpIAzKbH518uNvA==}
 
   reselect@5.2.0:
     resolution: {integrity: sha512-AgZ3UOZm3YndfrJ4OYjgrT7bmCm/1iqkjvEfH/oYjzh6PD2qw4QuT3jjnXIrpdt4MTpMXclMT3lXbmRY+XRakw==}
@@ -3778,8 +3772,6 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       set-function-name: 2.0.2
-
-  remeda@2.36.0: {}
 
   reselect@5.2.0: {}
 
