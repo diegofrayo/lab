@@ -18,11 +18,14 @@ export type Step2Values = Pick<FormValues, "state" | "city">;
 /** The subset of values owned by step 3. */
 export type Step3Values = Pick<FormValues, "hasCollegeDegree" | "collegeName">;
 
+/** The subset of values owned by step 4. */
+export type Step4Values = Pick<FormValues, "startDate" | "stillStudying" | "endDate">;
+
 /** Total number of steps in the form. */
-export const TOTAL_STEPS = 4;
+export const TOTAL_STEPS = 5;
 
 /** A valid step index (1-based). */
-export type StepNumber = 1 | 2 | 3 | 4;
+export type StepNumber = 1 | 2 | 3 | 4 | 5;
 
 /**
  * What every `useStep<n>Form` hook returns: the react-hook-form instance plus a

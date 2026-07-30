@@ -2,7 +2,7 @@
 
 import { useMemo, type JSX } from "react";
 import { Controller, useForm } from "react-hook-form";
-import type { Control } from "react-hook-form";
+import type { Control, RegisterOptions } from "react-hook-form";
 
 import Form from "../components/form";
 import Checkbox from "../components/primitive/checkbox";
@@ -11,7 +11,12 @@ import Label from "../components/primitive/label";
 import { useFormNavigation } from "../context/form.hook";
 import { useFormSubmitted } from "../hooks/use-form-submitted";
 import { usePersistInput } from "../hooks/use-persist-input";
-import { formSchema, getFieldStatus, validateField } from "../utils/form";
+import {
+	createValidateInputSchemaFunction,
+	CustomValidations,
+	formSchema,
+	getFieldStatus,
+} from "../utils/form";
 import type { FormInputName, Step3Values, StepFormReturn } from "../utils/types";
 
 function Step3(): JSX.Element {
@@ -40,6 +45,7 @@ function Step3(): JSX.Element {
 					<Controller
 						name="hasCollegeDegree"
 						control={control}
+						rules={ValidationRules.hasCollegeDegree}
 						render={({ field }) => {
 							function handleCheckedChange(checked: boolean): void {
 								field.onChange(checked);
@@ -76,7 +82,7 @@ function Step3(): JSX.Element {
 							id="collegeName"
 							data-state={collegeNameStatus}
 							aria-invalid={collegeNameStatus === "invalid"}
-							{...register("collegeName", COLLEGE_NAME_RULES)}
+							{...register("collegeName", ValidationRules.collegeName)}
 						/>
 						<Form.FieldMessage status={collegeNameStatus}>
 							{errors.collegeName?.message}
@@ -127,8 +133,8 @@ function useStep3Form(): UseStep3FormReturn {
 	const formValues = form.watch();
 
 	// --- EFFECTS ---
-	usePersistInput("hasCollegeDegree", String(formValues.hasCollegeDegree));
-	usePersistInput("collegeName", formValues.collegeName ?? "");
+	usePersistInput("hasCollegeDegree", formValues.hasCollegeDegree);
+	usePersistInput("collegeName", formValues.collegeName);
 	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
 
 	return { ...form, formValues, onSubmit, handleHasCollegeDegreeChange };
@@ -136,12 +142,18 @@ function useStep3Form(): UseStep3FormReturn {
 
 // --- VALIDATION RULES ---
 
-const COLLEGE_NAME_RULES = {
-	validate: {
-		schema: (value: string | undefined, formValues: Step3Values): string | true => {
-			return formValues.hasCollegeDegree
-				? validateField(formSchema.shape.collegeName, value)
-				: true;
+const ValidationRules: {
+	hasCollegeDegree: RegisterOptions<Step3Values, "hasCollegeDegree">;
+	collegeName: RegisterOptions<Step3Values, "collegeName">;
+} = {
+	hasCollegeDegree: {
+		validate: {
+			schema: createValidateInputSchemaFunction<boolean>(formSchema.shape.hasCollegeDegree),
+		},
+	},
+	collegeName: {
+		validate: {
+			schema: CustomValidations.step3.collegeName,
 		},
 	},
 };

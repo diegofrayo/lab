@@ -17,6 +17,7 @@ export type FormContextValue = {
 	goToNextStep: () => void;
 	goToPreviousStep: () => void;
 	getDefaultValues: (keys: FormInputName[]) => Partial<FormValues>;
+	resetForm: () => void;
 };
 
 type FormProviderProps = {
@@ -61,7 +62,7 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 
 				return {
 					...result,
-					[inputName]: lsValue ?? formValues[inputName] ?? "",
+					[inputName]: lsValue ?? formValues[inputName] ?? DEFAULT_VALUES[inputName],
 				};
 			}, {});
 
@@ -72,6 +73,15 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 		[formValues],
 	);
 
+	const resetForm = useCallback(function resetForm() {
+		Object.keys(DEFAULT_VALUES).forEach((inputName) => {
+			window.localStorage.removeItem(composeLocalStorageKeyForInput(inputName));
+		});
+		window.localStorage.removeItem(STORAGE_KEYS.values);
+		window.localStorage.removeItem(STORAGE_KEYS.step);
+		window.location.reload();
+	}, []);
+
 	// --- COMPUTED STATES ---
 	const value = useMemo<FormContextValue>(
 		() => ({
@@ -81,8 +91,17 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 			goToNextStep,
 			goToPreviousStep,
 			getDefaultValues,
+			resetForm,
 		}),
-		[formValues, currentStep, updateFormValues, goToNextStep, goToPreviousStep, getDefaultValues],
+		[
+			formValues,
+			currentStep,
+			updateFormValues,
+			goToNextStep,
+			goToPreviousStep,
+			getDefaultValues,
+			resetForm,
+		],
 	);
 
 	return <FormContext.Provider value={value}>{children}</FormContext.Provider>;
@@ -97,13 +116,27 @@ const STORAGE_KEYS = {
 	step: "form:step",
 };
 
+const DEFAULT_VALUES = {
+	name: "",
+	email: "",
+	username: "",
+	state: "",
+	city: "",
+	hasCollegeDegree: false,
+	collegeName: "",
+	startDate: "",
+	stillStudying: undefined,
+	endDate: "",
+};
+
 // --- UTILS ---
 
 function parseLocalStorageValue(inputName: FormInputName): string | boolean | null {
 	const rawValue = window.localStorage.getItem(composeLocalStorageKeyForInput(inputName));
 	if (rawValue === null) return rawValue;
 
-	const value = inputName === "hasCollegeDegree" ? rawValue === "true" : rawValue;
+	const BOOLEAN_FIELD_NAMES: FormInputName[] = ["hasCollegeDegree", "stillStudying"];
+	const value = BOOLEAN_FIELD_NAMES.includes(inputName) ? rawValue === "true" : rawValue;
 
 	return value;
 }

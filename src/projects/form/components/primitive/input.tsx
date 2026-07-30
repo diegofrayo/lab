@@ -40,6 +40,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 			// Responsiveness styling
 			"md:text-sm",
 
+			{ "inline-block": props.type?.toLowerCase() === "date" },
+
 			className,
 		),
 	};

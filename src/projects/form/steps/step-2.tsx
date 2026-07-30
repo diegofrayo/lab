@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type JSX } from "react";
 import { Controller, useForm } from "react-hook-form";
-import type { Control } from "react-hook-form";
+import type { Control, RegisterOptions } from "react-hook-form";
 import { toast } from "sonner";
 
 import Form from "../components/form";
@@ -12,7 +12,7 @@ import type { SelectOption } from "../components/primitive/select";
 import { useFormNavigation } from "../context/form.hook";
 import { useFormSubmitted } from "../hooks/use-form-submitted";
 import { usePersistInput } from "../hooks/use-persist-input";
-import { formSchema, getFieldStatus, validateField } from "../utils/form";
+import { createValidateInputSchemaFunction, formSchema, getFieldStatus } from "../utils/form";
 import type { FormInputName, Step2Values, StepFormReturn } from "../utils/types";
 
 function Step2(): JSX.Element {
@@ -53,7 +53,7 @@ function Step2(): JSX.Element {
 					<Controller
 						name="state"
 						control={control}
-						rules={STATE_RULES}
+						rules={ValidationRules.state}
 						render={({ field }) => {
 							function handleStateValueChange(value: string | null): void {
 								field.onChange(value);
@@ -87,7 +87,7 @@ function Step2(): JSX.Element {
 					<Controller
 						name="city"
 						control={control}
-						rules={CITY_RULES}
+						rules={ValidationRules.city}
 						render={({ field }) => (
 							<Select
 								id="city"
@@ -178,15 +178,19 @@ function useStep2Form(): UseStep2FormReturn {
 
 // --- VALIDATION RULES ---
 
-const STATE_RULES = {
-	validate: {
-		schema: (value: string): string | true => validateField(formSchema.shape.state, value),
+const ValidationRules: {
+	state: RegisterOptions<Step2Values, "state">;
+	city: RegisterOptions<Step2Values, "city">;
+} = {
+	state: {
+		validate: {
+			schema: createValidateInputSchemaFunction(formSchema.shape.state),
+		},
 	},
-};
-
-const CITY_RULES = {
-	validate: {
-		schema: (value: string): string | true => validateField(formSchema.shape.city, value),
+	city: {
+		validate: {
+			schema: createValidateInputSchemaFunction(formSchema.shape.city),
+		},
 	},
 };
 

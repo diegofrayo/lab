@@ -1,6 +1,43 @@
-import { z } from "zod";
+import { z, type ZodSafeParseResult } from "zod";
 
-import type { FieldStatus } from "./types";
+import type { FieldStatus, FormInputName, FormValues, Step3Values, Step4Values } from "./types";
+
+const VALID_INPUT = true;
+type VALID_INPUT = true;
+type ERROR_MESSAGE = string;
+
+export const CustomValidations = {
+	step3: {
+		collegeName: (
+			collegeName: string | undefined,
+			formValues: Step3Values,
+		): ERROR_MESSAGE | VALID_INPUT => {
+			if (!formValues.hasCollegeDegree) return VALID_INPUT;
+
+			return validateField(formSchema.shape.collegeName, collegeName);
+		},
+	},
+	step4: {
+		endDate: (
+			endDate: string | undefined,
+			formValues: Step4Values,
+		): ERROR_MESSAGE | VALID_INPUT => {
+			if (formValues.stillStudying) return VALID_INPUT;
+
+			const validationResult = validateField(formSchema.shape.endDate, endDate);
+
+			if (validationResult !== VALID_INPUT) {
+				return validationResult;
+			}
+
+			if (formValues.startDate && endDate && endDate <= formValues.startDate) {
+				return "End date must be after start date";
+			}
+
+			return VALID_INPUT;
+		},
+	},
+};
 
 /**
  * Single source of truth for the full form. `react-hook-form` handles per-step
@@ -10,7 +47,7 @@ import type { FieldStatus } from "./types";
  * As steps 2–4 gain fields, extend this object and the derived `FormValues`
  * type (in `types.ts`) follows automatically.
  */
-export const formSchema = z.object({
+const baseFormSchema = z.object({
 	name: z.string().trim().min(1, "Name is required").max(40, "Name must be at most 40 characters"),
 	email: z.email("Enter a valid email").max(30, "Email must be at most 30 characters"),
 	username: z
@@ -26,7 +63,18 @@ export const formSchema = z.object({
 		.string()
 		.trim()
 		.min(1, "College name is required")
-		.max(60, "College name must be at most 60 characters"),
+		.max(60, "College name must be at most 60 characters")
+		.optional(),
+	startDate: z
+		.string()
+		.nonempty("Start date is required")
+		.regex(/^\d{4}\/\d{2}\/\d{2}$/, "Date must be in yyyy/mm/dd format"),
+	stillStudying: z.boolean(),
+	endDate: z
+		.string()
+		.nonempty("End date is required")
+		.regex(/^\d{4}\/\d{2}\/\d{2}$/, "Date must be in yyyy/mm/dd format")
+		.optional(),
 });
 
 /**
@@ -37,19 +85,29 @@ export const formSchema = z.object({
  * `ZodEffects`, which would break the `formSchema.shape.<field>` lookups
  * other steps rely on for per-field validation.
  */
-export const fullFormSchema = formSchema.superRefine((values, ctx) => {
-	if (values.hasCollegeDegree) {
-		const validationResult = validateField(formSchema.shape.collegeName, values.collegeName);
+export const formSchema = baseFormSchema.superRefine((values, ctx) => {
+	const { collegeName, endDate } = values;
 
-		if (validationResult !== true) {
-			ctx.addIssue({
-				code: "custom",
-				message: validationResult,
-				path: ["collegeName"],
-			});
-		}
+	const collegeNameValidationResult = CustomValidations.step3.collegeName(collegeName, values);
+	if (collegeNameValidationResult !== VALID_INPUT) {
+		ctx.addIssue({ code: "custom", message: collegeNameValidationResult });
+	}
+
+	const endDateValidationResult = CustomValidations.step4.endDate(endDate, values);
+	if (endDateValidationResult !== VALID_INPUT) {
+		ctx.addIssue({ code: "custom", message: endDateValidationResult });
 	}
 });
+
+export function parseForm(formValues: Record<string, unknown>): ZodSafeParseResult<FormValues> {
+	// NOTE: Clean optional default values to avoid unexpected validations errors
+	const OPTIONAL_FIELDS: FormInputName[] = ["collegeName", "endDate"] as const;
+	OPTIONAL_FIELDS.forEach((fieldName) => {
+		if (!formValues[fieldName]) formValues[fieldName] = undefined;
+	});
+
+	return formSchema.safeParse(formValues);
+}
 
 /**
  * Derives a field's visual status from its react-hook-form state. Shared across
@@ -73,15 +131,35 @@ export function getFieldStatus({
 
 /**
  * Validates a single value against a field schema, shaped for a
- * `react-hook-form` `validate` rule: returns `true` when valid, otherwise the
+ * `react-hook-form` `validate` rule: returns `VALID_INPUT` when valid, otherwise the
  * first zod error message. Lets each step reuse the schema above as the single
  * source of truth instead of re-declaring the same rules inline.
  */
-export function validateField(fieldSchema: z.ZodType, value: unknown): true | string {
+export function validateField(fieldSchema: z.ZodType, value: unknown): VALID_INPUT | ERROR_MESSAGE {
 	const result = fieldSchema.safeParse(value);
-	return result.success ? true : (result.error.issues[0]?.message ?? "Invalid value");
+	return result.success ? VALID_INPUT : (result.error.issues[0]?.message ?? "Invalid value");
+}
+
+export function createValidateInputSchemaFunction<InputValue = string>(inputShape: z.ZodType) {
+	return function validator(value: InputValue): ERROR_MESSAGE | VALID_INPUT {
+		return validateField(inputShape, value);
+	};
 }
 
 export function composeLocalStorageKeyForInput(inputName: string): string {
 	return `input:${inputName}`;
+}
+
+/**
+ * `formSchema` stores dates as `yyyy/mm/dd`, but a native `<input type="date">`
+ * only accepts/emits `yyyy-mm-dd`. These convert between the two at the DOM
+ * boundary so the rest of the form (validation, persistence, submission) can
+ * keep treating `yyyy/mm/dd` as the single source of truth.
+ */
+export function toHtmlDateValue(value: string): string {
+	return value.replaceAll("/", "-");
+}
+
+export function fromHtmlDateValue(value: string): string {
+	return value.replaceAll("-", "/");
 }

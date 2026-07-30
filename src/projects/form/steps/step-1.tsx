@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, type JSX } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type RegisterOptions } from "react-hook-form";
 
 import Form from "../components/form";
 import Input from "../components/primitive/input";
@@ -10,7 +10,7 @@ import { useFormNavigation } from "../context/form.hook";
 import { useFormSubmitted } from "../hooks/use-form-submitted";
 import { usePersistInput } from "../hooks/use-persist-input";
 import { asyncCheck, debounce } from "../utils/async";
-import { formSchema, getFieldStatus, validateField } from "../utils/form";
+import { createValidateInputSchemaFunction, formSchema, getFieldStatus } from "../utils/form";
 import type { FormInputName, Step1Values, StepFormReturn } from "../utils/types";
 
 function Step1(): JSX.Element {
@@ -57,7 +57,7 @@ function Step1(): JSX.Element {
 						id="name"
 						data-state={nameStatus}
 						aria-invalid={nameStatus === "invalid"}
-						{...register("name", NAME_RULES)}
+						{...register("name", ValidationRules.name)}
 					/>
 					<Form.FieldMessage status={nameStatus}>{errors.name?.message}</Form.FieldMessage>
 				</Form.Field>
@@ -74,7 +74,7 @@ function Step1(): JSX.Element {
 							id="email"
 							data-state={emailStatus}
 							aria-invalid={emailStatus === "invalid"}
-							{...register("email", EMAIL_RULES)}
+							{...register("email", ValidationRules.email)}
 						/>
 					</Form.FieldWithLoader>
 					<Form.FieldMessage status={emailStatus}>
@@ -94,7 +94,7 @@ function Step1(): JSX.Element {
 							id="username"
 							data-state={usernameStatus}
 							aria-invalid={usernameStatus === "invalid"}
-							{...register("username", USERNAME_RULES)}
+							{...register("username", ValidationRules.username)}
 						/>
 					</Form.FieldWithLoader>
 
@@ -142,26 +142,30 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 
 // --- VALIDATION RULES ---
 
-const NAME_RULES = {
-	validate: {
-		schema: (value: string): string | true => validateField(formSchema.shape.name, value),
-	},
-};
-
-const EMAIL_RULES = {
-	validate: {
-		schema: (value: string): string | true => validateField(formSchema.shape.email, value),
-		availability: async (value: string): Promise<true | string> => {
-			return await checkEmailAvailability(value);
+const ValidationRules: {
+	name: RegisterOptions<Step1Values, "name">;
+	email: RegisterOptions<Step1Values, "email">;
+	username: RegisterOptions<Step1Values, "username">;
+} = {
+	name: {
+		validate: {
+			schema: createValidateInputSchemaFunction(formSchema.shape.name),
 		},
 	},
-};
-
-const USERNAME_RULES = {
-	validate: {
-		schema: (value: string): string | true => validateField(formSchema.shape.username, value),
-		availability: async (value: string): Promise<true | string> => {
-			return await checkUsernameAvailability(value);
+	email: {
+		validate: {
+			schema: createValidateInputSchemaFunction(formSchema.shape.email),
+			availability: async (value: string): Promise<true | string> => {
+				return await checkEmailAvailability(value);
+			},
+		},
+	},
+	username: {
+		validate: {
+			schema: createValidateInputSchemaFunction(formSchema.shape.username),
+			availability: async (value: string): Promise<true | string> => {
+				return await checkUsernameAvailability(value);
+			},
 		},
 	},
 };

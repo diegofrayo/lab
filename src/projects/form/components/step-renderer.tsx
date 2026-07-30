@@ -9,6 +9,7 @@ import Step1 from "../steps/step-1";
 import Step2 from "../steps/step-2";
 import Step3 from "../steps/step-3";
 import Step4 from "../steps/step-4";
+import Step5 from "../steps/step-5";
 import { TOTAL_STEPS } from "../utils/types";
 import type { StepNumber } from "../utils/types";
 
@@ -17,6 +18,7 @@ const STEP_COMPONENTS: Record<StepNumber, () => JSX.Element> = {
 	2: Step2,
 	3: Step3,
 	4: Step4,
+	5: Step5,
 };
 
 function StepRenderer(): JSX.Element {
