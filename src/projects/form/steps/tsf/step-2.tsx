@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type JSX } from "react";
-import { Controller, useForm } from "react-hook-form";
-import type { Control, RegisterOptions } from "react-hook-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { toast } from "sonner";
 
 import Form from "../../components/form";
@@ -12,98 +11,96 @@ import type { SelectOption } from "../../components/primitive/select";
 import { useFormNavigation } from "../../context/form.hook";
 import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
-import { createRHFInputValidator, formSchema, getFieldStatus } from "../../utils/form";
-import type { FormInputName, Step2Values, StepFormReturn } from "../../utils/types";
+import { createTSFValidatorFromInputShape, formSchema, getFieldStatus } from "../../utils/form";
+import type { FormInputName, Step2Values } from "../../utils/types";
 
 function Step2(): JSX.Element {
 	// --- HOOKS ---
-	const {
-		control,
-		formValues,
-		formState: { errors, touchedFields, dirtyFields },
-		stateOptions,
-		cityOptions,
-		handleStateChange,
-		onSubmit,
-	} = useStep2Form();
+	const { form, onSubmit, stateOptions, cityOptions, handleStateChange } = useStep2Form();
 
 	// --- COMPUTED STATES ---
-	const stateStatus = getFieldStatus({
-		hasError: Boolean(errors.state),
-		isTouched: Boolean(dirtyFields.state) || Boolean(touchedFields.state),
-		hasValue: Boolean(formValues.state),
-	});
-	const cityStatus = getFieldStatus({
-		hasError: Boolean(errors.city),
-		isTouched: Boolean(dirtyFields.city) || Boolean(touchedFields.city),
-		hasValue: Boolean(formValues.city),
-	});
 	const isCityDisabled = cityOptions.length === 0;
 
 	return (
 		<Form onSubmit={onSubmit}>
 			<Form.Body>
-				<Form.Field>
-					<Label
-						htmlFor="state"
-						data-state={stateStatus}
-					>
-						State
-					</Label>
-					<Controller
-						name="state"
-						control={control}
-						rules={ValidationRules.state}
-						render={({ field }) => {
-							function handleStateValueChange(value: string | null): void {
-								field.onChange(value);
-								handleStateChange(value);
-							}
+				<form.Field
+					name="state"
+					validators={ValidationRules.state}
+				>
+					{(field) => {
+						const stateStatus = getFieldStatus({
+							hasError: field.state.meta.errors.length > 0,
+							isTouched: field.state.meta.isTouched,
+							hasValue: Boolean(field.state.value),
+						});
 
-							return (
+						function handleValueChange(value: string | null): void {
+							field.handleChange(value ?? "");
+							handleStateChange();
+						}
+
+						return (
+							<Form.Field>
+								<Label
+									htmlFor="state"
+									data-state={stateStatus}
+								>
+									State
+								</Label>
 								<Select
 									id="state"
 									data-state={stateStatus}
 									items={stateOptions}
 									placeholder="Select a state"
-									value={field.value || null}
-									ref={field.ref}
-									onBlur={field.onBlur}
-									onValueChange={handleStateValueChange}
+									value={field.state.value || null}
+									onBlur={field.handleBlur}
+									onValueChange={handleValueChange}
 								/>
-							);
-						}}
-					/>
-					<Form.FieldMessage status={stateStatus}>{errors.state?.message}</Form.FieldMessage>
-				</Form.Field>
+								<Form.FieldMessage status={stateStatus}>
+									{field.state.meta.errors[0]}
+								</Form.FieldMessage>
+							</Form.Field>
+						);
+					}}
+				</form.Field>
 
-				<Form.Field>
-					<Label
-						htmlFor="city"
-						data-state={cityStatus}
-					>
-						City
-					</Label>
-					<Controller
-						name="city"
-						control={control}
-						rules={ValidationRules.city}
-						render={({ field }) => (
-							<Select
-								id="city"
-								data-state={cityStatus}
-								items={cityOptions}
-								placeholder="Select a city"
-								disabled={isCityDisabled}
-								value={field.value || null}
-								ref={field.ref}
-								onBlur={field.onBlur}
-								onValueChange={field.onChange}
-							/>
-						)}
-					/>
-					<Form.FieldMessage status={cityStatus}>{errors.city?.message}</Form.FieldMessage>
-				</Form.Field>
+				<form.Field
+					name="city"
+					validators={ValidationRules.city}
+				>
+					{(field) => {
+						const cityStatus = getFieldStatus({
+							hasError: field.state.meta.errors.length > 0,
+							isTouched: field.state.meta.isTouched,
+							hasValue: Boolean(field.state.value),
+						});
+
+						return (
+							<Form.Field>
+								<Label
+									htmlFor="city"
+									data-state={cityStatus}
+								>
+									City
+								</Label>
+								<Select
+									id="city"
+									data-state={cityStatus}
+									items={cityOptions}
+									placeholder="Select a city"
+									disabled={isCityDisabled}
+									value={field.state.value || null}
+									onBlur={field.handleBlur}
+									onValueChange={(value) => field.handleChange(value ?? "")}
+								/>
+								<Form.FieldMessage status={cityStatus}>
+									{field.state.meta.errors[0]}
+								</Form.FieldMessage>
+							</Form.Field>
+						);
+					}}
+				</form.Field>
 			</Form.Body>
 
 			<Form.Navigation />
@@ -115,85 +112,55 @@ export default Step2;
 
 // --- CONTROLLER ---
 
-type UseStep2FormReturn = StepFormReturn<Step2Values> & {
-	control: Control<Step2Values>;
-	stateOptions: SelectOption[];
-	cityOptions: SelectOption[];
-	handleStateChange: (stateId: string | null) => void;
-};
-
-function useStep2Form(): UseStep2FormReturn {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
+function useStep2Form() {
 	// --- HOOKS ---
 	const { stateOptions, getCitiesOptions } = useColombiaLocations();
 	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["state", "city"], []);
 	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
+		() => getDefaultValues<Step2Values>(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],
 	);
-	const form = useForm<Step2Values>({
-		mode: "onChange",
+	const form = useForm({
 		defaultValues: DEFAULT_VALUES,
+		onSubmit: ({ value }) => {
+			updateFormValues(value);
+		},
 	});
-
-	// --- STATES & REFS ---
-	const [cityOptions, setCityOptions] = useState<SelectOption[]>([]);
 
 	// --- HANDLERS ---
-	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
-		updateFormValues(data);
-	});
+	function onSubmit(event?: React.SubmitEvent): void {
+		event?.preventDefault();
+		event?.stopPropagation();
+		form.handleSubmit();
+	}
 
-	function handleStateChange(stateId: string | null): void {
-		form.setValue("city", "", { shouldValidate: true, shouldDirty: true });
-		setCityOptions(stateId ? getCitiesOptions(stateId) : []);
+	function handleStateChange(): void {
+		form.setFieldValue("city", "");
 	}
 
 	// --- COMPUTED STATES ---
-	const formValues = form.watch();
+	const formValues = useSelector(form.store, (state) => state.values);
+	const isSubmitSuccessful = useSelector(form.store, (state) => state.isSubmitSuccessful);
+	const cityOptions = formValues.state ? getCitiesOptions(formValues.state) : [];
 
 	// --- EFFECTS ---
 	usePersistInput("state", formValues.state);
 	usePersistInput("city", formValues.city);
-	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
+	useFormSubmitted(FORM_INPUTS_NAME, isSubmitSuccessful, goToNextStep);
 
-	useEffect(
-		function restoreCityOptions() {
-			const stateId = form.getValues("state");
-
-			if (!stateId) return;
-
-			setCityOptions(getCitiesOptions(stateId));
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[stateOptions],
-	);
-
-	return {
-		...form,
-		formValues,
-		onSubmit,
-		stateOptions,
-		cityOptions,
-		handleStateChange,
-	};
+	return { form, onSubmit, stateOptions, cityOptions, handleStateChange };
 }
 
 // --- VALIDATION RULES ---
 
-const ValidationRules: {
-	state: RegisterOptions<Step2Values, "state">;
-	city: RegisterOptions<Step2Values, "city">;
-} = {
+const ValidationRules = {
 	state: {
-		validate: {
-			schema: createRHFInputValidator(formSchema.shape.state),
-		},
+		onChange: createTSFValidatorFromInputShape(formSchema.shape.state),
 	},
 	city: {
-		validate: {
-			schema: createRHFInputValidator(formSchema.shape.city),
-		},
+		onChange: createTSFValidatorFromInputShape(formSchema.shape.city),
 	},
 };
 

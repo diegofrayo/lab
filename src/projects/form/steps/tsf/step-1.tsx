@@ -10,7 +10,7 @@ import { useFormNavigation } from "../../context/form.hook";
 import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import { asyncCheck } from "../../utils/async";
-import { createTSFInputValidator, formSchema, getFieldStatus } from "../../utils/form";
+import { createTSFValidatorFromInputShape, formSchema, getFieldStatus } from "../../utils/form";
 import type { FormInputName, Step1Values } from "../../utils/types";
 
 function Step1(): JSX.Element {
@@ -188,15 +188,15 @@ function useStep1Form() {
 
 const ValidationRules = {
 	name: {
-		onChange: createTSFInputValidator(formSchema.shape.name),
+		onChange: createTSFValidatorFromInputShape(formSchema.shape.name),
 	},
 	email: {
-		onChange: createTSFInputValidator(formSchema.shape.email),
+		onChange: createTSFValidatorFromInputShape(formSchema.shape.email),
 		onChangeAsync: validateEmailAvailability,
 		onChangeAsyncDebounceMs: 500,
 	},
 	username: {
-		onChange: createTSFInputValidator(formSchema.shape.username),
+		onChange: createTSFValidatorFromInputShape(formSchema.shape.username),
 		onChangeAsync: validateUsernameAvailability,
 		onChangeAsyncDebounceMs: 500,
 	},

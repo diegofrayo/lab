@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, type JSX } from "react";
-import { Controller, useForm } from "react-hook-form";
-import type { Control, RegisterOptions } from "react-hook-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 
 import Form from "../../components/form";
 import Checkbox from "../../components/primitive/checkbox";
@@ -12,82 +11,85 @@ import { useFormNavigation } from "../../context/form.hook";
 import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
-	createRHFInputValidator,
+	createTSFValidatorFromCustomValidation,
+	createTSFValidatorFromInputShape,
 	CustomValidations,
 	formSchema,
 	getFieldStatus,
 } from "../../utils/form";
-import type { FormInputName, Step3Values, StepFormReturn } from "../../utils/types";
+import type { FormInputName, Step3Values } from "../../utils/types";
 
 function Step3(): JSX.Element {
 	// --- HOOKS ---
-	const {
-		control,
-		register,
-		formValues,
-		formState: { errors, touchedFields, dirtyFields },
-		handleHasCollegeDegreeChange,
-		onSubmit,
-	} = useStep3Form();
-
-	// --- COMPUTED STATES ---
-	const hasCollegeDegree = Boolean(formValues.hasCollegeDegree);
-	const collegeNameStatus = getFieldStatus({
-		hasError: Boolean(errors.collegeName),
-		isTouched: Boolean(dirtyFields.collegeName) || Boolean(touchedFields.collegeName),
-		hasValue: Boolean(formValues.collegeName),
-	});
+	const { form, onSubmit } = useStep3Form();
+	const hasCollegeDegree = useSelector(form.store, (state) =>
+		Boolean(state.values.hasCollegeDegree),
+	);
 
 	return (
 		<Form onSubmit={onSubmit}>
 			<Form.Body className="min-h-32">
-				<Form.Field className="flex w-fit flex-row items-center gap-2.5">
-					<Controller
-						name="hasCollegeDegree"
-						control={control}
-						rules={ValidationRules.hasCollegeDegree}
-						render={({ field }) => {
-							function handleCheckedChange(checked: boolean): void {
-								field.onChange(checked);
-								handleHasCollegeDegreeChange(checked);
-							}
+				<form.Field
+					name="hasCollegeDegree"
+					validators={ValidationRules.hasCollegeDegree}
+				>
+					{(field) => (
+						<Form.Field className="flex w-fit flex-row items-center gap-2.5">
+							<Checkbox
+								id="hasCollegeDegree"
+								checked={field.state.value}
+								onCheckedChange={(checked) => {
+									field.handleChange(checked);
 
-							return (
-								<Checkbox
-									id="hasCollegeDegree"
-									checked={field.value}
-									ref={field.ref}
-									onCheckedChange={handleCheckedChange}
-								/>
-							);
-						}}
-					/>
-					<Label
-						htmlFor="hasCollegeDegree"
-						className="cursor-pointer"
-					>
-						I have a college degree
-					</Label>
-				</Form.Field>
+									if (!checked) form.setFieldValue("collegeName", "");
+								}}
+							/>
+							<Label
+								htmlFor="hasCollegeDegree"
+								className="cursor-pointer"
+							>
+								I have a college degree
+							</Label>
+						</Form.Field>
+					)}
+				</form.Field>
 
 				{hasCollegeDegree && (
-					<Form.Field>
-						<Label
-							htmlFor="collegeName"
-							data-state={collegeNameStatus}
-						>
-							College name
-						</Label>
-						<Input
-							id="collegeName"
-							data-state={collegeNameStatus}
-							aria-invalid={collegeNameStatus === "invalid"}
-							{...register("collegeName", ValidationRules.collegeName)}
-						/>
-						<Form.FieldMessage status={collegeNameStatus}>
-							{errors.collegeName?.message}
-						</Form.FieldMessage>
-					</Form.Field>
+					<form.Field
+						name="collegeName"
+						validators={ValidationRules.collegeName}
+					>
+						{(field) => {
+							const collegeNameStatus = getFieldStatus({
+								hasError: field.state.meta.errors.length > 0,
+								isTouched: field.state.meta.isTouched,
+								hasValue: Boolean(field.state.value),
+							});
+
+							return (
+								<Form.Field>
+									<Label
+										htmlFor="collegeName"
+										data-state={collegeNameStatus}
+									>
+										College name
+									</Label>
+									<Input
+										id="collegeName"
+										name={field.name}
+										data-state={collegeNameStatus}
+										aria-invalid={collegeNameStatus === "invalid"}
+										value={field.state.value ?? ""}
+										onBlur={field.handleBlur}
+										onChange={(event) => field.handleChange(event.target.value)}
+									/>
+									<Form.FieldMessage status={collegeNameStatus}>
+										{field.state.meta.errors[0]}
+									</Form.FieldMessage>
+								</Form.Field>
+							);
+						}}
+					</form.Field>
 				)}
 			</Form.Body>
 
@@ -100,63 +102,51 @@ export default Step3;
 
 // --- CONTROLLER ---
 
-type UseStep3FormReturn = StepFormReturn<Step3Values> & {
-	control: Control<Step3Values>;
-	handleHasCollegeDegreeChange: (checked: boolean) => void;
-};
-
-function useStep3Form(): UseStep3FormReturn {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
+function useStep3Form() {
 	// --- HOOKS ---
 	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
 	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
+		() => getDefaultValues<Step3Values>(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],
 	);
-	const form = useForm<Step3Values>({
-		mode: "onChange",
+	const form = useForm({
 		defaultValues: DEFAULT_VALUES,
+		onSubmit: ({ value }) => {
+			updateFormValues(value);
+		},
 	});
 
 	// --- HANDLERS ---
-	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
-		updateFormValues(data);
-	});
-
-	function handleHasCollegeDegreeChange(checked: boolean): void {
-		if (checked) {
-			form.trigger("collegeName");
-			return;
-		}
-
-		form.setValue("collegeName", "", { shouldValidate: true });
+	function onSubmit(event?: React.SubmitEvent): void {
+		event?.preventDefault();
+		event?.stopPropagation();
+		form.handleSubmit();
 	}
 
 	// --- COMPUTED STATES ---
-	const formValues = form.watch();
+	const formValues = useSelector(form.store, (state) => state.values);
+	const isSubmitSuccessful = useSelector(form.store, (state) => state.isSubmitSuccessful);
 
 	// --- EFFECTS ---
 	usePersistInput("hasCollegeDegree", formValues.hasCollegeDegree);
 	usePersistInput("collegeName", formValues.collegeName);
-	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
+	useFormSubmitted(FORM_INPUTS_NAME, isSubmitSuccessful, goToNextStep);
 
-	return { ...form, formValues, onSubmit, handleHasCollegeDegreeChange };
+	return { form, onSubmit };
 }
 
 // --- VALIDATION RULES ---
 
-const ValidationRules: {
-	hasCollegeDegree: RegisterOptions<Step3Values, "hasCollegeDegree">;
-	collegeName: RegisterOptions<Step3Values, "collegeName">;
-} = {
+const ValidationRules = {
 	hasCollegeDegree: {
-		validate: {
-			schema: createRHFInputValidator<boolean>(formSchema.shape.hasCollegeDegree),
-		},
+		onChange: createTSFValidatorFromInputShape(formSchema.shape.hasCollegeDegree),
 	},
 	collegeName: {
-		validate: {
-			schema: CustomValidations.step3.collegeName,
-		},
+		onChangeListenTo: ["hasCollegeDegree"] as (keyof Step3Values)[],
+		onChange: createTSFValidatorFromCustomValidation<Step3Values["collegeName"], Step3Values>(
+			CustomValidations.step3.collegeName,
+		),
 	},
 };

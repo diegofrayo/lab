@@ -1,3 +1,4 @@
+import type { AnyFieldApi } from "@tanstack/react-form";
 import { z, type ZodSafeParseResult } from "zod";
 
 import type {
@@ -14,6 +15,11 @@ type VALID_INPUT = true;
 type ERROR_MESSAGE = string;
 const TSF_VALID_INPUT = undefined;
 type TSF_VALID_INPUT = undefined;
+
+type CustomValidation<InputValue, FormValues> = (
+	inputValue: InputValue,
+	formValues: FormValues,
+) => ERROR_MESSAGE | VALID_INPUT;
 
 export const CustomValidations = {
 	step3: {
@@ -169,7 +175,7 @@ export function fromHtmlDateValue(value: string): string {
 
 // --- RHF Utils ---
 
-export function createRHFInputValidator<InputValue = string>(inputShape: z.ZodType) {
+export function createRHFInputValidator<InputValue>(inputShape: z.ZodType) {
 	return function validator(value: InputValue): ERROR_MESSAGE | VALID_INPUT {
 		return validateField(inputShape, value);
 	};
@@ -177,9 +183,24 @@ export function createRHFInputValidator<InputValue = string>(inputShape: z.ZodTy
 
 // --- TSF Utils ---
 
-export function createTSFInputValidator<InputValue = string>(inputShape: z.ZodType) {
+export function createTSFValidatorFromInputShape<InputValue>(inputShape: z.ZodType) {
 	return function validator({ value }: { value: InputValue }): ERROR_MESSAGE | TSF_VALID_INPUT {
 		const result = validateField(inputShape, value);
+		return result === true ? TSF_VALID_INPUT : result;
+	};
+}
+
+export function createTSFValidatorFromCustomValidation<InputValue, FormValues>(
+	customValidation: CustomValidation<InputValue, FormValues>,
+) {
+	return function validator({
+		value,
+		fieldApi,
+	}: {
+		value: InputValue;
+		fieldApi: AnyFieldApi;
+	}): ERROR_MESSAGE | TSF_VALID_INPUT {
+		const result = customValidation(value, fieldApi.form.state.values as FormValues);
 		return result === true ? TSF_VALID_INPUT : result;
 	};
 }
