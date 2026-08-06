@@ -5,15 +5,15 @@ import { Controller, useForm } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 import { toast } from "sonner";
 
-import Form from "../components/form";
-import Label from "../components/primitive/label";
-import Select from "../components/primitive/select";
-import type { SelectOption } from "../components/primitive/select";
-import { useFormNavigation } from "../context/form.hook";
-import { useFormSubmitted } from "../hooks/use-form-submitted";
-import { usePersistInput } from "../hooks/use-persist-input";
-import { createValidateInputSchemaFunction, formSchema, getFieldStatus } from "../utils/form";
-import type { FormInputName, Step2Values, StepFormReturn } from "../utils/types";
+import Form from "../../components/form";
+import Label from "../../components/primitive/label";
+import Select from "../../components/primitive/select";
+import type { SelectOption } from "../../components/primitive/select";
+import { useFormNavigation } from "../../context/form.hook";
+import { useFormSubmitted } from "../../hooks/use-form-submitted";
+import { usePersistInput } from "../../hooks/use-persist-input";
+import { createRHFInputValidator, formSchema, getFieldStatus } from "../../utils/form";
+import type { FormInputName, Step2Values, StepFormReturn } from "../../utils/types";
 
 function Step2(): JSX.Element {
 	// --- HOOKS ---
@@ -127,7 +127,10 @@ function useStep2Form(): UseStep2FormReturn {
 	const { stateOptions, getCitiesOptions } = useColombiaLocations();
 	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["state", "city"], []);
-	const DEFAULT_VALUES = useMemo(() => getDefaultValues(FORM_INPUTS_NAME), [FORM_INPUTS_NAME]);
+	const DEFAULT_VALUES = useMemo(
+		() => getDefaultValues(FORM_INPUTS_NAME),
+		[getDefaultValues, FORM_INPUTS_NAME],
+	);
 	const form = useForm<Step2Values>({
 		mode: "onChange",
 		defaultValues: DEFAULT_VALUES,
@@ -184,12 +187,12 @@ const ValidationRules: {
 } = {
 	state: {
 		validate: {
-			schema: createValidateInputSchemaFunction(formSchema.shape.state),
+			schema: createRHFInputValidator(formSchema.shape.state),
 		},
 	},
 	city: {
 		validate: {
-			schema: createValidateInputSchemaFunction(formSchema.shape.city),
+			schema: createRHFInputValidator(formSchema.shape.city),
 		},
 	},
 };

@@ -4,20 +4,20 @@ import { useMemo, type JSX } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 
-import Form from "../components/form";
-import Checkbox from "../components/primitive/checkbox";
-import Input from "../components/primitive/input";
-import Label from "../components/primitive/label";
-import { useFormNavigation } from "../context/form.hook";
-import { useFormSubmitted } from "../hooks/use-form-submitted";
-import { usePersistInput } from "../hooks/use-persist-input";
+import Form from "../../components/form";
+import Checkbox from "../../components/primitive/checkbox";
+import Input from "../../components/primitive/input";
+import Label from "../../components/primitive/label";
+import { useFormNavigation } from "../../context/form.hook";
+import { useFormSubmitted } from "../../hooks/use-form-submitted";
+import { usePersistInput } from "../../hooks/use-persist-input";
 import {
-	createValidateInputSchemaFunction,
+	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
 	getFieldStatus,
-} from "../utils/form";
-import type { FormInputName, Step3Values, StepFormReturn } from "../utils/types";
+} from "../../utils/form";
+import type { FormInputName, Step3Values, StepFormReturn } from "../../utils/types";
 
 function Step3(): JSX.Element {
 	// --- HOOKS ---
@@ -109,7 +109,10 @@ function useStep3Form(): UseStep3FormReturn {
 	// --- HOOKS ---
 	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
-	const DEFAULT_VALUES = useMemo(() => getDefaultValues(FORM_INPUTS_NAME), [FORM_INPUTS_NAME]);
+	const DEFAULT_VALUES = useMemo(
+		() => getDefaultValues<Step3Values>(FORM_INPUTS_NAME),
+		[getDefaultValues, FORM_INPUTS_NAME],
+	);
 	const form = useForm<Step3Values>({
 		mode: "onChange",
 		defaultValues: DEFAULT_VALUES,
@@ -148,7 +151,7 @@ const ValidationRules: {
 } = {
 	hasCollegeDegree: {
 		validate: {
-			schema: createValidateInputSchemaFunction<boolean>(formSchema.shape.hasCollegeDegree),
+			schema: createRHFInputValidator<boolean>(formSchema.shape.hasCollegeDegree),
 		},
 	},
 	collegeName: {

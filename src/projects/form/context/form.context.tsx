@@ -6,29 +6,37 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { composeLocalStorageKeyForInput } from "../utils/form";
 import { TOTAL_STEPS } from "../utils/types";
-import type { FormInputName, FormValues, StepNumber } from "../utils/types";
+import type { FormInputName, FormScope, FormValues, StepNumber } from "../utils/types";
 
 // --- TYPES ---
 
 export type FormContextValue = {
 	formValues: Partial<FormValues>;
 	currentStep: StepNumber;
+	scope: FormScope;
 	updateFormValues: (partial: Partial<FormValues>) => void;
 	goToNextStep: () => void;
 	goToPreviousStep: () => void;
-	getDefaultValues: (keys: FormInputName[]) => Partial<FormValues>;
+	getDefaultValues: <StepFormValues = FormValues>(keys: FormInputName[]) => StepFormValues;
 	resetForm: () => void;
 };
 
 type FormProviderProps = {
 	children: ReactNode;
+	scope: FormScope;
 };
 
 // --- CONTEXT ---
 
 export const FormContext = createContext<FormContextValue | null>(null);
 
-function FormProvider({ children }: FormProviderProps): JSX.Element {
+function FormProvider({ children, scope }: FormProviderProps): JSX.Element {
+	// --- CONSTANTS ---
+	const STORAGE_KEYS = {
+		values: `${scope}:form:values`,
+		step: `${scope}:form:step`,
+	};
+
 	// --- HOOKS ---
 	const [formValues, setFormValues] = useLocalStorage<Partial<FormValues>>(STORAGE_KEYS.values, {});
 	const [currentStep, setCurrentStep] = useLocalStorage<StepNumber>(STORAGE_KEYS.step, 1);
@@ -56,31 +64,34 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 	);
 
 	const getDefaultValues = useCallback(
-		function getDefaultValues(keys: (keyof FormValues)[]) {
+		function getDefaultValues<StepFormValues>(keys: (keyof FormValues)[]) {
 			const values = keys.reduce((result, inputName) => {
-				const lsValue = parseLocalStorageValue(inputName);
+				const lsValue = parseLocalStorageValue(scope, inputName);
 
 				return {
 					...result,
 					[inputName]: lsValue ?? formValues[inputName] ?? DEFAULT_VALUES[inputName],
 				};
-			}, {});
+			}, {} as StepFormValues);
 
 			console.log("getDefaultValues:", values);
 
 			return values;
 		},
-		[formValues],
+		[formValues, scope],
 	);
 
-	const resetForm = useCallback(function resetForm() {
-		Object.keys(DEFAULT_VALUES).forEach((inputName) => {
-			window.localStorage.removeItem(composeLocalStorageKeyForInput(inputName));
-		});
-		window.localStorage.removeItem(STORAGE_KEYS.values);
-		window.localStorage.removeItem(STORAGE_KEYS.step);
-		window.location.reload();
-	}, []);
+	const resetForm = useCallback(
+		function resetForm() {
+			Object.keys(DEFAULT_VALUES).forEach((inputName) => {
+				window.localStorage.removeItem(composeLocalStorageKeyForInput(scope, inputName));
+			});
+			window.localStorage.removeItem(STORAGE_KEYS.values);
+			window.localStorage.removeItem(STORAGE_KEYS.step);
+			window.location.reload();
+		},
+		[scope, STORAGE_KEYS.step, STORAGE_KEYS.values],
+	);
 
 	// --- COMPUTED STATES ---
 	const value = useMemo<FormContextValue>(
@@ -92,6 +103,7 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 			goToPreviousStep,
 			getDefaultValues,
 			resetForm,
+			scope,
 		}),
 		[
 			formValues,
@@ -101,6 +113,7 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 			goToPreviousStep,
 			getDefaultValues,
 			resetForm,
+			scope,
 		],
 	);
 
@@ -108,13 +121,6 @@ function FormProvider({ children }: FormProviderProps): JSX.Element {
 }
 
 export default FormProvider;
-
-// --- CONSTANTS ---
-
-const STORAGE_KEYS = {
-	values: "form:values",
-	step: "form:step",
-};
 
 const DEFAULT_VALUES = {
 	name: "",
@@ -131,8 +137,11 @@ const DEFAULT_VALUES = {
 
 // --- UTILS ---
 
-function parseLocalStorageValue(inputName: FormInputName): string | boolean | null {
-	const rawValue = window.localStorage.getItem(composeLocalStorageKeyForInput(inputName));
+function parseLocalStorageValue(
+	scope: FormScope,
+	inputName: FormInputName,
+): string | boolean | null {
+	const rawValue = window.localStorage.getItem(composeLocalStorageKeyForInput(scope, inputName));
 	if (rawValue === null) return rawValue;
 
 	const BOOLEAN_FIELD_NAMES: FormInputName[] = ["hasCollegeDegree", "stillStudying"];

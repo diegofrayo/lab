@@ -18,11 +18,12 @@
 	"dependencies": {
 		"@base-ui/react": "^1.5.0",
 		"@tailwindcss/postcss": "^4.3.0",
+		"@tanstack/react-form": "^1.33.3",
 		"class-variance-authority": "^0.7.1",
 		"classnames": "^2.5.1",
 		"cnfast": "^0.0.8",
 		"lucide-react": "^1.16.0",
-		"next": "^15.3.2",
+		"next": "^16.3.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.81.0",
@@ -39,7 +40,7 @@
 		"@types/node": "^22.0.0",
 		"@types/react": "^19.0.0",
 		"@types/react-dom": "^19.0.0",
-		"eslint": "^10.4.0",
+		"eslint": "^10.6.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^7.1.1",
@@ -51,7 +52,8 @@
 		"prettier-plugin-tailwindcss": "^0.8.0",
 		"tsx": "^4.22.3",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.60.0"
+		"typescript-7": "npm:typescript@^7.0.2",
+		"typescript-eslint": "^8.63.0"
 	},
 	"lint-staged": {
 		"src/**/*.{ts,tsx}": [

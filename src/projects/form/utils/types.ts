@@ -37,3 +37,5 @@ export type StepFormReturn<T extends FieldValues = FieldValues> = UseFormReturn<
 };
 
 export type FieldStatus = "neutral" | "valid" | "invalid";
+
+export type FormScope = "rhf" | "tsf";

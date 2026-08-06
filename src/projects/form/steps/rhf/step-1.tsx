@@ -3,15 +3,15 @@
 import { useMemo, type JSX } from "react";
 import { useForm, type RegisterOptions } from "react-hook-form";
 
-import Form from "../components/form";
-import Input from "../components/primitive/input";
-import Label from "../components/primitive/label";
-import { useFormNavigation } from "../context/form.hook";
-import { useFormSubmitted } from "../hooks/use-form-submitted";
-import { usePersistInput } from "../hooks/use-persist-input";
-import { asyncCheck, debounce } from "../utils/async";
-import { createValidateInputSchemaFunction, formSchema, getFieldStatus } from "../utils/form";
-import type { FormInputName, Step1Values, StepFormReturn } from "../utils/types";
+import Form from "../../components/form";
+import Input from "../../components/primitive/input";
+import Label from "../../components/primitive/label";
+import { useFormNavigation } from "../../context/form.hook";
+import { useFormSubmitted } from "../../hooks/use-form-submitted";
+import { usePersistInput } from "../../hooks/use-persist-input";
+import { asyncCheck, debounce } from "../../utils/async";
+import { createRHFInputValidator, formSchema, getFieldStatus } from "../../utils/form";
+import type { FormInputName, Step1Values, StepFormReturn } from "../../utils/types";
 
 function Step1(): JSX.Element {
 	// --- HOOKS ---
@@ -117,7 +117,10 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 	// --- HOOKS ---
 	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["name", "email", "username"], []);
-	const DEFAULT_VALUES = useMemo(() => getDefaultValues(FORM_INPUTS_NAME), [FORM_INPUTS_NAME]);
+	const DEFAULT_VALUES = useMemo(
+		() => getDefaultValues<Step1Values>(FORM_INPUTS_NAME),
+		[getDefaultValues, FORM_INPUTS_NAME],
+	);
 	const form = useForm<Step1Values>({
 		mode: "onChange",
 		defaultValues: DEFAULT_VALUES,
@@ -149,12 +152,12 @@ const ValidationRules: {
 } = {
 	name: {
 		validate: {
-			schema: createValidateInputSchemaFunction(formSchema.shape.name),
+			schema: createRHFInputValidator(formSchema.shape.name),
 		},
 	},
 	email: {
 		validate: {
-			schema: createValidateInputSchemaFunction(formSchema.shape.email),
+			schema: createRHFInputValidator(formSchema.shape.email),
 			availability: async (value: string): Promise<true | string> => {
 				return await checkEmailAvailability(value);
 			},
@@ -162,7 +165,7 @@ const ValidationRules: {
 	},
 	username: {
 		validate: {
-			schema: createValidateInputSchemaFunction(formSchema.shape.username),
+			schema: createRHFInputValidator(formSchema.shape.username),
 			availability: async (value: string): Promise<true | string> => {
 				return await checkUsernameAvailability(value);
 			},

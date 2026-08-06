@@ -5,28 +5,17 @@ import type { JSX } from "react";
 import cn from "~/lib/cn";
 
 import { useFormNavigation } from "../context/form.hook";
-import Step1 from "../steps/step-1";
-import Step2 from "../steps/step-2";
-import Step3 from "../steps/step-3";
-import Step4 from "../steps/step-4";
-import Step5 from "../steps/step-5";
 import { TOTAL_STEPS } from "../utils/types";
 import type { StepNumber } from "../utils/types";
 
-const STEP_COMPONENTS: Record<StepNumber, () => JSX.Element> = {
-	1: Step1,
-	2: Step2,
-	3: Step3,
-	4: Step4,
-	5: Step5,
-};
+type StepRendererProps = { stepComponents: Record<StepNumber, () => JSX.Element> };
 
-function StepRenderer(): JSX.Element {
+function StepRenderer({ stepComponents }: StepRendererProps): JSX.Element {
 	// --- HOOKS ---
 	const { currentStep } = useFormNavigation();
 
 	// --- COMPUTED STATES ---
-	const StepComponent = STEP_COMPONENTS[currentStep];
+	const StepComponent = stepComponents[currentStep];
 
 	// --- STYLES ---
 	const classes = {

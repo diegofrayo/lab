@@ -1,10 +1,19 @@
 import { z, type ZodSafeParseResult } from "zod";
 
-import type { FieldStatus, FormInputName, FormValues, Step3Values, Step4Values } from "./types";
+import type {
+	FieldStatus,
+	FormInputName,
+	FormScope,
+	FormValues,
+	Step3Values,
+	Step4Values,
+} from "./types";
 
 const VALID_INPUT = true;
 type VALID_INPUT = true;
 type ERROR_MESSAGE = string;
+const TSF_VALID_INPUT = undefined;
+type TSF_VALID_INPUT = undefined;
 
 export const CustomValidations = {
 	step3: {
@@ -110,6 +119,17 @@ export function parseForm(formValues: Record<string, unknown>): ZodSafeParseResu
 }
 
 /**
+ * Validates a single value against a field schema, shaped for a
+ * `react-hook-form` `validate` rule: returns `VALID_INPUT` when valid, otherwise the
+ * first zod error message. Lets each step reuse the schema above as the single
+ * source of truth instead of re-declaring the same rules inline.
+ */
+function validateField(fieldSchema: z.ZodType, value: unknown): VALID_INPUT | ERROR_MESSAGE {
+	const result = fieldSchema.safeParse(value);
+	return result.success ? VALID_INPUT : (result.error.issues[0]?.message ?? "Invalid value");
+}
+
+/**
  * Derives a field's visual status from its react-hook-form state. Shared across
  * steps so every field reports valid/invalid/neutral the same way.
  */
@@ -129,25 +149,8 @@ export function getFieldStatus({
 	return "neutral";
 }
 
-/**
- * Validates a single value against a field schema, shaped for a
- * `react-hook-form` `validate` rule: returns `VALID_INPUT` when valid, otherwise the
- * first zod error message. Lets each step reuse the schema above as the single
- * source of truth instead of re-declaring the same rules inline.
- */
-export function validateField(fieldSchema: z.ZodType, value: unknown): VALID_INPUT | ERROR_MESSAGE {
-	const result = fieldSchema.safeParse(value);
-	return result.success ? VALID_INPUT : (result.error.issues[0]?.message ?? "Invalid value");
-}
-
-export function createValidateInputSchemaFunction<InputValue = string>(inputShape: z.ZodType) {
-	return function validator(value: InputValue): ERROR_MESSAGE | VALID_INPUT {
-		return validateField(inputShape, value);
-	};
-}
-
-export function composeLocalStorageKeyForInput(inputName: string): string {
-	return `input:${inputName}`;
+export function composeLocalStorageKeyForInput(scope: FormScope, inputName: string): string {
+	return `form:${scope}:input:${inputName}`;
 }
 
 /**
@@ -162,4 +165,21 @@ export function toHtmlDateValue(value: string): string {
 
 export function fromHtmlDateValue(value: string): string {
 	return value.replaceAll("-", "/");
+}
+
+// --- RHF Utils ---
+
+export function createRHFInputValidator<InputValue = string>(inputShape: z.ZodType) {
+	return function validator(value: InputValue): ERROR_MESSAGE | VALID_INPUT {
+		return validateField(inputShape, value);
+	};
+}
+
+// --- TSF Utils ---
+
+export function createTSFInputValidator<InputValue = string>(inputShape: z.ZodType) {
+	return function validator({ value }: { value: InputValue }): ERROR_MESSAGE | TSF_VALID_INPUT {
+		const result = validateField(inputShape, value);
+		return result === true ? TSF_VALID_INPUT : result;
+	};
 }

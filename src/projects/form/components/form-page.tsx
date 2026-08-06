@@ -5,11 +5,17 @@ import { Toaster } from "sonner";
 
 import cn from "~/lib/cn";
 
-import StepRenderer from "./components/step-renderer";
-import FormProvider from "./context/form.context";
-import { useIsHydrated } from "./hooks/use-is-hydrated";
+import FormProvider from "../context/form.context";
+import { useIsHydrated } from "../hooks/use-is-hydrated";
+import type { FormScope, StepNumber } from "../utils/types";
+import StepRenderer from "./step-renderer";
 
-function FormPage(): JSX.Element | null {
+type FormPageProps = {
+	scope: FormScope;
+	stepComponents: Record<StepNumber, () => JSX.Element>;
+};
+
+function FormPage({ stepComponents, scope }: FormPageProps): JSX.Element | null {
 	// --- HOOKS ---
 	const isHydrated = useIsHydrated();
 
@@ -26,8 +32,8 @@ function FormPage(): JSX.Element | null {
 	return (
 		<main className={classes.main}>
 			<div className={classes.container}>
-				<FormProvider>
-					<StepRenderer />
+				<FormProvider scope={scope}>
+					<StepRenderer stepComponents={stepComponents} />
 				</FormProvider>
 			</div>
 			<Toaster

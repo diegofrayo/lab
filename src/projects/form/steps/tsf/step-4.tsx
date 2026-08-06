@@ -7,23 +7,23 @@ import { toast } from "sonner";
 
 import cn from "~/lib/cn";
 
-import Form from "../components/form";
-import Checkbox from "../components/primitive/checkbox";
-import Input from "../components/primitive/input";
-import Label from "../components/primitive/label";
-import { useFormNavigation } from "../context/form.hook";
-import { useFormSubmitted } from "../hooks/use-form-submitted";
-import { usePersistInput } from "../hooks/use-persist-input";
+import Form from "../../components/form";
+import Checkbox from "../../components/primitive/checkbox";
+import Input from "../../components/primitive/input";
+import Label from "../../components/primitive/label";
+import { useFormNavigation } from "../../context/form.hook";
+import { useFormSubmitted } from "../../hooks/use-form-submitted";
+import { usePersistInput } from "../../hooks/use-persist-input";
 import {
-	createValidateInputSchemaFunction,
+	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
 	fromHtmlDateValue,
 	getFieldStatus,
 	parseForm,
 	toHtmlDateValue,
-} from "../utils/form";
-import type { FormInputName, Step4Values, StepFormReturn } from "../utils/types";
+} from "../../utils/form";
+import type { FormInputName, Step4Values, StepFormReturn } from "../../utils/types";
 
 function Step4(): JSX.Element {
 	// --- HOOKS ---
@@ -201,7 +201,10 @@ function useStep4Form(): UseStep4FormReturn {
 		() => ["startDate", "stillStudying", "endDate"],
 		[],
 	);
-	const DEFAULT_VALUES = useMemo(() => getDefaultValues(FORM_INPUTS_NAME), [FORM_INPUTS_NAME]);
+	const DEFAULT_VALUES = useMemo(
+		() => getDefaultValues(FORM_INPUTS_NAME),
+		[getDefaultValues, FORM_INPUTS_NAME],
+	);
 	const form = useForm<Step4Values>({
 		mode: "onChange",
 		defaultValues: DEFAULT_VALUES,
@@ -260,12 +263,12 @@ const ValidationRules: {
 } = {
 	startDate: {
 		validate: {
-			schema: createValidateInputSchemaFunction(formSchema.shape.startDate),
+			schema: createRHFInputValidator(formSchema.shape.startDate),
 		},
 	},
 	stillStudying: {
 		validate: {
-			schema: createValidateInputSchemaFunction<boolean>(formSchema.shape.stillStudying),
+			schema: createRHFInputValidator<boolean>(formSchema.shape.stillStudying),
 		},
 	},
 	endDate: {
