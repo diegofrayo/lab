@@ -85,7 +85,7 @@ function Step4(): JSX.Element {
 						const stillStudyingStatus = getFieldStatus({
 							hasError: field.state.meta.errors.length > 0,
 							isTouched: field.state.meta.isTouched,
-							hasValue: Boolean(field.state.value),
+							hasValue: field.state.value !== undefined,
 						});
 
 						function handleStillStudyingChange(value: boolean): void {

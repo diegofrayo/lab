@@ -33,7 +33,10 @@ function FormPage({ stepComponents, scope }: FormPageProps): JSX.Element | null 
 		<main className={classes.main}>
 			<div className={classes.container}>
 				<FormProvider scope={scope}>
-					<StepRenderer stepComponents={stepComponents} />
+					<StepRenderer
+						stepComponents={stepComponents}
+						scope={scope}
+					/>
 				</FormProvider>
 			</div>
 			<Toaster

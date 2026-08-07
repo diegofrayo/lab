@@ -40,7 +40,7 @@ function Step4(): JSX.Element {
 	const stillStudyingStatus = getFieldStatus({
 		hasError: Boolean(errors.stillStudying),
 		isTouched: Boolean(dirtyFields.stillStudying) || Boolean(touchedFields.stillStudying),
-		hasValue: Boolean(formValues.startDate),
+		hasValue: formValues.stillStudying !== undefined,
 	});
 	const startDateStatus = getFieldStatus({
 		hasError: Boolean(errors.startDate),
