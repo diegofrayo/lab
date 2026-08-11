@@ -20,7 +20,6 @@
 		"@tailwindcss/postcss": "^4.3.0",
 		"@tanstack/react-form": "^1.33.3",
 		"class-variance-authority": "^0.7.1",
-		"classnames": "^2.5.1",
 		"cnfast": "^0.0.8",
 		"lucide-react": "^1.16.0",
 		"next": "^16.3.0",
@@ -28,7 +27,6 @@
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.81.0",
 		"sonner": "^2.0.7",
-		"tailwind-merge": "^3.6.0",
 		"tailwindcss": "^4.3.0",
 		"usehooks-ts": "^3.1.1",
 		"zod": "^4.4.3"
