@@ -60,6 +60,12 @@ function Step1(): JSX.Element {
 				<form.Field
 					name="email"
 					validators={ValidationRules.email}
+					listeners={{
+						onChange: (field) => {
+							form.setFieldMeta("email", { ...field.fieldApi.getMeta(), isValidating: true });
+						},
+					}}
+					asyncDebounceMs={500}
 				>
 					{(field) => {
 						const isCheckingEmail = field.state.meta.isValidating;
@@ -69,7 +75,6 @@ function Step1(): JSX.Element {
 							hasValue: Boolean(field.state.value),
 							isValidating: isCheckingEmail,
 						});
-						console.log(field.state.meta, isCheckingEmail);
 
 						return (
 							<Form.Field>
@@ -193,7 +198,7 @@ const ValidationRules = {
 	email: {
 		onChange: createTSFValidatorFromInputShape(formSchema.shape.email),
 		onChangeAsync: validateEmailAvailability,
-		onChangeAsyncDebounceMs: 500,
+		onChangeAsyncDebounce: 500,
 	},
 	username: {
 		onChange: createTSFValidatorFromInputShape(formSchema.shape.username),

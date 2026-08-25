@@ -18,7 +18,7 @@ function Step1(): JSX.Element {
 	const {
 		register,
 		formValues,
-		formState: { errors, isValidating, validatingFields, touchedFields, dirtyFields },
+		formState: { errors, isValidating, validatingFields, touchedFields, dirtyFields, isSubmitted },
 		onSubmit,
 	} = useStep1Form();
 
@@ -26,17 +26,20 @@ function Step1(): JSX.Element {
 	const isCheckingUsername = Boolean(validatingFields.username);
 	const isCheckingEmail = Boolean(validatingFields.email);
 	const nameStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.name),
 		isTouched: Boolean(dirtyFields.name) || Boolean(touchedFields.name),
 		hasValue: Boolean(formValues.name),
 	});
 	const emailStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.email),
 		isTouched: Boolean(dirtyFields.email) || Boolean(touchedFields.email),
 		hasValue: Boolean(formValues.email),
 		isValidating: isCheckingEmail,
 	});
 	const usernameStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.username),
 		isTouched: Boolean(dirtyFields.username) || Boolean(touchedFields.username),
 		hasValue: Boolean(formValues.username),

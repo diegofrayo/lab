@@ -141,17 +141,19 @@ function validateField(fieldSchema: z.ZodType, value: unknown): VALID_INPUT | ER
  */
 export function getFieldStatus({
 	hasError,
-	isTouched,
 	hasValue,
+	isFormSubmitted,
+	isTouched,
 	isValidating,
 }: {
 	hasError: boolean;
-	isTouched: boolean;
 	hasValue: boolean;
+	isFormSubmitted?: boolean;
+	isTouched: boolean;
 	isValidating?: boolean;
 }): FieldStatus {
 	if (hasError) return "invalid";
-	if (isTouched && hasValue && !isValidating) return "valid";
+	if ((isTouched || isFormSubmitted) && hasValue && !isValidating) return "valid";
 	return "neutral";
 }
 

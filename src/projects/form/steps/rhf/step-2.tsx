@@ -20,7 +20,7 @@ function Step2(): JSX.Element {
 	const {
 		control,
 		formValues,
-		formState: { errors, touchedFields, dirtyFields },
+		formState: { errors, touchedFields, dirtyFields, isSubmitted },
 		stateOptions,
 		cityOptions,
 		handleStateChange,
@@ -29,11 +29,13 @@ function Step2(): JSX.Element {
 
 	// --- COMPUTED STATES ---
 	const stateStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.state),
 		isTouched: Boolean(dirtyFields.state) || Boolean(touchedFields.state),
 		hasValue: Boolean(formValues.state),
 	});
 	const cityStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.city),
 		isTouched: Boolean(dirtyFields.city) || Boolean(touchedFields.city),
 		hasValue: Boolean(formValues.city),

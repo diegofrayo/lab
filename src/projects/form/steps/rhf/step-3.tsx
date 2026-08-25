@@ -25,7 +25,7 @@ function Step3(): JSX.Element {
 		control,
 		register,
 		formValues,
-		formState: { errors, touchedFields, dirtyFields },
+		formState: { errors, touchedFields, dirtyFields, isSubmitted },
 		handleHasCollegeDegreeChange,
 		onSubmit,
 	} = useStep3Form();
@@ -33,6 +33,7 @@ function Step3(): JSX.Element {
 	// --- COMPUTED STATES ---
 	const hasCollegeDegree = Boolean(formValues.hasCollegeDegree);
 	const collegeNameStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.collegeName),
 		isTouched: Boolean(dirtyFields.collegeName) || Boolean(touchedFields.collegeName),
 		hasValue: Boolean(formValues.collegeName),

@@ -30,7 +30,7 @@ function Step4(): JSX.Element {
 	const {
 		control,
 		formValues,
-		formState: { errors, touchedFields, dirtyFields },
+		formState: { errors, touchedFields, dirtyFields, isSubmitted },
 		handleStillStudyingChange,
 		onSubmit,
 	} = useStep4Form();
@@ -38,16 +38,19 @@ function Step4(): JSX.Element {
 	// --- COMPUTED STATES ---
 	const stillStudying = formValues.stillStudying;
 	const stillStudyingStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.stillStudying),
 		isTouched: Boolean(dirtyFields.stillStudying) || Boolean(touchedFields.stillStudying),
 		hasValue: formValues.stillStudying !== undefined,
 	});
 	const startDateStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.startDate),
 		isTouched: Boolean(dirtyFields.startDate) || Boolean(touchedFields.startDate),
 		hasValue: Boolean(formValues.startDate),
 	});
 	const endDateStatus = getFieldStatus({
+		isFormSubmitted: isSubmitted,
 		hasError: Boolean(errors.endDate),
 		isTouched: Boolean(dirtyFields.endDate) || Boolean(touchedFields.endDate),
 		hasValue: Boolean(formValues.endDate),
