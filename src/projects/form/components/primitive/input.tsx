@@ -9,10 +9,7 @@ import type { FieldStatus } from "../../utils/types";
 
 type InputProps = BaseInput.Props & { "data-state": FieldStatus };
 
-const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-	{ className, ...props },
-	ref,
-) {
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ className, ...props }, ref) {
 	// --- STYLES ---
 	const classes = {
 		input: cn(

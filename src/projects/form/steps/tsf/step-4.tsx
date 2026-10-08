@@ -198,10 +198,7 @@ function useStep4Form() {
 		getDefaultValues,
 		goToNextStep,
 	} = useFormNavigation();
-	const FORM_INPUTS_NAME: FormInputName[] = useMemo(
-		() => ["startDate", "stillStudying", "endDate"],
-		[],
-	);
+	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["startDate", "stillStudying", "endDate"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues<Step4Values>(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],

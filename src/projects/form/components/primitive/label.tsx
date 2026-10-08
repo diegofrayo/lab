@@ -8,10 +8,7 @@ import type { FieldStatus } from "../../utils/types";
 
 type LabelProps = React.ComponentPropsWithoutRef<"label"> & { "data-state"?: FieldStatus };
 
-const Label = forwardRef<HTMLLabelElement, LabelProps>(function Label(
-	{ className, ...props },
-	ref,
-) {
+const Label = forwardRef<HTMLLabelElement, LabelProps>(function Label({ className, ...props }, ref) {
 	// --- STYLES ---
 	const classes = {
 		label: cn(

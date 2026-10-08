@@ -22,9 +22,7 @@ import type { FormInputName, Step3Values } from "../../utils/types";
 function Step3(): JSX.Element {
 	// --- HOOKS ---
 	const { form, onSubmit } = useStep3Form();
-	const hasCollegeDegree = useSelector(form.store, (state) =>
-		Boolean(state.values.hasCollegeDegree),
-	);
+	const hasCollegeDegree = useSelector(form.store, (state) => Boolean(state.values.hasCollegeDegree));
 
 	return (
 		<Form onSubmit={onSubmit}>

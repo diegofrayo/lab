@@ -91,9 +91,7 @@ function Step4(): JSX.Element {
 							/>
 						)}
 					/>
-					<Form.FieldMessage status={startDateStatus}>
-						{errors.startDate?.message}
-					</Form.FieldMessage>
+					<Form.FieldMessage status={startDateStatus}>{errors.startDate?.message}</Form.FieldMessage>
 				</Form.Field>
 
 				<Form.Field>
@@ -200,10 +198,7 @@ function useStep4Form(): UseStep4FormReturn {
 		getDefaultValues,
 		goToNextStep,
 	} = useFormNavigation();
-	const FORM_INPUTS_NAME: FormInputName[] = useMemo(
-		() => ["startDate", "stillStudying", "endDate"],
-		[],
-	);
+	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["startDate", "stillStudying", "endDate"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues<Step4Values>(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],

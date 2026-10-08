@@ -36,9 +36,7 @@ function StepRenderer({ stepComponents, scope }: StepRendererProps): JSX.Element
 	return (
 		<div>
 			<div className="mb-6 flex items-center justify-between gap-2">
-				<p className={classes.scopeBadge}>
-					{scope === "rhf" ? "React Hook Form" : "TanStack form"}
-				</p>
+				<p className={classes.scopeBadge}>{scope === "rhf" ? "React Hook Form" : "TanStack form"}</p>
 				<div className={classes.stepBadge}>
 					Step {currentStep} of {TOTAL_STEPS}
 				</div>

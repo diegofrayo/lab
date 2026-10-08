@@ -33,10 +33,7 @@ export const CustomValidations = {
 		},
 	},
 	step4: {
-		endDate: (
-			endDate: string | undefined,
-			formValues: Step4Values,
-		): ERROR_MESSAGE | VALID_INPUT => {
+		endDate: (endDate: string | undefined, formValues: Step4Values): ERROR_MESSAGE | VALID_INPUT => {
 			if (formValues.stillStudying) return VALID_INPUT;
 
 			const validationResult = validateField(formSchema.shape.endDate, endDate);

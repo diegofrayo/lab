@@ -137,10 +137,7 @@ const DEFAULT_VALUES = {
 
 // --- UTILS ---
 
-function parseLocalStorageValue(
-	scope: FormScope,
-	inputName: FormInputName,
-): string | boolean | null {
+function parseLocalStorageValue(scope: FormScope, inputName: FormInputName): string | boolean | null {
 	const rawValue = window.localStorage.getItem(composeLocalStorageKeyForInput(scope, inputName));
 	if (rawValue === null) return rawValue;
 

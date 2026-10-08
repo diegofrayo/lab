@@ -1,44 +1,46 @@
-export default {
-  // global
-  printWidth: 100,
-  tabWidth: 2,
-  useTabs: true,
+const prettierConfig = {
+	// global
+	printWidth: 105,
+	tabWidth: 2,
+	useTabs: true,
 
-  // common
-  bracketSpacing: true,
-  singleQuote: false,
+	// common
+	bracketSpacing: true,
+	singleQuote: false,
 
-  // js
-  arrowParens: "always",
-  semi: true,
-  trailingComma: "all",
+	// js
+	arrowParens: "always",
+	semi: true,
+	trailingComma: "all",
 
-  // jsx
-  bracketSameLine: false,
-  singleAttributePerLine: true,
+	// jsx
+	bracketSameLine: false,
+	singleAttributePerLine: true,
 
-  // plugins
-  plugins: ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+	// plugins
+	plugins: ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
 
-  // plugin: @ianvs/prettier-plugin-sort-imports
-  importOrder: [
-    "<BUILTIN_MODULES>",
-    "^react$",
-    "<THIRD_PARTY_MODULES>",
-    "",
-    "^(@diegofrayo-pkg)(/.*)$",
-    "",
-    "^~/(.*)$",
-    "",
-    "^[./]",
-    "",
-    ".css$",
-  ],
-  importOrderParserPlugins: ["typescript", "jsx", "decorators"],
+	// plugin: @ianvs/prettier-plugin-sort-imports
+	importOrder: [
+		"<BUILTIN_MODULES>",
+		"^react$",
+		"<THIRD_PARTY_MODULES>",
+		"",
+		"^(@diegofrayo-pkg)(/.*)$",
+		"",
+		"^~/(.*)$",
+		"",
+		"^[./]",
+		"",
+		".css$",
+	],
+	importOrderParserPlugins: ["typescript", "jsx", "decorators"],
 
-  // plugin: prettier-plugin-tailwindcss
-  tailwindFunctions: ["cva", "cn", "clsx", "tw"],
-  tailwindAttributes: ["wrapperClassName", "contentClassName", "containerClassName"],
-  tailwindPreserveWhitespace: false,
-  tailwindPreserveDuplicates: false,
+	// plugin: prettier-plugin-tailwindcss
+	tailwindFunctions: ["cva", "cn", "clsx", "tw"],
+	tailwindAttributes: ["wrapperClassName", "contentClassName", "containerClassName"],
+	tailwindPreserveWhitespace: false,
+	tailwindPreserveDuplicates: false,
 };
+
+export default prettierConfig;

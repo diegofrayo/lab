@@ -49,9 +49,7 @@ function Step1(): JSX.Element {
 									onBlur={field.handleBlur}
 									onChange={(event) => field.handleChange(event.target.value)}
 								/>
-								<Form.FieldMessage status={nameStatus}>
-									{field.state.meta.errors[0]}
-								</Form.FieldMessage>
+								<Form.FieldMessage status={nameStatus}>{field.state.meta.errors[0]}</Form.FieldMessage>
 							</Form.Field>
 						);
 					}}
@@ -207,22 +205,14 @@ const ValidationRules = {
 	},
 };
 
-async function validateEmailAvailability({
-	value,
-}: {
-	value: string;
-}): Promise<string | undefined> {
+async function validateEmailAvailability({ value }: { value: string }): Promise<string | undefined> {
 	if (!value) return undefined;
 
 	const result = await asyncCheck("email", value, "This email is already taken");
 	return result === true ? undefined : result;
 }
 
-async function validateUsernameAvailability({
-	value,
-}: {
-	value: string;
-}): Promise<string | undefined> {
+async function validateUsernameAvailability({ value }: { value: string }): Promise<string | undefined> {
 	if (!value) return undefined;
 
 	const result = await asyncCheck("username", value, "This username is already taken");

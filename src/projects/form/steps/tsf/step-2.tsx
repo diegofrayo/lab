@@ -57,9 +57,7 @@ function Step2(): JSX.Element {
 									onBlur={field.handleBlur}
 									onValueChange={handleValueChange}
 								/>
-								<Form.FieldMessage status={stateStatus}>
-									{field.state.meta.errors[0]}
-								</Form.FieldMessage>
+								<Form.FieldMessage status={stateStatus}>{field.state.meta.errors[0]}</Form.FieldMessage>
 							</Form.Field>
 						);
 					}}
@@ -94,9 +92,7 @@ function Step2(): JSX.Element {
 									onBlur={field.handleBlur}
 									onValueChange={(value) => field.handleChange(value ?? "")}
 								/>
-								<Form.FieldMessage status={cityStatus}>
-									{field.state.meta.errors[0]}
-								</Form.FieldMessage>
+								<Form.FieldMessage status={cityStatus}>{field.state.meta.errors[0]}</Form.FieldMessage>
 							</Form.Field>
 						);
 					}}
