@@ -10,16 +10,30 @@ type ProductRowProps = {
 
 	// Optional props
 	trends?: ProductTrends | undefined;
+
+	// Event handlers
+	onSelect: (product: Product) => void;
 };
 
-function ProductRow({ product, trends }: ProductRowProps): JSX.Element {
+function ProductRow({ product, trends, onSelect }: ProductRowProps): JSX.Element {
 	// --- STYLES ---
 	const classes = {
-		container: cn("flex h-18 items-center gap-3 border-b border-gray-200 px-2"),
+		container: cn(
+			"relative flex h-18 items-center gap-3 border-b border-gray-200 px-2 hover:bg-gray-50",
+		),
 		photo: cn("h-12 w-12 shrink-0 rounded object-cover"),
-		name: cn("flex-1 truncate text-sm font-medium text-gray-800"),
+		name: cn("min-w-0 flex-1 truncate text-sm font-medium text-gray-800"),
+		// The button covers the whole row, so clicking anywhere opens the product details
+		nameButton: cn(
+			"cursor-pointer text-left after:absolute after:inset-0 focus:outline-none focus-visible:after:ring-2 focus-visible:after:ring-blue-500 focus-visible:after:ring-inset",
+		),
 		metrics: cn("grid shrink-0 grid-cols-4 gap-3"),
 	};
+
+	// --- HANDLERS ---
+	function handleNameClick(): void {
+		onSelect(product);
+	}
 
 	return (
 		<article className={classes.container}>
@@ -29,7 +43,15 @@ function ProductRow({ product, trends }: ProductRowProps): JSX.Element {
 				alt={product.name}
 				loading="lazy"
 			/>
-			<h2 className={classes.name}>{product.name}</h2>
+			<h2 className={classes.name}>
+				<button
+					type="button"
+					className={classes.nameButton}
+					onClick={handleNameClick}
+				>
+					{product.name}
+				</button>
+			</h2>
 			<dl className={classes.metrics}>
 				<ProductMetric
 					label="Price"

@@ -1,19 +1,20 @@
 import {
 	dataOrchestrator,
 	type DataOrchestratorEventDetail,
-	type DataOrchestratorEventName,
 } from "../../../services/data-orchestrator.service";
 import { createProducts, updateProducts } from "../../../utils/products-faker";
 
 // Like a real socket, the payload is not trusted: consumers must validate it
 type ProductsSocketHandler = (data: unknown) => void;
 
+type ProductsSocketEventName = "FETCH_INITIAL_DATA" | "GET_UPDATES";
+
 let connectionsCount = 0;
 
 export class ProductsSocket {
 	private connectionId = `products-socket-${++connectionsCount}`;
 	private isConnected = false;
-	private handlers: Record<DataOrchestratorEventName, Set<ProductsSocketHandler>> = {
+	private handlers: Record<ProductsSocketEventName, Set<ProductsSocketHandler>> = {
 		FETCH_INITIAL_DATA: new Set(),
 		GET_UPDATES: new Set(),
 	};
@@ -51,7 +52,7 @@ export class ProductsSocket {
 		dataOrchestrator.disconnect(this.connectionId);
 	}
 
-	on(eventName: DataOrchestratorEventName, handler: ProductsSocketHandler): () => void {
+	on(eventName: ProductsSocketEventName, handler: ProductsSocketHandler): () => void {
 		this.handlers[eventName].add(handler);
 
 		return (): void => {
@@ -60,7 +61,7 @@ export class ProductsSocket {
 	}
 
 	private notify(
-		eventName: DataOrchestratorEventName,
+		eventName: ProductsSocketEventName,
 		{ connectionId, data }: DataOrchestratorEventDetail<unknown>,
 	): void {
 		if (connectionId !== this.connectionId) return;

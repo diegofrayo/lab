@@ -4,7 +4,7 @@ import { createContext, useCallback, useState, type ReactNode } from "react";
 import type { JSX } from "react";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
-import type { OpenedApp, OpenedApps } from "../desktop.types";
+import type { AppParams, OpenedApp, OpenedApps } from "../desktop.types";
 
 export const DesktopContext = createContext<DesktopContextValue | null>(null);
 
@@ -15,7 +15,7 @@ type DesktopProviderProps = {
 export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element {
 	const [openedApps, setOpenedApps] = useState<OpenedApps>({});
 
-	const openApp = useCallback((targetAppId: string): void => {
+	const openApp = useCallback((targetAppId: string, params: AppParams = {}): void => {
 		const appConfig = APPS_REPOSITORY[targetAppId];
 		if (!appConfig) return;
 
@@ -27,7 +27,12 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 					...updatedState,
 					[targetAppId]: {
 						...updatedState[targetAppId],
+						status:
+							updatedState[targetAppId].status === "MINIMIZED"
+								? "VISIBLE"
+								: updatedState[targetAppId].status,
 						isFocused: true,
+						params,
 					},
 				};
 			}
@@ -38,6 +43,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 				appConfig,
 				status: "VISIBLE",
 				isFocused: true,
+				params,
 				windowConfig: {
 					x: 100 + offset,
 					y: 80 + offset,
@@ -136,7 +142,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 
 export type DesktopContextValue = {
 	openedApps: OpenedApps;
-	openApp: (targetAppId: string) => void;
+	openApp: (targetAppId: string, params?: AppParams) => void;
 	closeApp: (targetAppId: string) => void;
 	maximizeApp: (targetAppId: string) => void;
 	minimizeApp: (targetAppId: string) => void;

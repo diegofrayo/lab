@@ -39,13 +39,13 @@ function Desktop(): JSX.Element {
 								key={openedApp.id}
 								openedApp={openedApp}
 							>
-								<AppComponent />
+								<AppComponent params={openedApp.params} />
 							</Window>
 						);
 					})}
 				</div>
 				<div className={classes.iconsArea}>
-					{Object.values(APPS_REPOSITORY).map((appConfig) => (
+					{DESKTOP_APPS.map((appConfig) => (
 						<DesktopIcon
 							key={appConfig.id}
 							appConfig={appConfig}
@@ -59,3 +59,9 @@ function Desktop(): JSX.Element {
 }
 
 export default Desktop;
+
+// --- CONSTANTS ---
+
+const DESKTOP_APPS = Object.values(APPS_REPOSITORY).filter(
+	(appConfig) => !appConfig.isHiddenFromDesktop,
+);

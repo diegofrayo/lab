@@ -3,7 +3,7 @@
  * (after a simulated latency) and then periodic updates, all delivered as `CustomEvent`s.
  */
 
-export type DataOrchestratorEventName = "FETCH_INITIAL_DATA" | "GET_UPDATES";
+export type DataOrchestratorEventName = "FETCH_INITIAL_DATA" | "GET_UPDATES" | "PRODUCT_ORDERS";
 
 export type DataOrchestratorEventDetail<TData> = {
 	connectionId: string;
@@ -23,12 +23,20 @@ type Connection = {
 type ConnectParams<TData> = {
 	connectionId: string;
 	dataSource: DataSource<TData>;
+	eventNames?: {
+		initialData: DataOrchestratorEventName;
+		updates: DataOrchestratorEventName;
+	};
 	latencyMs?: number;
 	updateIntervalMs?: number;
 };
 
 const DEFAULT_LATENCY_MS = 300;
 const DEFAULT_UPDATE_INTERVAL_MS = 1000;
+const DEFAULT_EVENT_NAMES = {
+	initialData: "FETCH_INITIAL_DATA",
+	updates: "GET_UPDATES",
+} as const;
 
 class DataOrchestrator {
 	private eventTarget = new EventTarget();
@@ -37,6 +45,7 @@ class DataOrchestrator {
 	connect<TData>({
 		connectionId,
 		dataSource,
+		eventNames = DEFAULT_EVENT_NAMES,
 		latencyMs = DEFAULT_LATENCY_MS,
 		updateIntervalMs = DEFAULT_UPDATE_INTERVAL_MS,
 	}: ConnectParams<TData>): void {
@@ -46,11 +55,11 @@ class DataOrchestrator {
 			updatesIntervalId: null,
 			latencyTimeoutId: setTimeout(() => {
 				let data = dataSource.getInitialData();
-				this.dispatch("FETCH_INITIAL_DATA", { connectionId, data });
+				this.dispatch(eventNames.initialData, { connectionId, data });
 
 				connection.updatesIntervalId = setInterval(() => {
 					data = dataSource.getUpdates(data);
-					this.dispatch("GET_UPDATES", { connectionId, data });
+					this.dispatch(eventNames.updates, { connectionId, data });
 				}, updateIntervalMs);
 			}, latencyMs),
 		};

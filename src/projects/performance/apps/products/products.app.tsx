@@ -4,6 +4,7 @@ import type { JSX } from "react";
 
 import cn from "@diegofrayo-pkg/cn";
 
+import { useDesktop } from "../../desktop/context/desktop.hook";
 import ProductRow from "./components/product-row";
 import VirtualList from "./components/virtual-list";
 import { useProductsSocket } from "./hooks/use-products-socket.hook";
@@ -14,6 +15,7 @@ const PRODUCT_ROW_HEIGHT = 72;
 function ProductsApp(): JSX.Element {
 	// --- HOOKS ---
 	const { products, trends, isConnected } = useProductsSocket();
+	const { openApp } = useDesktop();
 
 	// --- STYLES ---
 	const classes = {
@@ -27,12 +29,18 @@ function ProductsApp(): JSX.Element {
 		list: cn("min-h-0 flex-1"),
 	};
 
+	// --- HANDLERS ---
+	function handleProductSelect(product: Product): void {
+		openApp("product-details", { productId: product.id, productName: product.name });
+	}
+
 	// --- UTILS ---
 	function renderProduct(product: Product): JSX.Element {
 		return (
 			<ProductRow
 				product={product}
 				trends={trends[product.id]}
+				onSelect={handleProductSelect}
 			/>
 		);
 	}
