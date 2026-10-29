@@ -18,7 +18,7 @@ type WindowProps = {
 
 function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	// --- HOOKS ---
-	const { closeApp, minimizeApp, maximizeApp, focusApp, moveWindow } = useDesktop();
+	const { closeApp, minimizeApp, maximizeApp, restoreApp, focusApp, moveWindow } = useDesktop();
 
 	// --- STATES & REFS ---
 	const isDragging = useRef(false);
@@ -84,7 +84,12 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 
 	function handleMaximizeClick(e: React.MouseEvent<HTMLButtonElement>): void {
 		e.stopPropagation();
-		maximizeApp(id);
+
+		if (isMaximized) {
+			restoreApp(id);
+		} else {
+			maximizeApp(id);
+		}
 	}
 
 	// --- UTILS ---
@@ -158,7 +163,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 					<button
 						className={classes.btnMaximize}
 						onClick={handleMaximizeClick}
-						aria-label="Maximize"
+						aria-label={isMaximized ? "Restore" : "Maximize"}
 					/>
 					<button
 						className={classes.btnClose}

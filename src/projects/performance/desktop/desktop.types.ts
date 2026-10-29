@@ -33,6 +33,8 @@ export type OpenedApp = {
 	id: string;
 	appConfig: AppConfig;
 	status: "MAXIMIZED" | "MINIMIZED" | "VISIBLE";
+	// Used to bring a minimized window back to the status it had before
+	statusBeforeMinimize?: "MAXIMIZED" | "VISIBLE";
 	isFocused: boolean;
 	params: AppParams;
 	windowConfig: NonNullable<AppConfig["windowConfig"]>;

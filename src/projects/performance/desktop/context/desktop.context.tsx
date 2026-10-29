@@ -30,7 +30,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 						...updatedState[targetAppId],
 						status:
 							updatedState[targetAppId].status === "MINIMIZED"
-								? "VISIBLE"
+								? getRestoredStatus(updatedState[targetAppId])
 								: updatedState[targetAppId].status,
 						isFocused: true,
 						params,
@@ -82,15 +82,35 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 		});
 	}, []);
 
-	const minimizeApp = useCallback((targetAppId: string): void => {
+	// The window keeps its last size and position while maximized, so restoring only changes the status.
+	// A minimized window goes back to the status it had before being minimized
+	const restoreApp = useCallback((targetAppId: string): void => {
 		setOpenedApps((prev) => {
 			if (!prev[targetAppId]) return prev;
+
+			const updatedState = unfocusAllApps(prev);
+
+			return {
+				...updatedState,
+				[targetAppId]: {
+					...updatedState[targetAppId]!,
+					status: getRestoredStatus(updatedState[targetAppId]!),
+					isFocused: true,
+				},
+			};
+		});
+	}, []);
+
+	const minimizeApp = useCallback((targetAppId: string): void => {
+		setOpenedApps((prev) => {
+			if (!prev[targetAppId] || prev[targetAppId].status === "MINIMIZED") return prev;
 
 			return {
 				...prev,
 				[targetAppId]: {
 					...prev[targetAppId],
 					status: "MINIMIZED",
+					statusBeforeMinimize: prev[targetAppId].status,
 					isFocused: false,
 				},
 			};
@@ -154,6 +174,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 				openApp,
 				closeApp,
 				maximizeApp,
+				restoreApp,
 				minimizeApp,
 				focusApp,
 				moveWindow,
@@ -172,6 +193,7 @@ export type DesktopContextValue = {
 	openApp: (targetAppId: string, params?: AppParams) => void;
 	closeApp: (targetAppId: string) => void;
 	maximizeApp: (targetAppId: string) => void;
+	restoreApp: (targetAppId: string) => void;
 	minimizeApp: (targetAppId: string) => void;
 	focusApp: (targetAppId: string) => void;
 	moveWindow: (targetAppId: string, x: number, y: number) => void;
@@ -179,6 +201,12 @@ export type DesktopContextValue = {
 };
 
 //  --- UTILS ---
+
+function getRestoredStatus(app: OpenedApp): OpenedApp["status"] {
+	if (app.status === "MINIMIZED") return app.statusBeforeMinimize ?? "VISIBLE";
+	if (app.status === "MAXIMIZED") return "VISIBLE";
+	return app.status;
+}
 
 function unfocusAllApps(apps: OpenedApps): OpenedApps {
 	return Object.fromEntries(

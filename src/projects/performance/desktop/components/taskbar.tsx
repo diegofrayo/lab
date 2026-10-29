@@ -45,7 +45,7 @@ type TaskbarButtonProps = {
 
 function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 	// --- HOOKS ---
-	const { minimizeApp, maximizeApp, focusApp } = useDesktop();
+	const { minimizeApp, restoreApp, focusApp } = useDesktop();
 
 	// --- STYLES ---
 	const classes = {
@@ -62,7 +62,7 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 	// --- HANDLERS ---
 	function handleClick(): void {
 		if (openedApp.status === "MINIMIZED") {
-			maximizeApp(openedApp.id);
+			restoreApp(openedApp.id);
 		} else if (openedApp.isFocused) {
 			minimizeApp(openedApp.id);
 		} else {
