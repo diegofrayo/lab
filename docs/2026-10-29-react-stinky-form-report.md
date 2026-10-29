@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 16 of 22 solved (10 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
+**Status:** 17 of 22 solved (11 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -163,7 +163,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 > **Solved (2026-10-29):** `Checkbox` now takes `BaseCheckbox.Root.Props & { status? }` and spreads the rest onto the root. `Select` takes `BaseSelect.Trigger.Props` and sends `name`, `disabled`, `items`, `value` and `onValueChange` to `Select.Root`, with everything else (`id`, `aria-*`, `onBlur`, `className`) going to the trigger. Every primitive (`Input`, `Select`, `Checkbox`, `Label`, `RadioGroup`) now takes an optional `status` prop instead of `data-state`, and sets `data-state` and `aria-invalid` itself, so the steps no longer repeat `aria-invalid={status === "invalid"}`. The checkboxes now get the library's blur handler and `name`, and the selects get `name`.
 
-### 12. `debounce` leaves superseded promises pending forever
+### 12. `debounce` leaves superseded promises pending forever ✅ Solved
 
 `async-handler`
 
@@ -172,6 +172,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Smell:** each call returns a new Promise. `clearTimeout` cancels the earlier timer, so those earlier promises never resolve or reject.
 - **Cost:** it works now because RHF only uses the latest result. Any caller that awaits an earlier call (logging, a spinner counter) will hang.
 - **Fix:** resolve superseded calls with a sentinel value, or skip the custom debounce. RHF validators can use an `AbortController`, and TSF already has `onChangeAsyncDebounceMs`.
+
+> **Solved (2026-10-29):** every call made during one debounce burst now gets the same promise (`Promise.withResolvers`). It settles with the result of the last call, or rejects if `func` throws. A superseded caller no longer hangs, and it gets the latest result instead of a stale one. The return type is now `Promise<Awaited<Return>>`, so an async `func` no longer gives a nested promise type.
 
 ### 13. No error boundary
 
