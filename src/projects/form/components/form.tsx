@@ -2,7 +2,7 @@
 
 import type { JSX, ReactNode } from "react";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 import { useFormNavigation } from "../context/form.hook";
 import { getFieldMessageId } from "../utils/form";

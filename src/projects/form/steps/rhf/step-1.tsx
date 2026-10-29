@@ -155,11 +155,15 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 	});
 
 	// --- HANDLERS ---
-	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
+	const submitForm = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
 		clearPersistedInputs(scope, FORM_INPUTS_NAME);
 		goToNextStep();
 	});
+
+	function onSubmit(event?: React.BaseSyntheticEvent): void {
+		void submitForm(event);
+	}
 
 	// --- COMPUTED STATES ---
 	const formValues = form.watch();

@@ -3,7 +3,7 @@
 import { forwardRef } from "react";
 import { Input as BaseInput } from "@base-ui/react/input";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 import type { FieldStatus } from "../../utils/types";
 

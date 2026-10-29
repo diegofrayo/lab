@@ -37,6 +37,7 @@ const prettierConfig = {
 	importOrderParserPlugins: ["typescript", "jsx", "decorators"],
 
 	// plugin: prettier-plugin-tailwindcss
+	tailwindStylesheet: "./src/app/globals.css",
 	tailwindFunctions: ["cva", "cn", "clsx", "tw"],
 	tailwindAttributes: ["wrapperClassName", "contentClassName", "containerClassName"],
 	tailwindPreserveWhitespace: false,

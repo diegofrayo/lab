@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 import Button from "../components/primitive/button";
 import { useFormNavigation } from "../context/form.hook";

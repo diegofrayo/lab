@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";

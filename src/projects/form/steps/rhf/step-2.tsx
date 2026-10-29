@@ -159,11 +159,15 @@ function useStep2Form(): UseStep2FormReturn {
 	const [cityOptions, setCityOptions] = useState<SelectOption[]>([]);
 
 	// --- HANDLERS ---
-	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
+	const submitForm = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
 		clearPersistedInputs(scope, FORM_INPUTS_NAME);
 		goToNextStep();
 	});
+
+	function onSubmit(event?: React.BaseSyntheticEvent): void {
+		void submitForm(event);
+	}
 
 	function handleStateChange(stateId: string | null): void {
 		form.setValue("city", "", { shouldValidate: true, shouldDirty: true });
@@ -262,7 +266,7 @@ function useColombiaLocations(): UseColombiaLocationsReturn {
 
 	// --- EFFECTS ---
 	useEffect(function loadStates() {
-		loadStatesData(); // eslint-disable-line react-hooks/set-state-in-effect
+		void loadStatesData(); // eslint-disable-line react-hooks/set-state-in-effect
 	}, []);
 
 	useEffect(function clearColombiaStorageOnUnmount() {

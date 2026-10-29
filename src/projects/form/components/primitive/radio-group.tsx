@@ -4,7 +4,7 @@ import type { JSX } from "react";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 import type { FieldStatus } from "../../utils/types";
 import Label from "./label";

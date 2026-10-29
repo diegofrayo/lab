@@ -2,7 +2,7 @@ import type { JSX } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 const LINKS = [
 	{ href: "/form/react-hook-form", name: "React Hook Form" },

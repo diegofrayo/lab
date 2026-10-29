@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { Check, ChevronDown } from "lucide-react";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 import type { FieldStatus } from "../../utils/types";
 

@@ -205,7 +205,7 @@ function useStep4Form() {
 	function onSubmit(event?: React.SubmitEvent): void {
 		event?.preventDefault();
 		event?.stopPropagation();
-		form.handleSubmit();
+		void form.handleSubmit();
 	}
 
 	// --- COMPUTED STATES ---

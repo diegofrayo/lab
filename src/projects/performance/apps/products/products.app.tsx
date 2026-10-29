@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
 
 function ProductsApp(): JSX.Element {
 	// --- STYLES ---

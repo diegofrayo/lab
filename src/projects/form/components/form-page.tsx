@@ -3,10 +3,10 @@
 import type { JSX } from "react";
 import { Toaster } from "sonner";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
+import { useIsClient } from "@diegofrayo-pkg/hooks";
 
 import FormProvider from "../context/form.context";
-import { useIsHydrated } from "../hooks/use-is-hydrated";
 import type { FormScope, StepNumber } from "../utils/types";
 import StepRenderer from "./step-renderer";
 
@@ -17,7 +17,7 @@ type FormPageProps = {
 
 function FormPage({ stepComponents, scope }: FormPageProps): JSX.Element | null {
 	// --- HOOKS ---
-	const isHydrated = useIsHydrated();
+	const isClient = useIsClient();
 
 	// --- STYLES ---
 	const classes = {
@@ -27,7 +27,7 @@ function FormPage({ stepComponents, scope }: FormPageProps): JSX.Element | null 
 
 	// The form state is restored from localStorage on mount, so wait for
 	// hydration before rendering to avoid a server/client markup mismatch.
-	if (!isHydrated) return null;
+	if (!isClient) return null;
 
 	return (
 		<main className={classes.main}>

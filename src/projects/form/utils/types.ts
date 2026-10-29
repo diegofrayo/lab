@@ -32,7 +32,7 @@ export type StepNumber = 1 | 2 | 3 | 4 | 5;
  * ready-to-bind `onSubmit` handler.
  */
 export type StepFormReturn<T extends FieldValues = FieldValues> = UseFormReturn<T> & {
-	onSubmit: (event?: BaseSyntheticEvent) => Promise<void>;
+	onSubmit: (event?: BaseSyntheticEvent) => void;
 	formValues: T;
 };
 

@@ -2,7 +2,8 @@
 
 import type { JSX } from "react";
 
-import cn from "~/lib/cn";
+import cn from "@diegofrayo-pkg/cn";
+
 import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";

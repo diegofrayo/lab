@@ -21,6 +21,7 @@
 
 		// Modules
 		"paths": {
+			"@diegofrayo-pkg/*": ["./src/lib/@diegofrayo-pkg/*"],
 			"~/*": ["./src/*"]
 		},
 		"module": "esnext",
@@ -37,6 +38,7 @@
 		"target": "es2022",
 		"lib": ["DOM", "DOM.ITERABLE", "ESNext"],
 		"moduleDetection": "force",
+		"types": ["node"],
 
 		// Completeness
 		"skipLibCheck": true,

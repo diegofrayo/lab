@@ -197,7 +197,7 @@ function useStep4Form(): UseStep4FormReturn {
 	});
 
 	// --- HANDLERS ---
-	const onSubmit = form.handleSubmit(function handleFinalSubmit(data) {
+	const submitForm = form.handleSubmit(function handleFinalSubmit(data) {
 		updateFormValues(data);
 
 		const finalFormValues = { ...contextFormValues, ...data };
@@ -213,13 +213,17 @@ function useStep4Form(): UseStep4FormReturn {
 		goToNextStep();
 	});
 
+	function onSubmit(event?: React.BaseSyntheticEvent): void {
+		void submitForm(event);
+	}
+
 	function handleStillStudyingChange(value: boolean): void {
 		if (value) {
 			form.setValue("endDate", "", { shouldValidate: true });
 			return;
 		}
 
-		form.trigger("endDate");
+		void form.trigger("endDate");
 	}
 
 	// --- COMPUTED STATES ---
@@ -233,7 +237,7 @@ function useStep4Form(): UseStep4FormReturn {
 	useEffect(
 		function revalidateEndDateOnStartDateChange() {
 			if (form.formState.dirtyFields.endDate) {
-				form.trigger("endDate");
+				void form.trigger("endDate");
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps

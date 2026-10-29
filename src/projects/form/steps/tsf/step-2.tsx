@@ -148,7 +148,7 @@ function useStep2Form() {
 	function onSubmit(event?: React.SubmitEvent): void {
 		event?.preventDefault();
 		event?.stopPropagation();
-		form.handleSubmit();
+		void form.handleSubmit();
 	}
 
 	function handleStateChange(): void {
@@ -222,7 +222,7 @@ function useColombiaLocations(): UseColombiaLocationsReturn {
 
 	// --- EFFECTS ---
 	useEffect(function loadStates() {
-		loadStatesData(); // eslint-disable-line react-hooks/set-state-in-effect
+		void loadStatesData(); // eslint-disable-line react-hooks/set-state-in-effect
 	}, []);
 
 	useEffect(function clearColombiaStorageOnUnmount() {

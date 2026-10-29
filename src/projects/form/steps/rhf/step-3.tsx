@@ -125,15 +125,19 @@ function useStep3Form(): UseStep3FormReturn {
 	});
 
 	// --- HANDLERS ---
-	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
+	const submitForm = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
 		clearPersistedInputs(scope, FORM_INPUTS_NAME);
 		goToNextStep();
 	});
 
+	function onSubmit(event?: React.BaseSyntheticEvent): void {
+		void submitForm(event);
+	}
+
 	function handleHasCollegeDegreeChange(checked: boolean): void {
 		if (checked) {
-			form.trigger("collegeName");
+			void form.trigger("collegeName");
 			return;
 		}
 
