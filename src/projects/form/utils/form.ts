@@ -1,4 +1,5 @@
 import type { AnyFieldApi } from "@tanstack/react-form";
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 import { z, type ZodSafeParseResult } from "zod";
 
 import type {
@@ -16,9 +17,9 @@ type ERROR_MESSAGE = string;
 const TSF_VALID_INPUT = undefined;
 type TSF_VALID_INPUT = undefined;
 
-type CustomValidation<InputValue, FormValues> = (
+type CustomValidation<InputValue, StepValues> = (
 	inputValue: InputValue,
-	formValues: FormValues,
+	formValues: StepValues,
 ) => ERROR_MESSAGE | VALID_INPUT;
 
 export const CustomValidations = {
@@ -111,14 +112,16 @@ export const formSchema = baseFormSchema.superRefine((values, ctx) => {
 	}
 });
 
-export function parseForm(formValues: Record<string, unknown>): ZodSafeParseResult<FormValues> {
-	// NOTE: Clean optional default values to avoid unexpected validations errors
-	const OPTIONAL_FIELDS: FormInputName[] = ["collegeName", "endDate"] as const;
+export function parseForm(formValues: Partial<FormValues>): ZodSafeParseResult<FormValues> {
+	// NOTE: Clean optional default values to avoid unexpected validations errors.
+	// Work on a copy so the caller's object is never mutated.
+	const values: Record<string, unknown> = { ...formValues };
+	const OPTIONAL_FIELDS: FormInputName[] = ["collegeName", "endDate"];
 	OPTIONAL_FIELDS.forEach((fieldName) => {
-		if (!formValues[fieldName]) formValues[fieldName] = undefined;
+		if (!values[fieldName]) values[fieldName] = undefined;
 	});
 
-	return formSchema.safeParse(formValues);
+	return formSchema.safeParse(values);
 }
 
 /**
@@ -132,26 +135,33 @@ function validateField(fieldSchema: z.ZodType, value: unknown): VALID_INPUT | ER
 	return result.success ? VALID_INPUT : (result.error.issues[0]?.message ?? "Invalid value");
 }
 
+type GetFieldStatusParams = {
+	hasError: boolean;
+	hasValue: boolean;
+	isFormSubmitted: boolean;
+	isTouched: boolean;
+	isValidating: boolean;
+};
+
 /**
- * Derives a field's visual status from its react-hook-form state. Shared across
- * steps so every field reports valid/invalid/neutral the same way.
+ * Derives a field's visual status. Only called through `getRHFFieldStatus` and
+ * `getTSFFieldStatus`, so both libraries decide "valid" the same way.
  */
-export function getFieldStatus({
+function getFieldStatus({
 	hasError,
 	hasValue,
 	isFormSubmitted,
 	isTouched,
 	isValidating,
-}: {
-	hasError: boolean;
-	hasValue: boolean;
-	isFormSubmitted?: boolean;
-	isTouched: boolean;
-	isValidating?: boolean;
-}): FieldStatus {
+}: GetFieldStatusParams): FieldStatus {
 	if (hasError) return "invalid";
 	if ((isTouched || isFormSubmitted) && hasValue && !isValidating) return "valid";
 	return "neutral";
+}
+
+/** `false` counts as a value (e.g. a "No" answer); only empty strings and missing values don't. */
+function hasFieldValue(value: unknown): boolean {
+	return value !== undefined && value !== null && value !== "";
 }
 
 export function composeLocalStorageKeyForInput(scope: FormScope, inputName: string): string {
@@ -180,7 +190,37 @@ export function createRHFInputValidator<InputValue>(inputShape: z.ZodType) {
 	};
 }
 
+type GetRHFFieldStatusParams<Values extends FieldValues> = {
+	form: Pick<UseFormReturn<Values>, "formState" | "getFieldState" | "getValues">;
+	name: Path<Values>;
+};
+
+export function getRHFFieldStatus<Values extends FieldValues>({
+	form,
+	name,
+}: GetRHFFieldStatusParams<Values>): FieldStatus {
+	const { invalid, isDirty, isTouched, isValidating } = form.getFieldState(name, form.formState);
+
+	return getFieldStatus({
+		hasError: invalid,
+		hasValue: hasFieldValue(form.getValues(name)),
+		isFormSubmitted: form.formState.isSubmitted,
+		isTouched: isDirty || isTouched,
+		isValidating,
+	});
+}
+
 // --- TSF Utils ---
+
+export function getTSFFieldStatus(field: AnyFieldApi): FieldStatus {
+	return getFieldStatus({
+		hasError: field.state.meta.errors.length > 0,
+		hasValue: hasFieldValue(field.state.value),
+		isFormSubmitted: field.form.state.isSubmitted,
+		isTouched: field.state.meta.isTouched,
+		isValidating: field.state.meta.isValidating,
+	});
+}
 
 export function createTSFValidatorFromInputShape<InputValue>(inputShape: z.ZodType) {
 	return function validator({ value }: { value: InputValue }): ERROR_MESSAGE | TSF_VALID_INPUT {
@@ -189,8 +229,8 @@ export function createTSFValidatorFromInputShape<InputValue>(inputShape: z.ZodTy
 	};
 }
 
-export function createTSFValidatorFromCustomValidation<InputValue, FormValues>(
-	customValidation: CustomValidation<InputValue, FormValues>,
+export function createTSFValidatorFromCustomValidation<InputValue, StepValues>(
+	customValidation: CustomValidation<InputValue, StepValues>,
 ) {
 	return function validator({
 		value,
@@ -199,12 +239,24 @@ export function createTSFValidatorFromCustomValidation<InputValue, FormValues>(
 		value: InputValue;
 		fieldApi: AnyFieldApi;
 	}): ERROR_MESSAGE | TSF_VALID_INPUT {
-		const result = customValidation(value, fieldApi.form.state.values as FormValues);
+		const result = customValidation(value, fieldApi.form.state.values as StepValues);
 		return result === true ? TSF_VALID_INPUT : result;
 	};
 }
 
-export function clearPersistedInputs(scope: FormScope, inputNames: FormInputName[]): void {
+/** `localStorage` key of the cached Colombia states/cities dataset used by step 2. */
+export const COLOMBIA_STORAGE_KEY = "data:colombia-locations";
+
+/** Removes every value the form saved under `scope` (submitted values, current step and per-input drafts). */
+export function clearPersistedForm(scope: FormScope): void {
+	const prefix = `${scope}:form:`;
+
+	Object.keys(window.localStorage)
+		.filter((key) => key.startsWith(prefix))
+		.forEach((key) => window.localStorage.removeItem(key));
+}
+
+export function clearPersistedInputs(scope: FormScope, inputNames: readonly FormInputName[]): void {
 	inputNames.forEach((inputName) => {
 		window.localStorage.removeItem(composeLocalStorageKeyForInput(scope, inputName));
 	});

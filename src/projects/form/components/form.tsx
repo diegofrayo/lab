@@ -4,10 +4,13 @@ import type { JSX, ReactNode } from "react";
 
 import cn from "@diegofrayo-pkg/cn";
 
-import { useFormNavigation } from "../context/form.hook";
+import { useMultiStepForm } from "../context/form.hook";
 import { getFieldMessageId } from "../utils/form";
 import type { FieldStatus } from "../utils/types";
 import Button from "./primitive/button";
+import Input from "./primitive/input";
+import Label from "./primitive/label";
+import Select from "./primitive/select";
 
 type FormProps = React.ComponentPropsWithoutRef<"form">;
 
@@ -34,6 +37,8 @@ const Form = Object.assign(FormRoot, {
 	FieldMessage: FormFieldMessage,
 	Navigation: FormNavigation,
 	FieldWithLoader: FieldWithLoader,
+	SelectField: FormSelectField,
+	TextField: FormTextField,
 });
 
 export default Form;
@@ -122,7 +127,7 @@ function FormNavigation({
 	nextButtonLabel = "Next",
 }: FormNavigationProps): JSX.Element {
 	// --- HOOKS ---
-	const { currentStep, goToPreviousStep } = useFormNavigation();
+	const { currentStep, goToPreviousStep } = useMultiStepForm();
 
 	// --- COMPUTED STATES ---
 	const isFirstStep = currentStep === 1;
@@ -174,5 +179,91 @@ function FieldWithLoader({ isLoading, loadingLabel, children }: FieldWithLoaderP
 				/>
 			)}
 		</div>
+	);
+}
+
+// --- COMPOSITE FIELDS ---
+
+type FieldLabelProps = {
+	// Becomes the control's `id`; the label and the message are wired to it.
+	id: string;
+	label: string;
+	status: FieldStatus;
+
+	message?: ReactNode;
+};
+
+// Either no loader at all, or a loader with its accessible label.
+type FieldLoaderProps =
+	{ isLoading?: never; loadingLabel?: never } | { isLoading: boolean; loadingLabel: string };
+
+type FormTextFieldProps = Omit<React.ComponentProps<typeof Input>, "id" | "status"> &
+	FieldLabelProps &
+	FieldLoaderProps;
+
+/** Label + `Input` + message, with `htmlFor`, `aria-describedby` and the status wired once. */
+function FormTextField({
+	id,
+	label,
+	status,
+	message,
+	isLoading = false,
+	loadingLabel = "",
+	...props
+}: FormTextFieldProps): JSX.Element {
+	return (
+		<FormField>
+			<Label
+				htmlFor={id}
+				status={status}
+			>
+				{label}
+			</Label>
+			<FieldWithLoader
+				isLoading={isLoading}
+				loadingLabel={loadingLabel}
+			>
+				<Input
+					id={id}
+					aria-describedby={getFieldMessageId(id)}
+					status={status}
+					{...props}
+				/>
+			</FieldWithLoader>
+			<FormFieldMessage
+				inputId={id}
+				status={status}
+			>
+				{message}
+			</FormFieldMessage>
+		</FormField>
+	);
+}
+
+type FormSelectFieldProps = Omit<React.ComponentProps<typeof Select>, "id" | "status"> & FieldLabelProps;
+
+/** Label + `Select` + message, with `htmlFor`, `aria-describedby` and the status wired once. */
+function FormSelectField({ id, label, status, message, ...props }: FormSelectFieldProps): JSX.Element {
+	return (
+		<FormField>
+			<Label
+				htmlFor={id}
+				status={status}
+			>
+				{label}
+			</Label>
+			<Select
+				id={id}
+				aria-describedby={getFieldMessageId(id)}
+				status={status}
+				{...props}
+			/>
+			<FormFieldMessage
+				inputId={id}
+				status={status}
+			>
+				{message}
+			</FormFieldMessage>
+		</FormField>
 	);
 }

@@ -13,33 +13,35 @@ export type SelectOption = {
 	value: string;
 };
 
-type SelectProps = {
+type SelectProps = Omit<BaseSelect.Trigger.Props, "children" | "value"> & {
 	// Required props — alphabetical order
 	items: SelectOption[];
-	onValueChange: (value: string | null) => void;
 	value: string | null;
 
 	// Optional props — alphabetical order
-	"aria-describedby"?: string;
-	disabled?: boolean;
-	id?: string;
+	name?: string;
 	placeholder?: string;
+	status?: FieldStatus | undefined;
 
 	// Event handlers — at the end
-	onBlur?: () => void;
-} & { "data-state": FieldStatus };
+	onValueChange: (value: string | null) => void;
+};
 
+/**
+ * `name`, `disabled`, `items`, `value` and `onValueChange` go to `Select.Root`;
+ * every other prop (`id`, `aria-*`, `onBlur`, `className`, ...) goes to the trigger.
+ */
 const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(
 	{
-		"aria-describedby": ariaDescribedBy,
-		id,
-		items,
-		placeholder = "Select an option",
-		value,
+		className,
 		disabled,
-		"data-state": dataState,
+		items,
+		name,
+		placeholder = "Select an option",
+		status,
+		value,
 		onValueChange,
-		onBlur,
+		...props
 	},
 	ref,
 ) {
@@ -68,6 +70,8 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(
 
 			// Responsiveness styling
 			"md:text-sm",
+
+			className,
 		),
 		popup: cn(
 			"max-h-64 w-(--anchor-width) overflow-y-auto rounded-none border-2 border-black bg-white p-1",
@@ -81,6 +85,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(
 
 	return (
 		<BaseSelect.Root
+			name={name}
 			items={items}
 			value={value}
 			disabled={disabled}
@@ -88,12 +93,10 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(
 		>
 			<BaseSelect.Trigger
 				ref={ref}
-				id={id}
-				data-state={dataState}
-				aria-invalid={dataState === "invalid"}
-				aria-describedby={ariaDescribedBy}
+				data-state={status}
+				aria-invalid={status === "invalid"}
 				className={classes.trigger}
-				onBlur={onBlur}
+				{...props}
 			>
 				<BaseSelect.Value placeholder={placeholder} />
 				<BaseSelect.Icon>

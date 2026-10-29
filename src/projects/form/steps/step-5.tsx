@@ -5,11 +5,11 @@ import type { JSX } from "react";
 import cn from "@diegofrayo-pkg/cn";
 
 import Button from "../components/primitive/button";
-import { useFormNavigation } from "../context/form.hook";
+import { useMultiStepForm } from "../context/form.hook";
 
 function Step5(): JSX.Element {
 	// --- HOOKS ---
-	const { formValues, resetForm } = useFormNavigation();
+	const { formValues, resetForm } = useMultiStepForm();
 
 	// --- STYLES ---
 	const classes = {

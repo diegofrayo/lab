@@ -23,35 +23,46 @@ export function asyncCheck(
 		if (cache[key] === undefined) cache[key] = {};
 
 		if (cache[key][value] === undefined) {
-			console.log("asyncCheck|fired:", key, value);
-
 			result = counter % 2 === 0 ? true : errorMessage;
 			cache[key][value] = result;
 			counter += 1;
 
 			setTimeout(() => resolve(result), SIMULATED_LATENCY_MS);
 		} else {
-			console.log("asyncCheck|cached:", key, value);
-
 			result = cache[key][value];
 			resolve(result);
 		}
 	});
 }
 
+/**
+ * Debounces `func`. Every call made during one burst returns the same promise,
+ * which settles with the result of the last call once `delay` has passed. That
+ * way a superseded call never hangs: it resolves with the latest result.
+ */
 export function debounce<Args extends unknown[], Return>(
 	func: (...args: Args) => Return,
 	delay: number,
-): (...args: Args) => Promise<Return> {
+): (...args: Args) => Promise<Awaited<Return>> {
 	let timer: ReturnType<typeof setTimeout>;
+	let pending: PromiseWithResolvers<Awaited<Return>> | null = null;
 
 	return function (this: unknown, ...args: Args) {
 		clearTimeout(timer);
 
-		return new Promise((resolve) => {
-			timer = setTimeout(() => {
-				resolve(func.apply(this, args));
-			}, delay);
-		});
+		const current = pending ?? Promise.withResolvers<Awaited<Return>>();
+		pending = current;
+
+		timer = setTimeout(() => {
+			pending = null;
+
+			try {
+				Promise.resolve(func.apply(this, args)).then(current.resolve, current.reject);
+			} catch (error) {
+				current.reject(error);
+			}
+		}, delay);
+
+		return current.promise;
 	};
 }

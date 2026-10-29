@@ -1,33 +1,28 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { useForm, useSelector } from "@tanstack/react-form";
-import { toast } from "sonner";
+import type { JSX } from "react";
+import { useSelector } from "@tanstack/react-form";
 
 import Form from "../../components/form";
-import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import RadioGroup from "../../components/primitive/radio-group";
 import type { RadioGroupOption } from "../../components/primitive/radio-group";
-import { useFormNavigation } from "../../context/form.hook";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useTSFStep } from "../../hooks/use-form-step";
 import {
-	clearPersistedInputs,
 	createTSFValidatorFromCustomValidation,
 	createTSFValidatorFromInputShape,
 	CustomValidations,
 	formSchema,
 	fromHtmlDateValue,
-	getFieldMessageId,
-	getFieldStatus,
-	parseForm,
+	getTSFFieldStatus,
 	toHtmlDateValue,
 } from "../../utils/form";
+import { STEP_4_INPUT_NAMES } from "../../utils/types";
 import type { Step4Values, TSFValidationRules } from "../../utils/types";
 
 function Step4(): JSX.Element {
 	// --- HOOKS ---
-	const { form, onSubmit } = useStep4Form();
+	const { form, onSubmit } = useTSFStep({ inputNames: STEP_4_INPUT_NAMES, isFinalStep: true });
 	const stillStudying = useSelector(form.store, (state) => state.values.stillStudying);
 
 	return (
@@ -37,42 +32,20 @@ function Step4(): JSX.Element {
 					name="startDate"
 					validators={ValidationRules.startDate}
 				>
-					{(field) => {
-						const startDateStatus = getFieldStatus({
-							hasError: field.state.meta.errors.length > 0,
-							isTouched: field.state.meta.isTouched,
-							hasValue: Boolean(field.state.value),
-						});
-
-						return (
-							<Form.Field>
-								<Label
-									htmlFor="startDate"
-									data-state={startDateStatus}
-								>
-									Start date
-								</Label>
-								<Input
-									id="startDate"
-									aria-describedby={getFieldMessageId("startDate")}
-									type="date"
-									data-state={startDateStatus}
-									aria-invalid={startDateStatus === "invalid"}
-									name={field.name}
-									value={toHtmlDateValue(field.state.value)}
-									placeholder="yyyy/mm/dd"
-									onBlur={field.handleBlur}
-									onChange={(event) => field.handleChange(fromHtmlDateValue(event.target.value))}
-								/>
-								<Form.FieldMessage
-									inputId="startDate"
-									status={startDateStatus}
-								>
-									{field.state.meta.errors[0]}
-								</Form.FieldMessage>
-							</Form.Field>
-						);
-					}}
+					{(field) => (
+						<Form.TextField
+							id="startDate"
+							label="Start date"
+							type="date"
+							name={field.name}
+							status={getTSFFieldStatus(field)}
+							message={field.state.meta.errors[0]}
+							value={toHtmlDateValue(field.state.value)}
+							placeholder="yyyy/mm/dd"
+							onBlur={field.handleBlur}
+							onChange={(event) => field.handleChange(fromHtmlDateValue(event.target.value))}
+						/>
+					)}
 				</form.Field>
 
 				<form.Field
@@ -80,11 +53,7 @@ function Step4(): JSX.Element {
 					validators={ValidationRules.stillStudying}
 				>
 					{(field) => {
-						const stillStudyingStatus = getFieldStatus({
-							hasError: field.state.meta.errors.length > 0,
-							isTouched: field.state.meta.isTouched,
-							hasValue: field.state.value !== undefined,
-						});
+						const stillStudyingStatus = getTSFFieldStatus(field);
 
 						function handleStillStudyingChange(value: boolean): void {
 							field.handleChange(value);
@@ -96,14 +65,14 @@ function Step4(): JSX.Element {
 							<Form.Field>
 								<Label
 									id="stillStudyingLabel"
-									data-state={stillStudyingStatus}
+									status={stillStudyingStatus}
 								>
 									Still studying?
 								</Label>
 								<RadioGroup
 									aria-labelledby="stillStudyingLabel"
 									name={field.name}
-									data-state={stillStudyingStatus}
+									status={stillStudyingStatus}
 									items={STILL_STUDYING_OPTIONS}
 									value={field.state.value ?? null}
 									onBlur={field.handleBlur}
@@ -119,42 +88,20 @@ function Step4(): JSX.Element {
 						name="endDate"
 						validators={ValidationRules.endDate}
 					>
-						{(field) => {
-							const endDateStatus = getFieldStatus({
-								hasError: field.state.meta.errors.length > 0,
-								isTouched: field.state.meta.isTouched,
-								hasValue: Boolean(field.state.value),
-							});
-
-							return (
-								<Form.Field>
-									<Label
-										htmlFor="endDate"
-										data-state={endDateStatus}
-									>
-										End date
-									</Label>
-									<Input
-										id="endDate"
-										aria-describedby={getFieldMessageId("endDate")}
-										type="date"
-										data-state={endDateStatus}
-										aria-invalid={endDateStatus === "invalid"}
-										name={field.name}
-										placeholder="yyyy/mm/dd"
-										value={toHtmlDateValue(field.state.value || "")}
-										onBlur={field.handleBlur}
-										onChange={(event) => field.handleChange(fromHtmlDateValue(event.target.value))}
-									/>
-									<Form.FieldMessage
-										inputId="endDate"
-										status={endDateStatus}
-									>
-										{field.state.meta.errors[0]}
-									</Form.FieldMessage>
-								</Form.Field>
-							);
-						}}
+						{(field) => (
+							<Form.TextField
+								id="endDate"
+								label="End date"
+								type="date"
+								name={field.name}
+								status={getTSFFieldStatus(field)}
+								message={field.state.meta.errors[0]}
+								placeholder="yyyy/mm/dd"
+								value={toHtmlDateValue(field.state.value || "")}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(fromHtmlDateValue(event.target.value))}
+							/>
+						)}
 					</form.Field>
 				)}
 			</Form.Body>
@@ -164,60 +111,6 @@ function Step4(): JSX.Element {
 }
 
 export default Step4;
-
-// --- CONTROLLER ---
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
-function useStep4Form() {
-	// --- HOOKS ---
-	const {
-		formValues: contextFormValues,
-		scope,
-		updateFormValues,
-		getDefaultValues,
-		goToNextStep,
-	} = useFormNavigation();
-	const FORM_INPUTS_NAME: (keyof Step4Values)[] = useMemo(() => ["startDate", "stillStudying", "endDate"], []);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm({
-		defaultValues: DEFAULT_VALUES,
-		onSubmit: ({ value }) => {
-			updateFormValues(value);
-
-			const finalFormValues = { ...contextFormValues, ...value };
-			const result = parseForm(finalFormValues);
-
-			if (result.error) {
-				const message = result.error.issues.map((issue) => issue.message).join("\n");
-				toast.error(message || "Please complete all fields correctly");
-				return;
-			}
-
-			clearPersistedInputs(scope, FORM_INPUTS_NAME);
-			goToNextStep();
-		},
-	});
-
-	// --- HANDLERS ---
-	function onSubmit(event?: React.SubmitEvent): void {
-		event?.preventDefault();
-		event?.stopPropagation();
-		void form.handleSubmit();
-	}
-
-	// --- COMPUTED STATES ---
-	const formValues = useSelector(form.store, (state) => state.values);
-
-	// --- EFFECTS ---
-	usePersistInput("startDate", formValues.startDate);
-	usePersistInput("stillStudying", formValues.stillStudying);
-	usePersistInput("endDate", formValues.endDate);
-
-	return { form, onSubmit };
-}
 
 // --- VALIDATION RULES ---
 

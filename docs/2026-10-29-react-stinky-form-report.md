@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 4 of 22 solved (#1, #2, #3, #4: all Rancid).
+**Status:** 21 of 22 solved (15 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -151,7 +151,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Fix:** add an `ignore` flag in cleanup, skip both `setStateOptions` and `setItem` once it's set, and parse the response with a small zod schema (zod is already a dependency). Impact here is low, which is why it's Funky and not Rancid.
 - **Source:** [Synchronizing with Effects, fetching data](https://react.dev/learn/synchronizing-with-effects#fetching-data)
 
-### 11. Primitives list their props by hand
+### 11. Primitives list their props by hand ✅ Solved
 
 `extending-html`
 
@@ -161,7 +161,9 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Fix:** extend the library's props, as `Input` already does: `type CheckboxProps = BaseCheckbox.Root.Props & { status?: FieldStatus }`. Spread `...rest` and set `data-state` inside. Renaming the prop to `status` also stops a styling hook being mistaken for an HTML attribute.
 - **Source:** [React, Common components](https://react.dev/reference/react-dom/components/common)
 
-### 12. `debounce` leaves superseded promises pending forever
+> **Solved (2026-10-29):** `Checkbox` now takes `BaseCheckbox.Root.Props & { status? }` and spreads the rest onto the root. `Select` takes `BaseSelect.Trigger.Props` and sends `name`, `disabled`, `items`, `value` and `onValueChange` to `Select.Root`, with everything else (`id`, `aria-*`, `onBlur`, `className`) going to the trigger. Every primitive (`Input`, `Select`, `Checkbox`, `Label`, `RadioGroup`) now takes an optional `status` prop instead of `data-state`, and sets `data-state` and `aria-invalid` itself, so the steps no longer repeat `aria-invalid={status === "invalid"}`. The checkboxes now get the library's blur handler and `name`, and the selects get `name`.
+
+### 12. `debounce` leaves superseded promises pending forever ✅ Solved
 
 `async-handler`
 
@@ -171,7 +173,9 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Cost:** it works now because RHF only uses the latest result. Any caller that awaits an earlier call (logging, a spinner counter) will hang.
 - **Fix:** resolve superseded calls with a sentinel value, or skip the custom debounce. RHF validators can use an `AbortController`, and TSF already has `onChangeAsyncDebounceMs`.
 
-### 13. No error boundary
+> **Solved (2026-10-29):** every call made during one debounce burst now gets the same promise (`Promise.withResolvers`). It settles with the result of the last call, or rejects if `func` throws. A superseded caller no longer hangs, and it gets the latest result instead of a stale one. The return type is now `Promise<Awaited<Return>>`, so an async `func` no longer gives a nested promise type.
+
+### 13. No error boundary ✅ Solved
 
 `missing-error-boundary`
 
@@ -181,9 +185,11 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Cost:** if `JSON.parse` throws on corrupted localStorage during render (e.g. in `getDefaultValues`), the whole page goes blank.
 - **Fix:** add `src/app/error.tsx` with a "reset saved form" action.
 
+> **Solved (2026-10-29):** added `src/app/form/error.tsx`. It sits on the form segment instead of the root, because a "reset saved form" action means nothing on the other subprojects. It re-exports `pages/form-error.page.tsx`, a neobrutalist fallback with **Try again** (Next's `retry`) and **Reset saved form**. The reset clears every `rhf:form:*` and `tsf:form:*` key with a new `clearPersistedForm(scope)` helper, which `resetForm` now uses too, plus the cached locations dataset (`COLOMBIA_STORAGE_KEY`, now exported from `utils/form.ts`), and then reloads. Verified in the browser: a corrupted locations cache on step 2 shows the fallback, and the reset brings the form back to step 1.
+
 ## Cross-file duplication
 
-### 14. `useColombiaLocations` copied in both step-2 files
+### 14. `useColombiaLocations` copied in both step-2 files ✅ Solved
 
 `duplicate-implementation` (Funky)
 
@@ -191,14 +197,18 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Risk:** the missing-cleanup fix (#10) would have to be made twice.
 - **Fix:** move it to `hooks/use-colombia-locations.ts`.
 
-### 15. Step controller boilerplate repeated in 8 hooks
+> **Solved (2026-10-29):** `useColombiaLocations`, `fetchColombiaData`, `readColombiaDataFromStorage`, `toStateOption`/`toCityOption` and `RawColombiaStateItem` now live once in `hooks/use-colombia-locations.ts`. Both step-2 files import the hook, so the #10 fix (still open) only has to be made in one place.
+
+### 15. Step controller boilerplate repeated in 8 hooks ✅ Solved
 
 `duplicate-implementation` (Funky)
 
 - **Smell:** each `useStepNForm` hook repeats the `FORM_INPUTS_NAME` `useMemo`, the `DEFAULT_VALUES` `useMemo`, one `usePersistInput` per field, `useFormSubmitted`, and in TSF the same `preventDefault/stopPropagation/handleSubmit` wrapper four times. The `useMemo(() => [...], [])` around a constant array is really a module-level constant.
 - **Fix:** add one hook per library, e.g. `useRHFStep<K>(inputNames: readonly K[])` and `useTSFStep<K>(...)`, that owns defaults, persistence and the submit-then-navigate flow. This is also the one place the Rancid submit fix (#1) would need to go.
 
-### 16. Field status and field markup repeated
+> **Solved (2026-10-29):** added `hooks/use-form-step.ts` with `useRHFStep({ inputNames, isFinalStep? })` and `useTSFStep(...)`. A private `useFormStep` they share owns the default values, the submit-then-navigate flow and, with `isFinalStep`, the whole-form `parseForm` check and its toast, which steps 4 had duplicated. Each hook also owns draft persistence through a new `usePersistInputs(values)`, which replaces the per-field `usePersistInput` calls, and the TSF `preventDefault/stopPropagation/handleSubmit` wrapper. The input-name lists are now module-level `STEP_N_INPUT_NAMES` constants in `utils/types.ts`, and `StepNValues` is derived from them, so the `useMemo(() => [...], [])` wrappers are gone. Steps 1 and 3 (TSF) and step 1 (RHF) call the shared hook directly; the other steps keep a small `useStepNForm` only for their step-specific handlers. Verified in the browser for both libraries: steps 1-4 through to the summary, drafts restored after a reload, drafts cleared after each submit, and step 4 blocked with the toast when earlier steps are missing.
+
+### 16. Field status and field markup repeated ✅ Solved
 
 `repeated-markup` (Funky)
 
@@ -206,14 +216,16 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Divergence:** TSF never passes `isFormSubmitted`, so the two implementations already decide "valid" differently.
 - **Fix:** add `getRHFFieldStatus(formState, values, name)` and `getTSFFieldStatus(field)`, plus a `<Form.TextField id label status message>` composite that handles the `aria-describedby` wiring (#3) once.
 
+> **Solved (2026-10-29):** added `getRHFFieldStatus({ form, name })`, built on RHF's `getFieldState`, and `getTSFFieldStatus(field)`. Both feed the now-private `getFieldStatus`, which receives `isFormSubmitted` and `isValidating` in both libraries, so they no longer decide "valid" differently. A shared `hasFieldValue` treats `false` as a value, which replaces the special case for `stillStudying`. Added `Form.TextField` and `Form.SelectField` composites that render label, control and message and wire `htmlFor`, `aria-describedby` and `status` once. The text field takes an optional `isLoading`/`loadingLabel` pair, which must be passed together. Every text, date and select field in both libraries uses them; the checkbox and the radio group keep their own markup. Verified in the browser for both libraries: valid, invalid and checking states, `aria-invalid`/`aria-describedby`, and end-date re-validation when the start date changes.
+
 ## Whiff
 
-- **`context/form.hook.ts:8`:** `useFormNavigation` also returns values, scope, defaults and reset. `useFormContext` / `useMultiStepForm` would describe it better.
-- **`components/form-page.tsx:36`:** `scope` is passed to `StepRenderer` as a prop even though it's already in context.
-- **`utils/types.ts:25-28`:** `TOTAL_STEPS = 5` and `StepNumber = 1|2|3|4|5` can drift apart, which forces `as StepNumber` casts in the context. Derive one from the other.
-- **`utils/form.ts:114-122`:** `parseForm` mutates its argument and takes `Record<string, unknown>`. It's safe today because callers pass a fresh spread, but it's a trap. Copy first and type the parameter as `Partial<FormValues>`. In `createTSFValidatorFromCustomValidation`, the generic parameter `FormValues` hides the imported `FormValues` type.
-- **`hooks/use-form-submitted.ts`:** three positional params, one of which (`goToNextStep`) it could read from the context it already uses. This goes away with fix #1.
-- **Debug output:** leftover `console.log` calls in `getDefaultValues`, `usePersistInput`, `useFormSubmitted` and `asyncCheck`.
+- **`context/form.hook.ts:8`:** `useFormNavigation` also returns values, scope, defaults and reset. `useFormContext` / `useMultiStepForm` would describe it better. ✅ **Solved (2026-10-29):** renamed to `useMultiStepForm` at every call site, since it exposes the whole multi-step form state, not just navigation.
+- **`components/form-page.tsx:36`:** `scope` is passed to `StepRenderer` as a prop even though it's already in context. ✅ **Solved (2026-10-29):** `StepRenderer` reads `scope` from `useMultiStepForm()` and no longer takes it as a prop.
+- **`utils/types.ts:25-28`:** `TOTAL_STEPS = 5` and `StepNumber = 1|2|3|4|5` can drift apart, which forces `as StepNumber` casts in the context. Derive one from the other. ✅ **Solved (2026-10-29):** a single `STEPS = [1, 2, 3, 4, 5] as const` now defines both `StepNumber` and `TOTAL_STEPS`. The context moves between steps with a `getSiblingStep` helper that indexes into `STEPS`, so the `as StepNumber` casts are gone.
+- **`utils/form.ts:114-122`:** `parseForm` mutates its argument and takes `Record<string, unknown>`. It's safe today because callers pass a fresh spread, but it's a trap. Copy first and type the parameter as `Partial<FormValues>`. In `createTSFValidatorFromCustomValidation`, the generic parameter `FormValues` hides the imported `FormValues` type. ✅ **Solved (2026-10-29):** `parseForm` takes `Partial<FormValues>` and cleans a copy, so the caller's object is never mutated. The generic that hid the imported type is now called `StepValues`, in both `CustomValidation` and `createTSFValidatorFromCustomValidation`.
+- **`hooks/use-form-submitted.ts`:** three positional params, one of which (`goToNextStep`) it could read from the context it already uses. This goes away with fix #1. ✅ **Solved (2026-10-29):** no code change needed. The hook was deleted by fix #1.
+- **Debug output:** leftover `console.log` calls in `getDefaultValues`, `usePersistInput`, `useFormSubmitted` and `asyncCheck`. ✅ **Solved (2026-10-29):** the calls in `getDefaultValues`, `usePersistInput` and `asyncCheck` are removed; the one in `useFormSubmitted` went away with #1.
 
 ## Not covered
 
