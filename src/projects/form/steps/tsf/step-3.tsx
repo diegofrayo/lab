@@ -18,7 +18,7 @@ import {
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
-import type { FormInputName, Step3Values } from "../../utils/types";
+import type { FormInputName, Step3Values, TSFValidationRules } from "../../utils/types";
 
 function Step3(): JSX.Element {
 	// --- HOOKS ---
@@ -152,4 +152,4 @@ const ValidationRules = {
 			CustomValidations.step3.collegeName,
 		),
 	},
-};
+} satisfies TSFValidationRules<Step3Values>;

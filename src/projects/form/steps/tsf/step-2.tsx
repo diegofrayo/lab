@@ -17,7 +17,7 @@ import {
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
-import type { FormInputName, Step2Values } from "../../utils/types";
+import type { FormInputName, Step2Values, TSFValidationRules } from "../../utils/types";
 
 function Step2(): JSX.Element {
 	// --- HOOKS ---
@@ -175,7 +175,7 @@ const ValidationRules = {
 	city: {
 		onChange: createTSFValidatorFromInputShape(formSchema.shape.city),
 	},
-};
+} satisfies TSFValidationRules<Step2Values>;
 
 // --- HOOKS ---
 

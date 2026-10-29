@@ -103,7 +103,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Fix:** use RHF's built-in option: `startDate: { validate: ..., deps: ["endDate"] }`. This mirrors `onChangeListenTo` in the TSF version.
 - **Source:** [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
 
-### 7. An untyped `ValidationRules` hides a typo
+### 7. An untyped `ValidationRules` hides a typo ✅ Solved
 
 `loose-internal-types`
 
@@ -113,6 +113,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Cost:** email only debounces because of the separate `asyncDebounceMs={500}` prop on `<form.Field>`. Remove that prop and debouncing silently stops.
 - **Fix:** fix the key, and add a type so typos fail to compile: `satisfies Record<keyof Step1Values, FieldValidators<...>>`, or write the validators inline on `<form.Field>`. The RHF steps already type theirs with `RegisterOptions`.
 - **Source:** [TypeScript, satisfies](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#the-satisfies-operator)
+
+> **Solved (2026-10-29):** the key is now `onChangeAsyncDebounceMs`, and the redundant `asyncDebounceMs={500}` prop is gone. A new `TSFValidationRules<T>` type in `utils/types.ts` is applied with `satisfies` to the `ValidationRules` of all four TSF steps, so a misspelled option now fails to compile.
 
 ### 8. `getDefaultValues` return type isn't tied to its keys
 

@@ -23,7 +23,7 @@ import {
 	parseForm,
 	toHtmlDateValue,
 } from "../../utils/form";
-import type { FormInputName, Step4Values } from "../../utils/types";
+import type { FormInputName, Step4Values, TSFValidationRules } from "../../utils/types";
 
 function Step4(): JSX.Element {
 	// --- HOOKS ---
@@ -234,7 +234,7 @@ const ValidationRules = {
 			CustomValidations.step4.endDate,
 		),
 	},
-};
+} satisfies TSFValidationRules<Step4Values>;
 
 const STILL_STUDYING_OPTIONS: RadioGroupOption<boolean>[] = [
 	{ label: "Yes", value: true },

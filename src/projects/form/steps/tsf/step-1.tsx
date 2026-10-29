@@ -16,7 +16,7 @@ import {
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
-import type { FormInputName, Step1Values } from "../../utils/types";
+import type { FormInputName, Step1Values, TSFValidationRules } from "../../utils/types";
 
 function Step1(): JSX.Element {
 	// --- HOOKS ---
@@ -74,7 +74,6 @@ function Step1(): JSX.Element {
 							form.setFieldMeta("email", { ...field.fieldApi.getMeta(), isValidating: true });
 						},
 					}}
-					asyncDebounceMs={500}
 				>
 					{(field) => {
 						const isCheckingEmail = field.state.meta.isValidating;
@@ -221,14 +220,14 @@ const ValidationRules = {
 	email: {
 		onChange: createTSFValidatorFromInputShape(formSchema.shape.email),
 		onChangeAsync: validateEmailAvailability,
-		onChangeAsyncDebounce: 500,
+		onChangeAsyncDebounceMs: 500,
 	},
 	username: {
 		onChange: createTSFValidatorFromInputShape(formSchema.shape.username),
 		onChangeAsync: validateUsernameAvailability,
 		onChangeAsyncDebounceMs: 500,
 	},
-};
+} satisfies TSFValidationRules<Step1Values>;
 
 async function validateEmailAvailability({ value }: { value: string }): Promise<string | undefined> {
 	if (!value) return undefined;
