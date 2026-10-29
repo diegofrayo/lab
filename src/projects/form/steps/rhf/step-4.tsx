@@ -12,9 +12,9 @@ import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useFormNavigation } from "../../context/form.hook";
-import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
+	clearPersistedInputs,
 	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
@@ -194,6 +194,7 @@ function useStep4Form(): UseStep4FormReturn {
 	// --- HOOKS ---
 	const {
 		formValues: contextFormValues,
+		scope,
 		updateFormValues,
 		getDefaultValues,
 		goToNextStep,
@@ -218,7 +219,11 @@ function useStep4Form(): UseStep4FormReturn {
 		if (result.error) {
 			const message = result.error.issues.map((issue) => issue.message).join("\n");
 			toast.error(message || "Please complete all fields correctly");
+			return;
 		}
+
+		clearPersistedInputs(scope, FORM_INPUTS_NAME);
+		goToNextStep();
 	});
 
 	function handleStillStudyingChange(value: boolean): void {
@@ -237,7 +242,6 @@ function useStep4Form(): UseStep4FormReturn {
 	usePersistInput("startDate", formValues.startDate);
 	usePersistInput("stillStudying", formValues.stillStudying);
 	usePersistInput("endDate", formValues.endDate);
-	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
 
 	useEffect(
 		function revalidateEndDateOnStartDateChange() {

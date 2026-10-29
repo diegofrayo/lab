@@ -7,10 +7,14 @@ import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useFormNavigation } from "../../context/form.hook";
-import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import { asyncCheck } from "../../utils/async";
-import { createTSFValidatorFromInputShape, formSchema, getFieldStatus } from "../../utils/form";
+import {
+	clearPersistedInputs,
+	createTSFValidatorFromInputShape,
+	formSchema,
+	getFieldStatus,
+} from "../../utils/form";
 import type { FormInputName, Step1Values } from "../../utils/types";
 
 function Step1(): JSX.Element {
@@ -154,7 +158,7 @@ export default Step1;
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
 function useStep1Form() {
 	// --- HOOKS ---
-	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["name", "email", "username"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues<Step1Values>(FORM_INPUTS_NAME),
@@ -164,6 +168,8 @@ function useStep1Form() {
 		defaultValues: DEFAULT_VALUES,
 		onSubmit: ({ value }) => {
 			updateFormValues(value);
+			clearPersistedInputs(scope, FORM_INPUTS_NAME);
+			goToNextStep();
 		},
 	});
 
@@ -176,13 +182,11 @@ function useStep1Form() {
 
 	// --- COMPUTED STATES ---
 	const formValues = useSelector(form.store, (state) => state.values);
-	const isSubmitSuccessful = useSelector(form.store, (state) => state.isSubmitSuccessful);
 
 	// --- EFFECTS ---
 	usePersistInput("name", formValues.name);
 	usePersistInput("email", formValues.email);
 	usePersistInput("username", formValues.username);
-	useFormSubmitted(FORM_INPUTS_NAME, isSubmitSuccessful, goToNextStep);
 
 	return { form, onSubmit };
 }

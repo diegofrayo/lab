@@ -8,13 +8,17 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
+**Status:** 1 of 22 solved (#1).
+
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
 ## Rancid
 
-### 1. Final submit continues after validation fails
+### 1. Final submit continues after validation fails ✅ Solved
 
 `effect-for-derived` / `effect-for-event` (effects)
+
+> **Solved (2026-10-29):** navigation moved into each step's submit handler via `clearPersistedInputs` + `goToNextStep`; step 4 returns early when `parseForm` fails; `hooks/use-form-submitted.ts` deleted.
 
 **Where:** `steps/rhf/step-4.tsx:212-222`, `steps/tsf/step-4.tsx:208-218`, `hooks/use-form-submitted.ts:16`
 

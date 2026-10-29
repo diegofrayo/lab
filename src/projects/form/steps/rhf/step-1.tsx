@@ -7,10 +7,14 @@ import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useFormNavigation } from "../../context/form.hook";
-import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import { asyncCheck, debounce } from "../../utils/async";
-import { createRHFInputValidator, formSchema, getFieldStatus } from "../../utils/form";
+import {
+	clearPersistedInputs,
+	createRHFInputValidator,
+	formSchema,
+	getFieldStatus,
+} from "../../utils/form";
 import type { FormInputName, Step1Values, StepFormReturn } from "../../utils/types";
 
 function Step1(): JSX.Element {
@@ -118,7 +122,7 @@ export default Step1;
 
 function useStep1Form(): StepFormReturn<Step1Values> {
 	// --- HOOKS ---
-	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["name", "email", "username"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues<Step1Values>(FORM_INPUTS_NAME),
@@ -132,6 +136,8 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 	// --- HANDLERS ---
 	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
+		clearPersistedInputs(scope, FORM_INPUTS_NAME);
+		goToNextStep();
 	});
 
 	// --- COMPUTED STATES ---
@@ -141,7 +147,6 @@ function useStep1Form(): StepFormReturn<Step1Values> {
 	usePersistInput("name", formValues.name);
 	usePersistInput("email", formValues.email);
 	usePersistInput("username", formValues.username);
-	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
 
 	return { ...form, formValues, onSubmit };
 }

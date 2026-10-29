@@ -10,9 +10,13 @@ import Label from "../../components/primitive/label";
 import Select from "../../components/primitive/select";
 import type { SelectOption } from "../../components/primitive/select";
 import { useFormNavigation } from "../../context/form.hook";
-import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
-import { createRHFInputValidator, formSchema, getFieldStatus } from "../../utils/form";
+import {
+	clearPersistedInputs,
+	createRHFInputValidator,
+	formSchema,
+	getFieldStatus,
+} from "../../utils/form";
 import type { FormInputName, Step2Values, StepFormReturn } from "../../utils/types";
 
 function Step2(): JSX.Element {
@@ -127,7 +131,7 @@ type UseStep2FormReturn = StepFormReturn<Step2Values> & {
 function useStep2Form(): UseStep2FormReturn {
 	// --- HOOKS ---
 	const { stateOptions, getCitiesOptions } = useColombiaLocations();
-	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["state", "city"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues<Step2Values>(FORM_INPUTS_NAME),
@@ -144,6 +148,8 @@ function useStep2Form(): UseStep2FormReturn {
 	// --- HANDLERS ---
 	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
+		clearPersistedInputs(scope, FORM_INPUTS_NAME);
+		goToNextStep();
 	});
 
 	function handleStateChange(stateId: string | null): void {
@@ -157,7 +163,6 @@ function useStep2Form(): UseStep2FormReturn {
 	// --- EFFECTS ---
 	usePersistInput("state", formValues.state);
 	usePersistInput("city", formValues.city);
-	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
 
 	useEffect(
 		function restoreCityOptions() {

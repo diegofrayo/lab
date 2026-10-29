@@ -8,9 +8,9 @@ import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useFormNavigation } from "../../context/form.hook";
-import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
+	clearPersistedInputs,
 	createTSFValidatorFromCustomValidation,
 	createTSFValidatorFromInputShape,
 	CustomValidations,
@@ -103,7 +103,7 @@ export default Step3;
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
 function useStep3Form() {
 	// --- HOOKS ---
-	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues<Step3Values>(FORM_INPUTS_NAME),
@@ -113,6 +113,8 @@ function useStep3Form() {
 		defaultValues: DEFAULT_VALUES,
 		onSubmit: ({ value }) => {
 			updateFormValues(value);
+			clearPersistedInputs(scope, FORM_INPUTS_NAME);
+			goToNextStep();
 		},
 	});
 
@@ -125,12 +127,10 @@ function useStep3Form() {
 
 	// --- COMPUTED STATES ---
 	const formValues = useSelector(form.store, (state) => state.values);
-	const isSubmitSuccessful = useSelector(form.store, (state) => state.isSubmitSuccessful);
 
 	// --- EFFECTS ---
 	usePersistInput("hasCollegeDegree", formValues.hasCollegeDegree);
 	usePersistInput("collegeName", formValues.collegeName);
-	useFormSubmitted(FORM_INPUTS_NAME, isSubmitSuccessful, goToNextStep);
 
 	return { form, onSubmit };
 }

@@ -9,9 +9,9 @@ import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useFormNavigation } from "../../context/form.hook";
-import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
+	clearPersistedInputs,
 	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
@@ -108,7 +108,7 @@ type UseStep3FormReturn = StepFormReturn<Step3Values> & {
 
 function useStep3Form(): UseStep3FormReturn {
 	// --- HOOKS ---
-	const { updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
 	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues<Step3Values>(FORM_INPUTS_NAME),
@@ -122,6 +122,8 @@ function useStep3Form(): UseStep3FormReturn {
 	// --- HANDLERS ---
 	const onSubmit = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
+		clearPersistedInputs(scope, FORM_INPUTS_NAME);
+		goToNextStep();
 	});
 
 	function handleHasCollegeDegreeChange(checked: boolean): void {
@@ -139,7 +141,6 @@ function useStep3Form(): UseStep3FormReturn {
 	// --- EFFECTS ---
 	usePersistInput("hasCollegeDegree", formValues.hasCollegeDegree);
 	usePersistInput("collegeName", formValues.collegeName);
-	useFormSubmitted(FORM_INPUTS_NAME, form.formState.isSubmitSuccessful, goToNextStep);
 
 	return { ...form, formValues, onSubmit, handleHasCollegeDegreeChange };
 }

@@ -11,9 +11,9 @@ import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useFormNavigation } from "../../context/form.hook";
-import { useFormSubmitted } from "../../hooks/use-form-submitted";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
+	clearPersistedInputs,
 	createTSFValidatorFromCustomValidation,
 	createTSFValidatorFromInputShape,
 	CustomValidations,
@@ -194,6 +194,7 @@ function useStep4Form() {
 	// --- HOOKS ---
 	const {
 		formValues: contextFormValues,
+		scope,
 		updateFormValues,
 		getDefaultValues,
 		goToNextStep,
@@ -214,7 +215,11 @@ function useStep4Form() {
 			if (result.error) {
 				const message = result.error.issues.map((issue) => issue.message).join("\n");
 				toast.error(message || "Please complete all fields correctly");
+				return;
 			}
+
+			clearPersistedInputs(scope, FORM_INPUTS_NAME);
+			goToNextStep();
 		},
 	});
 
@@ -227,13 +232,11 @@ function useStep4Form() {
 
 	// --- COMPUTED STATES ---
 	const formValues = useSelector(form.store, (state) => state.values);
-	const isSubmitSuccessful = useSelector(form.store, (state) => state.isSubmitSuccessful);
 
 	// --- EFFECTS ---
 	usePersistInput("startDate", formValues.startDate);
 	usePersistInput("stillStudying", formValues.stillStudying);
 	usePersistInput("endDate", formValues.endDate);
-	useFormSubmitted(FORM_INPUTS_NAME, isSubmitSuccessful, goToNextStep);
 
 	return { form, onSubmit };
 }

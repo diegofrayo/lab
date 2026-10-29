@@ -203,3 +203,9 @@ export function createTSFValidatorFromCustomValidation<InputValue, FormValues>(
 		return result === true ? TSF_VALID_INPUT : result;
 	};
 }
+
+export function clearPersistedInputs(scope: FormScope, inputNames: FormInputName[]): void {
+	inputNames.forEach((inputName) => {
+		window.localStorage.removeItem(composeLocalStorageKeyForInput(scope, inputName));
+	});
+}
