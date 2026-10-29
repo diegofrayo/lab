@@ -4,7 +4,7 @@ import type { JSX, ReactNode } from "react";
 
 import cn from "@diegofrayo-pkg/cn";
 
-import { useFormNavigation } from "../context/form.hook";
+import { useMultiStepForm } from "../context/form.hook";
 import { getFieldMessageId } from "../utils/form";
 import type { FieldStatus } from "../utils/types";
 import Button from "./primitive/button";
@@ -122,7 +122,7 @@ function FormNavigation({
 	nextButtonLabel = "Next",
 }: FormNavigationProps): JSX.Element {
 	// --- HOOKS ---
-	const { currentStep, goToPreviousStep } = useFormNavigation();
+	const { currentStep, goToPreviousStep } = useMultiStepForm();
 
 	// --- COMPUTED STATES ---
 	const isFirstStep = currentStep === 1;

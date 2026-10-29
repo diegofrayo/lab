@@ -6,7 +6,7 @@ import { useForm, useSelector } from "@tanstack/react-form";
 import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
-import { useFormNavigation } from "../../context/form.hook";
+import { useMultiStepForm } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import { asyncCheck } from "../../utils/async";
 import {
@@ -178,7 +178,7 @@ export default Step1;
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
 function useStep1Form() {
 	// --- HOOKS ---
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
 	const FORM_INPUTS_NAME: (keyof Step1Values)[] = useMemo(() => ["name", "email", "username"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues(FORM_INPUTS_NAME),

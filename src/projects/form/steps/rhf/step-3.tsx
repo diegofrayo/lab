@@ -8,7 +8,7 @@ import Form from "../../components/form";
 import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
-import { useFormNavigation } from "../../context/form.hook";
+import { useMultiStepForm } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
 	clearPersistedInputs,
@@ -113,7 +113,7 @@ type UseStep3FormReturn = StepFormReturn<Step3Values> & {
 
 function useStep3Form(): UseStep3FormReturn {
 	// --- HOOKS ---
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
 	const FORM_INPUTS_NAME: (keyof Step3Values)[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues(FORM_INPUTS_NAME),

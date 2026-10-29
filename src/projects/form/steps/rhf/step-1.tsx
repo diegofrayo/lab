@@ -6,7 +6,7 @@ import { useForm, type RegisterOptions } from "react-hook-form";
 import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
-import { useFormNavigation } from "../../context/form.hook";
+import { useMultiStepForm } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import { asyncCheck, debounce } from "../../utils/async";
 import {
@@ -143,7 +143,7 @@ export default Step1;
 
 function useStep1Form(): StepFormReturn<Step1Values> {
 	// --- HOOKS ---
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
 	const FORM_INPUTS_NAME: (keyof Step1Values)[] = useMemo(() => ["name", "email", "username"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues(FORM_INPUTS_NAME),

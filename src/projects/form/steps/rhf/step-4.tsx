@@ -10,7 +10,7 @@ import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import RadioGroup from "../../components/primitive/radio-group";
 import type { RadioGroupOption } from "../../components/primitive/radio-group";
-import { useFormNavigation } from "../../context/form.hook";
+import { useMultiStepForm } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
 	clearPersistedInputs,
@@ -185,8 +185,11 @@ function useStep4Form(): UseStep4FormReturn {
 		updateFormValues,
 		getDefaultValues,
 		goToNextStep,
-	} = useFormNavigation();
-	const FORM_INPUTS_NAME: (keyof Step4Values)[] = useMemo(() => ["startDate", "stillStudying", "endDate"], []);
+	} = useMultiStepForm();
+	const FORM_INPUTS_NAME: (keyof Step4Values)[] = useMemo(
+		() => ["startDate", "stillStudying", "endDate"],
+		[],
+	);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],

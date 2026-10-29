@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useFormNavigation } from "../context/form.hook";
+import { useMultiStepForm } from "../context/form.hook";
 import { composeLocalStorageKeyForInput } from "../utils/form";
 
 export function usePersistInput(
@@ -8,7 +8,7 @@ export function usePersistInput(
 	inputValue: string | number | boolean | undefined,
 ): null {
 	// --- HOOKS ---
-	const { scope } = useFormNavigation();
+	const { scope } = useMultiStepForm();
 
 	// --- EFFECTS ---
 	useEffect((): void => {

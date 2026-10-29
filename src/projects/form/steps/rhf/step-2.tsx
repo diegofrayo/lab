@@ -9,7 +9,7 @@ import Form from "../../components/form";
 import Label from "../../components/primitive/label";
 import Select from "../../components/primitive/select";
 import type { SelectOption } from "../../components/primitive/select";
-import { useFormNavigation } from "../../context/form.hook";
+import { useMultiStepForm } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
 	clearPersistedInputs,
@@ -144,7 +144,7 @@ type UseStep2FormReturn = StepFormReturn<Step2Values> & {
 function useStep2Form(): UseStep2FormReturn {
 	// --- HOOKS ---
 	const { stateOptions, getCitiesOptions } = useColombiaLocations();
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
+	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
 	const FORM_INPUTS_NAME: (keyof Step2Values)[] = useMemo(() => ["state", "city"], []);
 	const DEFAULT_VALUES = useMemo(
 		() => getDefaultValues(FORM_INPUTS_NAME),
