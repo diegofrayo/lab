@@ -16,9 +16,9 @@ type ERROR_MESSAGE = string;
 const TSF_VALID_INPUT = undefined;
 type TSF_VALID_INPUT = undefined;
 
-type CustomValidation<InputValue, FormValues> = (
+type CustomValidation<InputValue, StepValues> = (
 	inputValue: InputValue,
-	formValues: FormValues,
+	formValues: StepValues,
 ) => ERROR_MESSAGE | VALID_INPUT;
 
 export const CustomValidations = {
@@ -111,14 +111,16 @@ export const formSchema = baseFormSchema.superRefine((values, ctx) => {
 	}
 });
 
-export function parseForm(formValues: Record<string, unknown>): ZodSafeParseResult<FormValues> {
-	// NOTE: Clean optional default values to avoid unexpected validations errors
-	const OPTIONAL_FIELDS: FormInputName[] = ["collegeName", "endDate"] as const;
+export function parseForm(formValues: Partial<FormValues>): ZodSafeParseResult<FormValues> {
+	// NOTE: Clean optional default values to avoid unexpected validations errors.
+	// Work on a copy so the caller's object is never mutated.
+	const values: Record<string, unknown> = { ...formValues };
+	const OPTIONAL_FIELDS: FormInputName[] = ["collegeName", "endDate"];
 	OPTIONAL_FIELDS.forEach((fieldName) => {
-		if (!formValues[fieldName]) formValues[fieldName] = undefined;
+		if (!values[fieldName]) values[fieldName] = undefined;
 	});
 
-	return formSchema.safeParse(formValues);
+	return formSchema.safeParse(values);
 }
 
 /**
@@ -189,8 +191,8 @@ export function createTSFValidatorFromInputShape<InputValue>(inputShape: z.ZodTy
 	};
 }
 
-export function createTSFValidatorFromCustomValidation<InputValue, FormValues>(
-	customValidation: CustomValidation<InputValue, FormValues>,
+export function createTSFValidatorFromCustomValidation<InputValue, StepValues>(
+	customValidation: CustomValidation<InputValue, StepValues>,
 ) {
 	return function validator({
 		value,
@@ -199,7 +201,7 @@ export function createTSFValidatorFromCustomValidation<InputValue, FormValues>(
 		value: InputValue;
 		fieldApi: AnyFieldApi;
 	}): ERROR_MESSAGE | TSF_VALID_INPUT {
-		const result = customValidation(value, fieldApi.form.state.values as FormValues);
+		const result = customValidation(value, fieldApi.form.state.values as StepValues);
 		return result === true ? TSF_VALID_INPUT : result;
 	};
 }
