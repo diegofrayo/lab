@@ -116,7 +116,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 > **Solved (2026-10-29):** the key is now `onChangeAsyncDebounceMs`, and the redundant `asyncDebounceMs={500}` prop is gone. A new `TSFValidationRules<T>` type in `utils/types.ts` is applied with `satisfies` to the `ValidationRules` of all four TSF steps, so a misspelled option now fails to compile.
 
-### 8. `getDefaultValues` return type isn't tied to its keys
+### 8. `getDefaultValues` return type isn't tied to its keys ✅ Solved
 
 `generic-props` / `unsafe-assertion`
 
@@ -125,6 +125,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Smell:** `getDefaultValues<StepFormValues = FormValues>(keys)` uses `{} as StepFormValues`, so the caller chooses the return type. `getDefaultValues<Step1Values>(["state"])` compiles.
 - **Fix:** `<K extends FormInputName>(keys: K[]) => Pick<FormValues, K>`. Each step's `StepNValues` then matches its key list automatically.
 - **Source:** [TypeScript, Generic Constraints](https://www.typescriptlang.org/docs/handbook/2/generics.html#using-type-parameters-in-generic-constraints)
+
+> **Solved (2026-10-29):** `getDefaultValues` is now `<K extends FormInputName>(keys: K[]) => Pick<FormValues, K>`, so the return type comes from the keys and the caller can't choose it. Each step types its `FORM_INPUTS_NAME` as `(keyof StepNValues)[]` and calls `getDefaultValues(FORM_INPUTS_NAME)` with no explicit generic. A key that doesn't belong to the step, like `"state"` in step 1, now fails to compile.
 
 ### 9. The same values persisted in two places
 

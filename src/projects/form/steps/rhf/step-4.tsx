@@ -23,7 +23,7 @@ import {
 	parseForm,
 	toHtmlDateValue,
 } from "../../utils/form";
-import type { FormInputName, Step4Values, StepFormReturn } from "../../utils/types";
+import type { Step4Values, StepFormReturn } from "../../utils/types";
 
 function Step4(): JSX.Element {
 	// --- HOOKS ---
@@ -186,9 +186,9 @@ function useStep4Form(): UseStep4FormReturn {
 		getDefaultValues,
 		goToNextStep,
 	} = useFormNavigation();
-	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["startDate", "stillStudying", "endDate"], []);
+	const FORM_INPUTS_NAME: (keyof Step4Values)[] = useMemo(() => ["startDate", "stillStudying", "endDate"], []);
 	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues<Step4Values>(FORM_INPUTS_NAME),
+		() => getDefaultValues(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],
 	);
 	const form = useForm<Step4Values>({

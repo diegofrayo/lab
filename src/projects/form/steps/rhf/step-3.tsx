@@ -18,7 +18,7 @@ import {
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
-import type { FormInputName, Step3Values, StepFormReturn } from "../../utils/types";
+import type { Step3Values, StepFormReturn } from "../../utils/types";
 
 function Step3(): JSX.Element {
 	// --- HOOKS ---
@@ -114,9 +114,9 @@ type UseStep3FormReturn = StepFormReturn<Step3Values> & {
 function useStep3Form(): UseStep3FormReturn {
 	// --- HOOKS ---
 	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
-	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
+	const FORM_INPUTS_NAME: (keyof Step3Values)[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
 	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues<Step3Values>(FORM_INPUTS_NAME),
+		() => getDefaultValues(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],
 	);
 	const form = useForm<Step3Values>({

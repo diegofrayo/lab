@@ -18,7 +18,7 @@ import {
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
-import type { FormInputName, Step3Values, TSFValidationRules } from "../../utils/types";
+import type { Step3Values, TSFValidationRules } from "../../utils/types";
 
 function Step3(): JSX.Element {
 	// --- HOOKS ---
@@ -109,9 +109,9 @@ export default Step3;
 function useStep3Form() {
 	// --- HOOKS ---
 	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
-	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
+	const FORM_INPUTS_NAME: (keyof Step3Values)[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
 	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues<Step3Values>(FORM_INPUTS_NAME),
+		() => getDefaultValues(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],
 	);
 	const form = useForm({

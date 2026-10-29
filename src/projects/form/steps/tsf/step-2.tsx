@@ -17,7 +17,7 @@ import {
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
-import type { FormInputName, Step2Values, TSFValidationRules } from "../../utils/types";
+import type { Step2Values, TSFValidationRules } from "../../utils/types";
 
 function Step2(): JSX.Element {
 	// --- HOOKS ---
@@ -130,9 +130,9 @@ function useStep2Form() {
 	// --- HOOKS ---
 	const { stateOptions, getCitiesOptions } = useColombiaLocations();
 	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useFormNavigation();
-	const FORM_INPUTS_NAME: FormInputName[] = useMemo(() => ["state", "city"], []);
+	const FORM_INPUTS_NAME: (keyof Step2Values)[] = useMemo(() => ["state", "city"], []);
 	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues<Step2Values>(FORM_INPUTS_NAME),
+		() => getDefaultValues(FORM_INPUTS_NAME),
 		[getDefaultValues, FORM_INPUTS_NAME],
 	);
 	const form = useForm({
