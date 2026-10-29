@@ -63,6 +63,8 @@ const typescriptConfig = defineConfig({
 		"max-params": ["error", 3],
 		"no-console": ["warn"],
 
+		"@next/next/no-img-element": 0,
+
 		"@typescript-eslint/ban-ts-comment": ["warn"],
 		"@typescript-eslint/consistent-type-imports": "error",
 		"@typescript-eslint/explicit-function-return-type": "error",
