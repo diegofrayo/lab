@@ -17,7 +17,6 @@ export type RadioGroupOption<Value> = {
 type RadioGroupProps<Value> = {
 	// Required props — alphabetical order
 	"aria-labelledby": string;
-	"data-state": FieldStatus;
 	items: RadioGroupOption<Value>[];
 	onValueChange: (value: Value) => void;
 	value: Value | null;
@@ -25,6 +24,7 @@ type RadioGroupProps<Value> = {
 	// Optional props — alphabetical order
 	"aria-describedby"?: string;
 	name?: string;
+	status?: FieldStatus | undefined;
 
 	// Event handlers — at the end
 	onBlur?: () => void;
@@ -33,9 +33,9 @@ type RadioGroupProps<Value> = {
 function RadioGroup<Value>({
 	"aria-labelledby": ariaLabelledBy,
 	"aria-describedby": ariaDescribedBy,
-	"data-state": dataState,
 	items,
 	name,
+	status,
 	value,
 	onValueChange,
 	onBlur,
@@ -76,7 +76,7 @@ function RadioGroup<Value>({
 			value={value}
 			aria-labelledby={ariaLabelledBy}
 			aria-describedby={ariaDescribedBy}
-			aria-invalid={dataState === "invalid"}
+			aria-invalid={status === "invalid"}
 			className={classes.group}
 			onValueChange={handleValueChange}
 		>
@@ -84,11 +84,11 @@ function RadioGroup<Value>({
 				<Label
 					key={String(item.value)}
 					className={classes.option}
-					data-state={dataState}
+					status={status}
 				>
 					<Radio.Root
 						value={item.value}
-						data-state={dataState}
+						data-state={status}
 						className={classes.radio}
 						onBlur={onBlur}
 					>

@@ -49,14 +49,15 @@ function Step2(): JSX.Element {
 							<Form.Field>
 								<Label
 									htmlFor="state"
-									data-state={stateStatus}
+									status={stateStatus}
 								>
 									State
 								</Label>
 								<Select
 									id="state"
+									name={field.name}
 									aria-describedby={getFieldMessageId("state")}
-									data-state={stateStatus}
+									status={stateStatus}
 									items={stateOptions}
 									placeholder="Select a state"
 									value={field.state.value || null}
@@ -89,14 +90,15 @@ function Step2(): JSX.Element {
 							<Form.Field>
 								<Label
 									htmlFor="city"
-									data-state={cityStatus}
+									status={cityStatus}
 								>
 									City
 								</Label>
 								<Select
 									id="city"
+									name={field.name}
 									aria-describedby={getFieldMessageId("city")}
-									data-state={cityStatus}
+									status={cityStatus}
 									items={cityOptions}
 									placeholder="Select a city"
 									disabled={isCityDisabled}

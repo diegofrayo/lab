@@ -41,7 +41,7 @@ function Step1(): JSX.Element {
 							<Form.Field>
 								<Label
 									htmlFor="name"
-									data-state={nameStatus}
+									status={nameStatus}
 								>
 									Name
 								</Label>
@@ -49,8 +49,7 @@ function Step1(): JSX.Element {
 									id="name"
 									aria-describedby={getFieldMessageId("name")}
 									name={field.name}
-									data-state={nameStatus}
-									aria-invalid={nameStatus === "invalid"}
+									status={nameStatus}
 									value={field.state.value}
 									onBlur={field.handleBlur}
 									onChange={(event) => field.handleChange(event.target.value)}
@@ -88,7 +87,7 @@ function Step1(): JSX.Element {
 							<Form.Field>
 								<Label
 									htmlFor="email"
-									data-state={emailStatus}
+									status={emailStatus}
 								>
 									Email
 								</Label>
@@ -100,8 +99,7 @@ function Step1(): JSX.Element {
 										id="email"
 										aria-describedby={getFieldMessageId("email")}
 										name={field.name}
-										data-state={emailStatus}
-										aria-invalid={emailStatus === "invalid"}
+										status={emailStatus}
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={(event) => field.handleChange(event.target.value)}
@@ -135,7 +133,7 @@ function Step1(): JSX.Element {
 							<Form.Field>
 								<Label
 									htmlFor="username"
-									data-state={usernameStatus}
+									status={usernameStatus}
 								>
 									Username
 								</Label>
@@ -147,8 +145,7 @@ function Step1(): JSX.Element {
 										id="username"
 										aria-describedby={getFieldMessageId("username")}
 										name={field.name}
-										data-state={usernameStatus}
-										aria-invalid={usernameStatus === "invalid"}
+										status={usernameStatus}
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={(event) => field.handleChange(event.target.value)}

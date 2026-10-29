@@ -57,15 +57,14 @@ function Step1(): JSX.Element {
 				<Form.Field>
 					<Label
 						htmlFor="name"
-						data-state={nameStatus}
+						status={nameStatus}
 					>
 						Name
 					</Label>
 					<Input
 						id="name"
 						aria-describedby={getFieldMessageId("name")}
-						data-state={nameStatus}
-						aria-invalid={nameStatus === "invalid"}
+						status={nameStatus}
 						{...register("name", ValidationRules.name)}
 					/>
 					<Form.FieldMessage
@@ -79,7 +78,7 @@ function Step1(): JSX.Element {
 				<Form.Field>
 					<Label
 						htmlFor="email"
-						data-state={emailStatus}
+						status={emailStatus}
 					>
 						Email
 					</Label>
@@ -90,8 +89,7 @@ function Step1(): JSX.Element {
 						<Input
 							id="email"
 							aria-describedby={getFieldMessageId("email")}
-							data-state={emailStatus}
-							aria-invalid={emailStatus === "invalid"}
+							status={emailStatus}
 							{...register("email", ValidationRules.email)}
 						/>
 					</Form.FieldWithLoader>
@@ -106,7 +104,7 @@ function Step1(): JSX.Element {
 				<Form.Field>
 					<Label
 						htmlFor="username"
-						data-state={usernameStatus}
+						status={usernameStatus}
 					>
 						Username
 					</Label>
@@ -117,8 +115,7 @@ function Step1(): JSX.Element {
 						<Input
 							id="username"
 							aria-describedby={getFieldMessageId("username")}
-							data-state={usernameStatus}
-							aria-invalid={usernameStatus === "invalid"}
+							status={usernameStatus}
 							{...register("username", ValidationRules.username)}
 						/>
 					</Form.FieldWithLoader>

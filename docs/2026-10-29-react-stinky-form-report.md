@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 15 of 22 solved (9 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
+**Status:** 16 of 22 solved (10 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -151,7 +151,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Fix:** add an `ignore` flag in cleanup, skip both `setStateOptions` and `setItem` once it's set, and parse the response with a small zod schema (zod is already a dependency). Impact here is low, which is why it's Funky and not Rancid.
 - **Source:** [Synchronizing with Effects, fetching data](https://react.dev/learn/synchronizing-with-effects#fetching-data)
 
-### 11. Primitives list their props by hand
+### 11. Primitives list their props by hand ✅ Solved
 
 `extending-html`
 
@@ -160,6 +160,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Smell:** `Checkbox` only accepts `id`, `checked` and `onCheckedChange`. It has no `onBlur`, `name`, `disabled`, `className` or `aria-*`. So RHF's `field.onBlur` and TSF's `field.handleBlur` can't be passed, and the a11y fixes above have no prop to go through. `Select` has the same gap. `"data-state"` is required on `Input`/`Select` but optional on `Checkbox`/`Label`.
 - **Fix:** extend the library's props, as `Input` already does: `type CheckboxProps = BaseCheckbox.Root.Props & { status?: FieldStatus }`. Spread `...rest` and set `data-state` inside. Renaming the prop to `status` also stops a styling hook being mistaken for an HTML attribute.
 - **Source:** [React, Common components](https://react.dev/reference/react-dom/components/common)
+
+> **Solved (2026-10-29):** `Checkbox` now takes `BaseCheckbox.Root.Props & { status? }` and spreads the rest onto the root. `Select` takes `BaseSelect.Trigger.Props` and sends `name`, `disabled`, `items`, `value` and `onValueChange` to `Select.Root`, with everything else (`id`, `aria-*`, `onBlur`, `className`) going to the trigger. Every primitive (`Input`, `Select`, `Checkbox`, `Label`, `RadioGroup`) now takes an optional `status` prop instead of `data-state`, and sets `data-state` and `aria-invalid` itself, so the steps no longer repeat `aria-invalid={status === "invalid"}`. The checkboxes now get the library's blur handler and `name`, and the selects get `name`.
 
 ### 12. `debounce` leaves superseded promises pending forever
 

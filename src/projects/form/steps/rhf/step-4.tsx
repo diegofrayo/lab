@@ -62,7 +62,7 @@ function Step4(): JSX.Element {
 				<Form.Field>
 					<Label
 						htmlFor="startDate"
-						data-state={startDateStatus}
+						status={startDateStatus}
 					>
 						Start date
 					</Label>
@@ -75,8 +75,7 @@ function Step4(): JSX.Element {
 								id="startDate"
 								aria-describedby={getFieldMessageId("startDate")}
 								type="date"
-								data-state={startDateStatus}
-								aria-invalid={startDateStatus === "invalid"}
+								status={startDateStatus}
 								name={field.name}
 								ref={field.ref}
 								value={toHtmlDateValue(field.value)}
@@ -97,7 +96,7 @@ function Step4(): JSX.Element {
 				<Form.Field>
 					<Label
 						id="stillStudyingLabel"
-						data-state={stillStudyingStatus}
+						status={stillStudyingStatus}
 					>
 						Still studying?
 					</Label>
@@ -115,7 +114,7 @@ function Step4(): JSX.Element {
 								<RadioGroup
 									aria-labelledby="stillStudyingLabel"
 									name={field.name}
-									data-state={stillStudyingStatus}
+									status={stillStudyingStatus}
 									items={STILL_STUDYING_OPTIONS}
 									value={field.value ?? null}
 									onBlur={field.onBlur}
@@ -130,7 +129,7 @@ function Step4(): JSX.Element {
 					<Form.Field>
 						<Label
 							htmlFor="endDate"
-							data-state={endDateStatus}
+							status={endDateStatus}
 						>
 							End date
 						</Label>
@@ -143,8 +142,7 @@ function Step4(): JSX.Element {
 									id="endDate"
 									aria-describedby={getFieldMessageId("endDate")}
 									type="date"
-									data-state={endDateStatus}
-									aria-invalid={endDateStatus === "invalid"}
+									status={endDateStatus}
 									name={field.name}
 									ref={field.ref}
 									placeholder="yyyy/mm/dd"

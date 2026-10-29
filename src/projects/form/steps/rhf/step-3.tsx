@@ -57,8 +57,10 @@ function Step3(): JSX.Element {
 							return (
 								<Checkbox
 									id="hasCollegeDegree"
+									name={field.name}
 									checked={field.value}
 									ref={field.ref}
+									onBlur={field.onBlur}
 									onCheckedChange={handleCheckedChange}
 								/>
 							);
@@ -76,15 +78,14 @@ function Step3(): JSX.Element {
 					<Form.Field>
 						<Label
 							htmlFor="collegeName"
-							data-state={collegeNameStatus}
+							status={collegeNameStatus}
 						>
 							College name
 						</Label>
 						<Input
 							id="collegeName"
 							aria-describedby={getFieldMessageId("collegeName")}
-							data-state={collegeNameStatus}
-							aria-invalid={collegeNameStatus === "invalid"}
+							status={collegeNameStatus}
 							{...register("collegeName", ValidationRules.collegeName)}
 						/>
 						<Form.FieldMessage

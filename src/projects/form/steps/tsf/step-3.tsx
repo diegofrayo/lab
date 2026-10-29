@@ -36,7 +36,9 @@ function Step3(): JSX.Element {
 						<Form.Field className="flex w-fit flex-row items-center gap-2.5">
 							<Checkbox
 								id="hasCollegeDegree"
+								name={field.name}
 								checked={field.state.value}
+								onBlur={field.handleBlur}
 								onCheckedChange={(checked) => {
 									field.handleChange(checked);
 
@@ -69,7 +71,7 @@ function Step3(): JSX.Element {
 								<Form.Field>
 									<Label
 										htmlFor="collegeName"
-										data-state={collegeNameStatus}
+										status={collegeNameStatus}
 									>
 										College name
 									</Label>
@@ -77,8 +79,7 @@ function Step3(): JSX.Element {
 										id="collegeName"
 										aria-describedby={getFieldMessageId("collegeName")}
 										name={field.name}
-										data-state={collegeNameStatus}
-										aria-invalid={collegeNameStatus === "invalid"}
+										status={collegeNameStatus}
 										value={field.state.value ?? ""}
 										onBlur={field.handleBlur}
 										onChange={(event) => field.handleChange(event.target.value)}

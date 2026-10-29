@@ -8,14 +8,10 @@ import cn from "@diegofrayo-pkg/cn";
 
 import type { FieldStatus } from "../../utils/types";
 
-type CheckboxProps = {
-	checked: boolean;
-	onCheckedChange: (checked: boolean) => void;
-	id?: string;
-} & { "data-state"?: FieldStatus };
+type CheckboxProps = BaseCheckbox.Root.Props & { status?: FieldStatus | undefined };
 
 const Checkbox = forwardRef<HTMLElement, CheckboxProps>(function Checkbox(
-	{ id, checked, "data-state": dataState, onCheckedChange },
+	{ className, status, ...props },
 	ref,
 ) {
 	// --- STYLES ---
@@ -35,6 +31,8 @@ const Checkbox = forwardRef<HTMLElement, CheckboxProps>(function Checkbox(
 
 			// Disabled state
 			"disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none",
+
+			className,
 		),
 		indicator: cn("text-white"),
 	};
@@ -42,12 +40,10 @@ const Checkbox = forwardRef<HTMLElement, CheckboxProps>(function Checkbox(
 	return (
 		<BaseCheckbox.Root
 			ref={ref}
-			id={id}
-			checked={checked}
-			data-state={dataState}
-			aria-invalid={dataState === "invalid"}
+			data-state={status}
+			aria-invalid={status === "invalid"}
 			className={classes.root}
-			onCheckedChange={onCheckedChange}
+			{...props}
 		>
 			<BaseCheckbox.Indicator className={classes.indicator}>
 				<Check className="size-4" />

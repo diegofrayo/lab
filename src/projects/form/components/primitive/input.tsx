@@ -7,9 +7,12 @@ import cn from "@diegofrayo-pkg/cn";
 
 import type { FieldStatus } from "../../utils/types";
 
-type InputProps = BaseInput.Props & { "data-state": FieldStatus };
+type InputProps = BaseInput.Props & { status?: FieldStatus | undefined };
 
-const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ className, ...props }, ref) {
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+	{ className, status, ...props },
+	ref,
+) {
 	// --- STYLES ---
 	const classes = {
 		input: cn(
@@ -46,6 +49,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ classNam
 	return (
 		<BaseInput
 			ref={ref}
+			data-state={status}
+			aria-invalid={status === "invalid"}
 			className={classes.input}
 			{...props}
 		/>
