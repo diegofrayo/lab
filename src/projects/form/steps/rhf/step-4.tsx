@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, type JSX } from "react";
+import { useMemo, type JSX } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 import { toast } from "sonner";
@@ -234,16 +234,6 @@ function useStep4Form(): UseStep4FormReturn {
 	usePersistInput("stillStudying", formValues.stillStudying);
 	usePersistInput("endDate", formValues.endDate);
 
-	useEffect(
-		function revalidateEndDateOnStartDateChange() {
-			if (form.formState.dirtyFields.endDate) {
-				void form.trigger("endDate");
-			}
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[formValues.startDate],
-	);
-
 	return { ...form, formValues, onSubmit, handleStillStudyingChange };
 }
 
@@ -258,6 +248,7 @@ const ValidationRules: {
 		validate: {
 			schema: createRHFInputValidator(formSchema.shape.startDate),
 		},
+		deps: ["endDate"],
 	},
 	stillStudying: {
 		validate: {

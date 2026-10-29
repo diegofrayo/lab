@@ -93,7 +93,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 > **Solved (2026-10-29):** `cityOptions` is now computed from `formValues.state` during render, as in the TSF step. The `useState`, the `restoreCityOptions` effect and the `stateId` argument of `handleStateChange` are gone.
 
-### 6. Re-checking `endDate` via an effect
+### 6. Re-checking `endDate` via an effect  ✅ Solved
 
 `effect-for-event`
 
