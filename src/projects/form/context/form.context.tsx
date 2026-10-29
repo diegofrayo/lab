@@ -5,7 +5,7 @@ import type { JSX, ReactNode } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { composeLocalStorageKeyForInput } from "../utils/form";
-import { TOTAL_STEPS } from "../utils/types";
+import { STEPS } from "../utils/types";
 import type { FormInputName, FormScope, FormValues, StepNumber } from "../utils/types";
 
 // --- TYPES ---
@@ -51,14 +51,14 @@ function FormProvider({ children, scope }: FormProviderProps): JSX.Element {
 
 	const goToNextStep = useCallback(
 		function goToNextStep() {
-			setCurrentStep((step) => Math.min(step + 1, TOTAL_STEPS) as StepNumber);
+			setCurrentStep((step) => getSiblingStep(step, 1));
 		},
 		[setCurrentStep],
 	);
 
 	const goToPreviousStep = useCallback(
 		function goToPreviousStep() {
-			setCurrentStep((step) => Math.max(step - 1, 1) as StepNumber);
+			setCurrentStep((step) => getSiblingStep(step, -1));
 		},
 		[setCurrentStep],
 	);
@@ -148,4 +148,9 @@ function parseLocalStorageValue<K extends FormInputName>(
 	} catch {
 		return null;
 	}
+}
+
+/** Returns the step `offset` positions away, staying on `step` at either end of the form. */
+function getSiblingStep(step: StepNumber, offset: 1 | -1): StepNumber {
+	return STEPS[STEPS.indexOf(step) + offset] ?? step;
 }
