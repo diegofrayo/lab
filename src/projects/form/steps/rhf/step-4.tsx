@@ -5,7 +5,6 @@ import { Controller } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 
 import Form from "../../components/form";
-import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import RadioGroup from "../../components/primitive/radio-group";
 import type { RadioGroupOption } from "../../components/primitive/radio-group";
@@ -15,8 +14,7 @@ import {
 	CustomValidations,
 	formSchema,
 	fromHtmlDateValue,
-	getFieldMessageId,
-	getFieldStatus,
+	getRHFFieldStatus,
 	toHtmlDateValue,
 } from "../../utils/form";
 import { STEP_4_INPUT_NAMES } from "../../utils/types";
@@ -24,71 +22,44 @@ import type { Step4Values, StepFormReturn } from "../../utils/types";
 
 function Step4(): JSX.Element {
 	// --- HOOKS ---
+	const form = useStep4Form();
 	const {
 		control,
 		formValues,
-		formState: { errors, touchedFields, dirtyFields, isSubmitted },
+		formState: { errors },
 		handleStillStudyingChange,
 		onSubmit,
-	} = useStep4Form();
+	} = form;
 
 	// --- COMPUTED STATES ---
 	const stillStudying = formValues.stillStudying;
-	const stillStudyingStatus = getFieldStatus({
-		isFormSubmitted: isSubmitted,
-		hasError: Boolean(errors.stillStudying),
-		isTouched: Boolean(dirtyFields.stillStudying) || Boolean(touchedFields.stillStudying),
-		hasValue: formValues.stillStudying !== undefined,
-	});
-	const startDateStatus = getFieldStatus({
-		isFormSubmitted: isSubmitted,
-		hasError: Boolean(errors.startDate),
-		isTouched: Boolean(dirtyFields.startDate) || Boolean(touchedFields.startDate),
-		hasValue: Boolean(formValues.startDate),
-	});
-	const endDateStatus = getFieldStatus({
-		isFormSubmitted: isSubmitted,
-		hasError: Boolean(errors.endDate),
-		isTouched: Boolean(dirtyFields.endDate) || Boolean(touchedFields.endDate),
-		hasValue: Boolean(formValues.endDate),
-	});
+	const stillStudyingStatus = getRHFFieldStatus({ form, name: "stillStudying" });
+	const startDateStatus = getRHFFieldStatus({ form, name: "startDate" });
+	const endDateStatus = getRHFFieldStatus({ form, name: "endDate" });
 
 	return (
 		<Form onSubmit={onSubmit}>
 			<Form.Body>
-				<Form.Field>
-					<Label
-						htmlFor="startDate"
-						status={startDateStatus}
-					>
-						Start date
-					</Label>
-					<Controller
-						name="startDate"
-						control={control}
-						rules={ValidationRules.startDate}
-						render={({ field }) => (
-							<Input
-								id="startDate"
-								aria-describedby={getFieldMessageId("startDate")}
-								type="date"
-								status={startDateStatus}
-								name={field.name}
-								ref={field.ref}
-								value={toHtmlDateValue(field.value)}
-								placeholder="yyyy/mm/dd"
-								onBlur={field.onBlur}
-								onChange={(event) => field.onChange(fromHtmlDateValue(event.target.value))}
-							/>
-						)}
-					/>
-					<Form.FieldMessage
-						inputId="startDate"
-						status={startDateStatus}
-					>
-						{errors.startDate?.message}
-					</Form.FieldMessage>
-				</Form.Field>
+				<Controller
+					name="startDate"
+					control={control}
+					rules={ValidationRules.startDate}
+					render={({ field }) => (
+						<Form.TextField
+							id="startDate"
+							label="Start date"
+							type="date"
+							status={startDateStatus}
+							message={errors.startDate?.message}
+							name={field.name}
+							ref={field.ref}
+							value={toHtmlDateValue(field.value)}
+							placeholder="yyyy/mm/dd"
+							onBlur={field.onBlur}
+							onChange={(event) => field.onChange(fromHtmlDateValue(event.target.value))}
+						/>
+					)}
+				/>
 
 				<Form.Field>
 					<Label
@@ -123,39 +94,26 @@ function Step4(): JSX.Element {
 				</Form.Field>
 
 				{stillStudying === false && (
-					<Form.Field>
-						<Label
-							htmlFor="endDate"
-							status={endDateStatus}
-						>
-							End date
-						</Label>
-						<Controller
-							name="endDate"
-							control={control}
-							rules={ValidationRules.endDate}
-							render={({ field }) => (
-								<Input
-									id="endDate"
-									aria-describedby={getFieldMessageId("endDate")}
-									type="date"
-									status={endDateStatus}
-									name={field.name}
-									ref={field.ref}
-									placeholder="yyyy/mm/dd"
-									value={toHtmlDateValue(field.value || "")}
-									onBlur={field.onBlur}
-									onChange={(event) => field.onChange(fromHtmlDateValue(event.target.value))}
-								/>
-							)}
-						/>
-						<Form.FieldMessage
-							inputId="endDate"
-							status={endDateStatus}
-						>
-							{errors.endDate?.message}
-						</Form.FieldMessage>
-					</Form.Field>
+					<Controller
+						name="endDate"
+						control={control}
+						rules={ValidationRules.endDate}
+						render={({ field }) => (
+							<Form.TextField
+								id="endDate"
+								label="End date"
+								type="date"
+								status={endDateStatus}
+								message={errors.endDate?.message}
+								name={field.name}
+								ref={field.ref}
+								placeholder="yyyy/mm/dd"
+								value={toHtmlDateValue(field.value || "")}
+								onBlur={field.onBlur}
+								onChange={(event) => field.onChange(fromHtmlDateValue(event.target.value))}
+							/>
+						)}
+					/>
 				)}
 			</Form.Body>
 			<Form.Navigation nextButtonLabel="Submit" />

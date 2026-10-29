@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 20 of 22 solved (14 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
+**Status:** 21 of 22 solved (15 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -208,13 +208,15 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 > **Solved (2026-10-29):** added `hooks/use-form-step.ts` with `useRHFStep({ inputNames, isFinalStep? })` and `useTSFStep(...)`. A private `useFormStep` they share owns the default values, the submit-then-navigate flow and, with `isFinalStep`, the whole-form `parseForm` check and its toast, which steps 4 had duplicated. Each hook also owns draft persistence through a new `usePersistInputs(values)`, which replaces the per-field `usePersistInput` calls, and the TSF `preventDefault/stopPropagation/handleSubmit` wrapper. The input-name lists are now module-level `STEP_N_INPUT_NAMES` constants in `utils/types.ts`, and `StepNValues` is derived from them, so the `useMemo(() => [...], [])` wrappers are gone. Steps 1 and 3 (TSF) and step 1 (RHF) call the shared hook directly; the other steps keep a small `useStepNForm` only for their step-specific handlers. Verified in the browser for both libraries: steps 1-4 through to the summary, drafts restored after a reload, drafts cleared after each submit, and step 4 blocked with the toast when earlier steps are missing.
 
-### 16. Field status and field markup repeated
+### 16. Field status and field markup repeated ✅ Solved
 
 `repeated-markup` (Funky)
 
 - **Smell:** `getFieldStatus({ isFormSubmitted, hasError: Boolean(errors.x), isTouched: Boolean(dirtyFields.x) || Boolean(touchedFields.x), hasValue: Boolean(formValues.x) })` appears 10 times in the RHF steps. The TSF version (`errors.length > 0, meta.isTouched, ...`) appears 9 times. Label + Input + FieldMessage blocks repeat about 19 times.
 - **Divergence:** TSF never passes `isFormSubmitted`, so the two implementations already decide "valid" differently.
 - **Fix:** add `getRHFFieldStatus(formState, values, name)` and `getTSFFieldStatus(field)`, plus a `<Form.TextField id label status message>` composite that handles the `aria-describedby` wiring (#3) once.
+
+> **Solved (2026-10-29):** added `getRHFFieldStatus({ form, name })`, built on RHF's `getFieldState`, and `getTSFFieldStatus(field)`. Both feed the now-private `getFieldStatus`, which receives `isFormSubmitted` and `isValidating` in both libraries, so they no longer decide "valid" differently. A shared `hasFieldValue` treats `false` as a value, which replaces the special case for `stillStudying`. Added `Form.TextField` and `Form.SelectField` composites that render label, control and message and wire `htmlFor`, `aria-describedby` and `status` once. The text field takes an optional `isLoading`/`loadingLabel` pair, which must be passed together. Every text, date and select field in both libraries uses them; the checkbox and the radio group keep their own markup. Verified in the browser for both libraries: valid, invalid and checking states, `aria-invalid`/`aria-describedby`, and end-date re-validation when the start date changes.
 
 ## Whiff
 

@@ -3,16 +3,9 @@
 import type { JSX } from "react";
 
 import Form from "../../components/form";
-import Label from "../../components/primitive/label";
-import Select from "../../components/primitive/select";
 import { useColombiaLocations } from "../../hooks/use-colombia-locations";
 import { useTSFStep } from "../../hooks/use-form-step";
-import {
-	createTSFValidatorFromInputShape,
-	formSchema,
-	getFieldMessageId,
-	getFieldStatus,
-} from "../../utils/form";
+import { createTSFValidatorFromInputShape, formSchema, getTSFFieldStatus } from "../../utils/form";
 import { STEP_2_INPUT_NAMES } from "../../utils/types";
 import type { Step2Values, TSFValidationRules } from "../../utils/types";
 
@@ -31,43 +24,24 @@ function Step2(): JSX.Element {
 					validators={ValidationRules.state}
 				>
 					{(field) => {
-						const stateStatus = getFieldStatus({
-							hasError: field.state.meta.errors.length > 0,
-							isTouched: field.state.meta.isTouched,
-							hasValue: Boolean(field.state.value),
-						});
-
 						function handleValueChange(value: string | null): void {
 							field.handleChange(value ?? "");
 							handleStateChange();
 						}
 
 						return (
-							<Form.Field>
-								<Label
-									htmlFor="state"
-									status={stateStatus}
-								>
-									State
-								</Label>
-								<Select
-									id="state"
-									name={field.name}
-									aria-describedby={getFieldMessageId("state")}
-									status={stateStatus}
-									items={stateOptions}
-									placeholder="Select a state"
-									value={field.state.value || null}
-									onBlur={field.handleBlur}
-									onValueChange={handleValueChange}
-								/>
-								<Form.FieldMessage
-									inputId="state"
-									status={stateStatus}
-								>
-									{field.state.meta.errors[0]}
-								</Form.FieldMessage>
-							</Form.Field>
+							<Form.SelectField
+								id="state"
+								label="State"
+								name={field.name}
+								status={getTSFFieldStatus(field)}
+								message={field.state.meta.errors[0]}
+								items={stateOptions}
+								placeholder="Select a state"
+								value={field.state.value || null}
+								onBlur={field.handleBlur}
+								onValueChange={handleValueChange}
+							/>
 						);
 					}}
 				</form.Field>
@@ -76,42 +50,21 @@ function Step2(): JSX.Element {
 					name="city"
 					validators={ValidationRules.city}
 				>
-					{(field) => {
-						const cityStatus = getFieldStatus({
-							hasError: field.state.meta.errors.length > 0,
-							isTouched: field.state.meta.isTouched,
-							hasValue: Boolean(field.state.value),
-						});
-
-						return (
-							<Form.Field>
-								<Label
-									htmlFor="city"
-									status={cityStatus}
-								>
-									City
-								</Label>
-								<Select
-									id="city"
-									name={field.name}
-									aria-describedby={getFieldMessageId("city")}
-									status={cityStatus}
-									items={cityOptions}
-									placeholder="Select a city"
-									disabled={isCityDisabled}
-									value={field.state.value || null}
-									onBlur={field.handleBlur}
-									onValueChange={(value) => field.handleChange(value ?? "")}
-								/>
-								<Form.FieldMessage
-									inputId="city"
-									status={cityStatus}
-								>
-									{field.state.meta.errors[0]}
-								</Form.FieldMessage>
-							</Form.Field>
-						);
-					}}
+					{(field) => (
+						<Form.SelectField
+							id="city"
+							label="City"
+							name={field.name}
+							status={getTSFFieldStatus(field)}
+							message={field.state.meta.errors[0]}
+							items={cityOptions}
+							placeholder="Select a city"
+							disabled={isCityDisabled}
+							value={field.state.value || null}
+							onBlur={field.handleBlur}
+							onValueChange={(value) => field.handleChange(value ?? "")}
+						/>
+					)}
 				</form.Field>
 			</Form.Body>
 

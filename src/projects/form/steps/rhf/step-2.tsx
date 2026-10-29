@@ -5,125 +5,81 @@ import { Controller } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 
 import Form from "../../components/form";
-import Label from "../../components/primitive/label";
-import Select from "../../components/primitive/select";
 import type { SelectOption } from "../../components/primitive/select";
 import { useColombiaLocations } from "../../hooks/use-colombia-locations";
 import { useRHFStep } from "../../hooks/use-form-step";
-import {
-	createRHFInputValidator,
-	formSchema,
-	getFieldMessageId,
-	getFieldStatus,
-} from "../../utils/form";
+import { createRHFInputValidator, formSchema, getRHFFieldStatus } from "../../utils/form";
 import { STEP_2_INPUT_NAMES } from "../../utils/types";
 import type { Step2Values, StepFormReturn } from "../../utils/types";
 
 function Step2(): JSX.Element {
 	// --- HOOKS ---
+	const form = useStep2Form();
 	const {
 		control,
-		formValues,
-		formState: { errors, touchedFields, dirtyFields, isSubmitted },
+		formState: { errors },
 		stateOptions,
 		cityOptions,
 		handleStateChange,
 		onSubmit,
-	} = useStep2Form();
+	} = form;
 
 	// --- COMPUTED STATES ---
-	const stateStatus = getFieldStatus({
-		isFormSubmitted: isSubmitted,
-		hasError: Boolean(errors.state),
-		isTouched: Boolean(dirtyFields.state) || Boolean(touchedFields.state),
-		hasValue: Boolean(formValues.state),
-	});
-	const cityStatus = getFieldStatus({
-		isFormSubmitted: isSubmitted,
-		hasError: Boolean(errors.city),
-		isTouched: Boolean(dirtyFields.city) || Boolean(touchedFields.city),
-		hasValue: Boolean(formValues.city),
-	});
+	const stateStatus = getRHFFieldStatus({ form, name: "state" });
+	const cityStatus = getRHFFieldStatus({ form, name: "city" });
 	const isCityDisabled = cityOptions.length === 0;
 
 	return (
 		<Form onSubmit={onSubmit}>
 			<Form.Body>
-				<Form.Field>
-					<Label
-						htmlFor="state"
-						status={stateStatus}
-					>
-						State
-					</Label>
-					<Controller
-						name="state"
-						control={control}
-						rules={ValidationRules.state}
-						render={({ field }) => {
-							function handleStateValueChange(value: string | null): void {
-								field.onChange(value);
-								handleStateChange();
-							}
+				<Controller
+					name="state"
+					control={control}
+					rules={ValidationRules.state}
+					render={({ field }) => {
+						function handleStateValueChange(value: string | null): void {
+							field.onChange(value);
+							handleStateChange();
+						}
 
-							return (
-								<Select
-									id="state"
-									name={field.name}
-									aria-describedby={getFieldMessageId("state")}
-									status={stateStatus}
-									items={stateOptions}
-									placeholder="Select a state"
-									value={field.value || null}
-									ref={field.ref}
-									onBlur={field.onBlur}
-									onValueChange={handleStateValueChange}
-								/>
-							);
-						}}
-					/>
-					<Form.FieldMessage
-						inputId="state"
-						status={stateStatus}
-					>
-						{errors.state?.message}
-					</Form.FieldMessage>
-				</Form.Field>
-
-				<Form.Field>
-					<Label
-						htmlFor="city"
-						status={cityStatus}
-					>
-						City
-					</Label>
-					<Controller
-						name="city"
-						control={control}
-						rules={ValidationRules.city}
-						render={({ field }) => (
-							<Select
-								id="city"
+						return (
+							<Form.SelectField
+								id="state"
+								label="State"
 								name={field.name}
-								aria-describedby={getFieldMessageId("city")}
-								status={cityStatus}
-								items={cityOptions}
-								placeholder="Select a city"
-								disabled={isCityDisabled}
+								status={stateStatus}
+								message={errors.state?.message}
+								items={stateOptions}
+								placeholder="Select a state"
 								value={field.value || null}
 								ref={field.ref}
 								onBlur={field.onBlur}
-								onValueChange={field.onChange}
+								onValueChange={handleStateValueChange}
 							/>
-						)}
-					/>
-					<Form.FieldMessage
-						inputId="city"
-						status={cityStatus}
-					>
-						{errors.city?.message}
-					</Form.FieldMessage>
-				</Form.Field>
+						);
+					}}
+				/>
+				<Controller
+					name="city"
+					control={control}
+					rules={ValidationRules.city}
+					render={({ field }) => (
+						<Form.SelectField
+							id="city"
+							label="City"
+							name={field.name}
+							status={cityStatus}
+							message={errors.city?.message}
+							items={cityOptions}
+							placeholder="Select a city"
+							disabled={isCityDisabled}
+							value={field.value || null}
+							ref={field.ref}
+							onBlur={field.onBlur}
+							onValueChange={field.onChange}
+						/>
+					)}
+				/>
 			</Form.Body>
 
 			<Form.Navigation />

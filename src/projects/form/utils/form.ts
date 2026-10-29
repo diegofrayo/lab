@@ -1,4 +1,5 @@
 import type { AnyFieldApi } from "@tanstack/react-form";
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 import { z, type ZodSafeParseResult } from "zod";
 
 import type {
@@ -134,26 +135,33 @@ function validateField(fieldSchema: z.ZodType, value: unknown): VALID_INPUT | ER
 	return result.success ? VALID_INPUT : (result.error.issues[0]?.message ?? "Invalid value");
 }
 
+type GetFieldStatusParams = {
+	hasError: boolean;
+	hasValue: boolean;
+	isFormSubmitted: boolean;
+	isTouched: boolean;
+	isValidating: boolean;
+};
+
 /**
- * Derives a field's visual status from its react-hook-form state. Shared across
- * steps so every field reports valid/invalid/neutral the same way.
+ * Derives a field's visual status. Only called through `getRHFFieldStatus` and
+ * `getTSFFieldStatus`, so both libraries decide "valid" the same way.
  */
-export function getFieldStatus({
+function getFieldStatus({
 	hasError,
 	hasValue,
 	isFormSubmitted,
 	isTouched,
 	isValidating,
-}: {
-	hasError: boolean;
-	hasValue: boolean;
-	isFormSubmitted?: boolean;
-	isTouched: boolean;
-	isValidating?: boolean;
-}): FieldStatus {
+}: GetFieldStatusParams): FieldStatus {
 	if (hasError) return "invalid";
 	if ((isTouched || isFormSubmitted) && hasValue && !isValidating) return "valid";
 	return "neutral";
+}
+
+/** `false` counts as a value (e.g. a "No" answer); only empty strings and missing values don't. */
+function hasFieldValue(value: unknown): boolean {
+	return value !== undefined && value !== null && value !== "";
 }
 
 export function composeLocalStorageKeyForInput(scope: FormScope, inputName: string): string {
@@ -182,7 +190,37 @@ export function createRHFInputValidator<InputValue>(inputShape: z.ZodType) {
 	};
 }
 
+type GetRHFFieldStatusParams<Values extends FieldValues> = {
+	form: Pick<UseFormReturn<Values>, "formState" | "getFieldState" | "getValues">;
+	name: Path<Values>;
+};
+
+export function getRHFFieldStatus<Values extends FieldValues>({
+	form,
+	name,
+}: GetRHFFieldStatusParams<Values>): FieldStatus {
+	const { invalid, isDirty, isTouched, isValidating } = form.getFieldState(name, form.formState);
+
+	return getFieldStatus({
+		hasError: invalid,
+		hasValue: hasFieldValue(form.getValues(name)),
+		isFormSubmitted: form.formState.isSubmitted,
+		isTouched: isDirty || isTouched,
+		isValidating,
+	});
+}
+
 // --- TSF Utils ---
+
+export function getTSFFieldStatus(field: AnyFieldApi): FieldStatus {
+	return getFieldStatus({
+		hasError: field.state.meta.errors.length > 0,
+		hasValue: hasFieldValue(field.state.value),
+		isFormSubmitted: field.form.state.isSubmitted,
+		isTouched: field.state.meta.isTouched,
+		isValidating: field.state.meta.isValidating,
+	});
+}
 
 export function createTSFValidatorFromInputShape<InputValue>(inputShape: z.ZodType) {
 	return function validator({ value }: { value: InputValue }): ERROR_MESSAGE | TSF_VALID_INPUT {

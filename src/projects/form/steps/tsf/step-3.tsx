@@ -5,7 +5,6 @@ import { useSelector } from "@tanstack/react-form";
 
 import Form from "../../components/form";
 import Checkbox from "../../components/primitive/checkbox";
-import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useTSFStep } from "../../hooks/use-form-step";
 import {
@@ -13,8 +12,7 @@ import {
 	createTSFValidatorFromInputShape,
 	CustomValidations,
 	formSchema,
-	getFieldMessageId,
-	getFieldStatus,
+	getTSFFieldStatus,
 } from "../../utils/form";
 import { STEP_3_INPUT_NAMES } from "../../utils/types";
 import type { Step3Values, TSFValidationRules } from "../../utils/types";
@@ -59,39 +57,18 @@ function Step3(): JSX.Element {
 						name="collegeName"
 						validators={ValidationRules.collegeName}
 					>
-						{(field) => {
-							const collegeNameStatus = getFieldStatus({
-								hasError: field.state.meta.errors.length > 0,
-								isTouched: field.state.meta.isTouched,
-								hasValue: Boolean(field.state.value),
-							});
-
-							return (
-								<Form.Field>
-									<Label
-										htmlFor="collegeName"
-										status={collegeNameStatus}
-									>
-										College name
-									</Label>
-									<Input
-										id="collegeName"
-										aria-describedby={getFieldMessageId("collegeName")}
-										name={field.name}
-										status={collegeNameStatus}
-										value={field.state.value ?? ""}
-										onBlur={field.handleBlur}
-										onChange={(event) => field.handleChange(event.target.value)}
-									/>
-									<Form.FieldMessage
-										inputId="collegeName"
-										status={collegeNameStatus}
-									>
-										{field.state.meta.errors[0]}
-									</Form.FieldMessage>
-								</Form.Field>
-							);
-						}}
+						{(field) => (
+							<Form.TextField
+								id="collegeName"
+								label="College name"
+								name={field.name}
+								status={getTSFFieldStatus(field)}
+								message={field.state.meta.errors[0]}
+								value={field.state.value ?? ""}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+							/>
+						)}
 					</form.Field>
 				)}
 			</Form.Body>

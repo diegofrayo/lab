@@ -6,38 +6,32 @@ import type { Control, RegisterOptions } from "react-hook-form";
 
 import Form from "../../components/form";
 import Checkbox from "../../components/primitive/checkbox";
-import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import { useRHFStep } from "../../hooks/use-form-step";
 import {
 	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
-	getFieldMessageId,
-	getFieldStatus,
+	getRHFFieldStatus,
 } from "../../utils/form";
 import { STEP_3_INPUT_NAMES } from "../../utils/types";
 import type { Step3Values, StepFormReturn } from "../../utils/types";
 
 function Step3(): JSX.Element {
 	// --- HOOKS ---
+	const form = useStep3Form();
 	const {
 		control,
 		register,
 		formValues,
-		formState: { errors, touchedFields, dirtyFields, isSubmitted },
+		formState: { errors },
 		handleHasCollegeDegreeChange,
 		onSubmit,
-	} = useStep3Form();
+	} = form;
 
 	// --- COMPUTED STATES ---
 	const hasCollegeDegree = Boolean(formValues.hasCollegeDegree);
-	const collegeNameStatus = getFieldStatus({
-		isFormSubmitted: isSubmitted,
-		hasError: Boolean(errors.collegeName),
-		isTouched: Boolean(dirtyFields.collegeName) || Boolean(touchedFields.collegeName),
-		hasValue: Boolean(formValues.collegeName),
-	});
+	const collegeNameStatus = getRHFFieldStatus({ form, name: "collegeName" });
 
 	return (
 		<Form onSubmit={onSubmit}>
@@ -74,26 +68,13 @@ function Step3(): JSX.Element {
 				</Form.Field>
 
 				{hasCollegeDegree && (
-					<Form.Field>
-						<Label
-							htmlFor="collegeName"
-							status={collegeNameStatus}
-						>
-							College name
-						</Label>
-						<Input
-							id="collegeName"
-							aria-describedby={getFieldMessageId("collegeName")}
-							status={collegeNameStatus}
-							{...register("collegeName", ValidationRules.collegeName)}
-						/>
-						<Form.FieldMessage
-							inputId="collegeName"
-							status={collegeNameStatus}
-						>
-							{errors.collegeName?.message}
-						</Form.FieldMessage>
-					</Form.Field>
+					<Form.TextField
+						id="collegeName"
+						label="College name"
+						status={collegeNameStatus}
+						message={errors.collegeName?.message}
+						{...register("collegeName", ValidationRules.collegeName)}
+					/>
 				)}
 			</Form.Body>
 

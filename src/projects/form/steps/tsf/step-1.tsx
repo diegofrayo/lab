@@ -3,16 +3,9 @@
 import type { JSX } from "react";
 
 import Form from "../../components/form";
-import Input from "../../components/primitive/input";
-import Label from "../../components/primitive/label";
 import { useTSFStep } from "../../hooks/use-form-step";
 import { asyncCheck } from "../../utils/async";
-import {
-	createTSFValidatorFromInputShape,
-	formSchema,
-	getFieldMessageId,
-	getFieldStatus,
-} from "../../utils/form";
+import { createTSFValidatorFromInputShape, formSchema, getTSFFieldStatus } from "../../utils/form";
 import { STEP_1_INPUT_NAMES } from "../../utils/types";
 import type { Step1Values, TSFValidationRules } from "../../utils/types";
 
@@ -28,39 +21,18 @@ function Step1(): JSX.Element {
 					name="name"
 					validators={ValidationRules.name}
 				>
-					{(field) => {
-						const nameStatus = getFieldStatus({
-							hasError: field.state.meta.errors.length > 0,
-							isTouched: field.state.meta.isTouched,
-							hasValue: Boolean(field.state.value),
-						});
-
-						return (
-							<Form.Field>
-								<Label
-									htmlFor="name"
-									status={nameStatus}
-								>
-									Name
-								</Label>
-								<Input
-									id="name"
-									aria-describedby={getFieldMessageId("name")}
-									name={field.name}
-									status={nameStatus}
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(event) => field.handleChange(event.target.value)}
-								/>
-								<Form.FieldMessage
-									inputId="name"
-									status={nameStatus}
-								>
-									{field.state.meta.errors[0]}
-								</Form.FieldMessage>
-							</Form.Field>
-						);
-					}}
+					{(field) => (
+						<Form.TextField
+							id="name"
+							label="Name"
+							name={field.name}
+							status={getTSFFieldStatus(field)}
+							message={field.state.meta.errors[0]}
+							value={field.state.value}
+							onBlur={field.handleBlur}
+							onChange={(event) => field.handleChange(event.target.value)}
+						/>
+					)}
 				</form.Field>
 
 				<form.Field
@@ -73,43 +45,21 @@ function Step1(): JSX.Element {
 					}}
 				>
 					{(field) => {
-						const isCheckingEmail = field.state.meta.isValidating;
-						const emailStatus = getFieldStatus({
-							hasError: field.state.meta.errors.length > 0,
-							isTouched: field.state.meta.isTouched,
-							hasValue: Boolean(field.state.value),
-							isValidating: isCheckingEmail,
-						});
+						const emailStatus = getTSFFieldStatus(field);
 
 						return (
-							<Form.Field>
-								<Label
-									htmlFor="email"
-									status={emailStatus}
-								>
-									Email
-								</Label>
-								<Form.FieldWithLoader
-									isLoading={isCheckingEmail}
-									loadingLabel="Checking email availability"
-								>
-									<Input
-										id="email"
-										aria-describedby={getFieldMessageId("email")}
-										name={field.name}
-										status={emailStatus}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(event) => field.handleChange(event.target.value)}
-									/>
-								</Form.FieldWithLoader>
-								<Form.FieldMessage
-									inputId="email"
-									status={emailStatus}
-								>
-									{emailStatus === "valid" ? "Email available" : field.state.meta.errors[0]}
-								</Form.FieldMessage>
-							</Form.Field>
+							<Form.TextField
+								id="email"
+								label="Email"
+								name={field.name}
+								status={emailStatus}
+								message={emailStatus === "valid" ? "Email available" : field.state.meta.errors[0]}
+								isLoading={field.state.meta.isValidating}
+								loadingLabel="Checking email availability"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+							/>
 						);
 					}}
 				</form.Field>
@@ -119,43 +69,21 @@ function Step1(): JSX.Element {
 					validators={ValidationRules.username}
 				>
 					{(field) => {
-						const isCheckingUsername = field.state.meta.isValidating;
-						const usernameStatus = getFieldStatus({
-							hasError: field.state.meta.errors.length > 0,
-							isTouched: field.state.meta.isTouched,
-							hasValue: Boolean(field.state.value),
-							isValidating: isCheckingUsername,
-						});
+						const usernameStatus = getTSFFieldStatus(field);
 
 						return (
-							<Form.Field>
-								<Label
-									htmlFor="username"
-									status={usernameStatus}
-								>
-									Username
-								</Label>
-								<Form.FieldWithLoader
-									isLoading={isCheckingUsername}
-									loadingLabel="Checking username availability"
-								>
-									<Input
-										id="username"
-										aria-describedby={getFieldMessageId("username")}
-										name={field.name}
-										status={usernameStatus}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(event) => field.handleChange(event.target.value)}
-									/>
-								</Form.FieldWithLoader>
-								<Form.FieldMessage
-									inputId="username"
-									status={usernameStatus}
-								>
-									{usernameStatus === "valid" ? "Username available" : field.state.meta.errors[0]}
-								</Form.FieldMessage>
-							</Form.Field>
+							<Form.TextField
+								id="username"
+								label="Username"
+								name={field.name}
+								status={usernameStatus}
+								message={usernameStatus === "valid" ? "Username available" : field.state.meta.errors[0]}
+								isLoading={field.state.meta.isValidating}
+								loadingLabel="Checking username availability"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+							/>
 						);
 					}}
 				</form.Field>
