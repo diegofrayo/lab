@@ -64,7 +64,7 @@ function Step2(): JSX.Element {
 						render={({ field }) => {
 							function handleStateValueChange(value: string | null): void {
 								field.onChange(value);
-								handleStateChange(value);
+								handleStateChange();
 							}
 
 							return (
@@ -138,7 +138,7 @@ type UseStep2FormReturn = StepFormReturn<Step2Values> & {
 	control: Control<Step2Values>;
 	stateOptions: SelectOption[];
 	cityOptions: SelectOption[];
-	handleStateChange: (stateId: string | null) => void;
+	handleStateChange: () => void;
 };
 
 function useStep2Form(): UseStep2FormReturn {
@@ -155,9 +155,6 @@ function useStep2Form(): UseStep2FormReturn {
 		defaultValues: DEFAULT_VALUES,
 	});
 
-	// --- STATES & REFS ---
-	const [cityOptions, setCityOptions] = useState<SelectOption[]>([]);
-
 	// --- HANDLERS ---
 	const submitForm = form.handleSubmit(function handleValidSubmit(data) {
 		updateFormValues(data);
@@ -169,29 +166,17 @@ function useStep2Form(): UseStep2FormReturn {
 		void submitForm(event);
 	}
 
-	function handleStateChange(stateId: string | null): void {
+	function handleStateChange(): void {
 		form.setValue("city", "", { shouldValidate: true, shouldDirty: true });
-		setCityOptions(stateId ? getCitiesOptions(stateId) : []);
 	}
 
 	// --- COMPUTED STATES ---
 	const formValues = form.watch();
+	const cityOptions = formValues.state ? getCitiesOptions(formValues.state) : [];
 
 	// --- EFFECTS ---
 	usePersistInput("state", formValues.state);
 	usePersistInput("city", formValues.city);
-
-	useEffect(
-		function restoreCityOptions() {
-			const stateId = form.getValues("state");
-
-			if (!stateId) return;
-
-			setCityOptions(getCitiesOptions(stateId));
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[stateOptions],
-	);
 
 	return {
 		...form,

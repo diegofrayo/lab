@@ -80,7 +80,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 ## Funky
 
-### 5. `cityOptions` held in state and synced by an effect
+### 5. `cityOptions` held in state and synced by an effect ✅ Solved
 
 `redundant-state` + `effect-for-derived`
 
@@ -90,6 +90,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Cost:** two writers for one value, an extra render, and a hidden ordering dependency on `stateOptions` loading.
 - **Fix:** do what the TSF version already does (`tsf/step-2.tsx:142`): `const cityOptions = formValues.state ? getCitiesOptions(formValues.state) : [];`. Then delete the state and the effect.
 - **Source:** [Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure#avoid-redundant-state)
+
+> **Solved (2026-10-29):** `cityOptions` is now computed from `formValues.state` during render, as in the TSF step. The `useState`, the `restoreCityOptions` effect and the `stateId` argument of `handleStateChange` are gone.
 
 ### 6. Re-checking `endDate` via an effect
 
