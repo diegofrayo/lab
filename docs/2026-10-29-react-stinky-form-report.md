@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 14 of 22 solved (9 of 16 numbered findings, 5 of 6 whiffs). #10 is intentionally left open.
+**Status:** 15 of 22 solved (9 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -212,7 +212,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **`components/form-page.tsx:36`:** `scope` is passed to `StepRenderer` as a prop even though it's already in context. ✅ **Solved (2026-10-29):** `StepRenderer` reads `scope` from `useMultiStepForm()` and no longer takes it as a prop.
 - **`utils/types.ts:25-28`:** `TOTAL_STEPS = 5` and `StepNumber = 1|2|3|4|5` can drift apart, which forces `as StepNumber` casts in the context. Derive one from the other. ✅ **Solved (2026-10-29):** a single `STEPS = [1, 2, 3, 4, 5] as const` now defines both `StepNumber` and `TOTAL_STEPS`. The context moves between steps with a `getSiblingStep` helper that indexes into `STEPS`, so the `as StepNumber` casts are gone.
 - **`utils/form.ts:114-122`:** `parseForm` mutates its argument and takes `Record<string, unknown>`. It's safe today because callers pass a fresh spread, but it's a trap. Copy first and type the parameter as `Partial<FormValues>`. In `createTSFValidatorFromCustomValidation`, the generic parameter `FormValues` hides the imported `FormValues` type. ✅ **Solved (2026-10-29):** `parseForm` takes `Partial<FormValues>` and cleans a copy, so the caller's object is never mutated. The generic that hid the imported type is now called `StepValues`, in both `CustomValidation` and `createTSFValidatorFromCustomValidation`.
-- **`hooks/use-form-submitted.ts`:** three positional params, one of which (`goToNextStep`) it could read from the context it already uses. This goes away with fix #1.
+- **`hooks/use-form-submitted.ts`:** three positional params, one of which (`goToNextStep`) it could read from the context it already uses. This goes away with fix #1. ✅ **Solved (2026-10-29):** no code change needed. The hook was deleted by fix #1.
 - **Debug output:** leftover `console.log` calls in `getDefaultValues`, `usePersistInput`, `useFormSubmitted` and `asyncCheck`. ✅ **Solved (2026-10-29):** the calls in `getDefaultValues`, `usePersistInput` and `asyncCheck` are removed; the one in `useFormSubmitted` went away with #1.
 
 ## Not covered
