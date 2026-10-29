@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "react-stinky": {
+      "source": "saschb2b/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/react-stinky/SKILL.md",
+      "computedHash": "3b61ed38ffc4406fe163802b057b32892bd4472605495ca44bd30856d595e625"
+    }
+  }
+}
