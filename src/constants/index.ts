@@ -18,6 +18,6 @@ export const SUBPROJECTS: Subproject[] = [
 		name: "/performance",
 		description:
 			"App that simulates a desktop environment to learn about performance, re-rendering, profiling and optimizations.",
-		enabled: false,
+		enabled: true,
 	},
 ];
