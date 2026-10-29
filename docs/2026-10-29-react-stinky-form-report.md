@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 11 of 22 solved (9 of 16 numbered findings, 2 of 6 whiffs). #10 is intentionally left open.
+**Status:** 12 of 22 solved (9 of 16 numbered findings, 3 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -209,7 +209,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 ## Whiff
 
 - **`context/form.hook.ts:8`:** `useFormNavigation` also returns values, scope, defaults and reset. `useFormContext` / `useMultiStepForm` would describe it better. ✅ **Solved (2026-10-29):** renamed to `useMultiStepForm` at every call site, since it exposes the whole multi-step form state, not just navigation.
-- **`components/form-page.tsx:36`:** `scope` is passed to `StepRenderer` as a prop even though it's already in context.
+- **`components/form-page.tsx:36`:** `scope` is passed to `StepRenderer` as a prop even though it's already in context. ✅ **Solved (2026-10-29):** `StepRenderer` reads `scope` from `useMultiStepForm()` and no longer takes it as a prop.
 - **`utils/types.ts:25-28`:** `TOTAL_STEPS = 5` and `StepNumber = 1|2|3|4|5` can drift apart, which forces `as StepNumber` casts in the context. Derive one from the other.
 - **`utils/form.ts:114-122`:** `parseForm` mutates its argument and takes `Record<string, unknown>`. It's safe today because callers pass a fresh spread, but it's a trap. Copy first and type the parameter as `Partial<FormValues>`. In `createTSFValidatorFromCustomValidation`, the generic parameter `FormValues` hides the imported `FormValues` type.
 - **`hooks/use-form-submitted.ts`:** three positional params, one of which (`goToNextStep`) it could read from the context it already uses. This goes away with fix #1.

@@ -6,16 +6,15 @@ import cn from "@diegofrayo-pkg/cn";
 
 import { useMultiStepForm } from "../context/form.hook";
 import { TOTAL_STEPS } from "../utils/types";
-import type { FormScope, StepNumber } from "../utils/types";
+import type { StepNumber } from "../utils/types";
 
 type StepRendererProps = {
-	scope: FormScope;
 	stepComponents: Record<StepNumber, () => JSX.Element>;
 };
 
-function StepRenderer({ stepComponents, scope }: StepRendererProps): JSX.Element {
+function StepRenderer({ stepComponents }: StepRendererProps): JSX.Element {
 	// --- HOOKS ---
-	const { currentStep } = useMultiStepForm();
+	const { currentStep, scope } = useMultiStepForm();
 
 	// --- COMPUTED STATES ---
 	const StepComponent = stepComponents[currentStep];
