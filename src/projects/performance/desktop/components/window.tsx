@@ -7,6 +7,9 @@ import cn from "@diegofrayo-pkg/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
+import { getMinWindowSize } from "../utils/window-size";
+
+type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
 
 type WindowProps = {
 	openedApp: OpenedApp;
@@ -24,6 +27,8 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	// --- COMPUTED STATES ---
 	const { id, appConfig, windowConfig, isFocused, status } = openedApp;
 	const isMaximized = status === "MAXIMIZED";
+	const isResizable = (appConfig.isResizable ?? true) && !isMaximized;
+	const minWindowSize = getMinWindowSize(appConfig);
 
 	// --- STYLES ---
 	const classes = {
@@ -163,8 +168,109 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 				</div>
 			</header>
 			<section className={classes.content}>{children}</section>
+			{isResizable ? (
+				<WindowResizeHandles
+					appId={id}
+					width={windowConfig.width}
+					height={windowConfig.height}
+					minWidth={minWindowSize.width}
+					minHeight={minWindowSize.height}
+				/>
+			) : null}
 		</div>
 	);
 }
 
 export default Window;
+
+// --- COMPONENTS ---
+
+type WindowResizeHandlesProps = {
+	appId: string;
+	width: number;
+	height: number;
+	minWidth: number;
+	minHeight: number;
+};
+
+function WindowResizeHandles({
+	appId,
+	width,
+	height,
+	minWidth,
+	minHeight,
+}: WindowResizeHandlesProps): JSX.Element {
+	// --- HOOKS ---
+	const { focusApp, resizeWindow } = useDesktop();
+
+	// --- STATES & REFS ---
+	const resizeDirection = useRef<ResizeDirection | null>(null);
+	const resizeStart = useRef({ mouseX: 0, mouseY: 0, width: 0, height: 0 });
+
+	// --- STYLES ---
+	const classes = {
+		right: cn("absolute top-0 right-0 bottom-3 w-1.5 cursor-ew-resize"),
+		bottom: cn("absolute right-3 bottom-0 left-0 h-1.5 cursor-ns-resize"),
+		bottomRight: cn("absolute right-0 bottom-0 h-3 w-3 cursor-nwse-resize"),
+	};
+
+	// --- HANDLERS ---
+	function handleHandleMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
+		e.preventDefault();
+		resizeDirection.current = e.currentTarget.dataset["direction"] as ResizeDirection;
+		resizeStart.current = { mouseX: e.clientX, mouseY: e.clientY, width, height };
+		focusApp(appId);
+	}
+
+	// --- EFFECTS ---
+	useEffect(
+		function setupResizeListeners() {
+			function handleMouseMove(e: MouseEvent): void {
+				if (!resizeDirection.current) return;
+
+				const start = resizeStart.current;
+				const canResizeWidth = resizeDirection.current !== "BOTTOM";
+				const canResizeHeight = resizeDirection.current !== "RIGHT";
+
+				resizeWindow(
+					appId,
+					canResizeWidth ? Math.max(minWidth, start.width + e.clientX - start.mouseX) : start.width,
+					canResizeHeight ? Math.max(minHeight, start.height + e.clientY - start.mouseY) : start.height,
+				);
+			}
+
+			function handleMouseUp(): void {
+				resizeDirection.current = null;
+			}
+
+			document.addEventListener("mousemove", handleMouseMove);
+			document.addEventListener("mouseup", handleMouseUp);
+
+			return (): void => {
+				document.removeEventListener("mousemove", handleMouseMove);
+				document.removeEventListener("mouseup", handleMouseUp);
+			};
+		},
+		[appId, minWidth, minHeight, resizeWindow],
+	);
+
+	return (
+		<>
+			<div
+				className={classes.right}
+				data-direction="RIGHT"
+				onMouseDown={handleHandleMouseDown}
+			/>
+			<div
+				className={classes.bottom}
+				data-direction="BOTTOM"
+				onMouseDown={handleHandleMouseDown}
+			/>
+			<div
+				className={classes.bottomRight}
+				data-direction="BOTTOM_RIGHT"
+				onMouseDown={handleHandleMouseDown}
+			/>
+		</>
+	);
+}

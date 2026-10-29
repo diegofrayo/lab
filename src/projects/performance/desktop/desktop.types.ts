@@ -5,6 +5,13 @@ export type AppConfig = {
 	// Apps that need params (e.g. a product) are opened by other apps, not from the desktop
 	isHiddenFromDesktop?: boolean;
 	allowMultipleInstances?: boolean;
+	// Defaults to true
+	isResizable?: boolean;
+	// Defaults to 768 x 768
+	minWindowSize?: {
+		width: number;
+		height: number;
+	};
 	windowConfig?: {
 		x: number;
 		y: number;

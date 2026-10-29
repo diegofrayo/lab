@@ -5,6 +5,7 @@ import type { JSX } from "react";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
 import type { AppParams, OpenedApp, OpenedApps } from "../desktop.types";
+import { getInitialWindowSize } from "../utils/window-size";
 
 export const DesktopContext = createContext<DesktopContextValue | null>(null);
 
@@ -47,8 +48,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 				windowConfig: {
 					x: 100 + offset,
 					y: 80 + offset,
-					width: appConfig.windowConfig?.width || 600,
-					height: appConfig.windowConfig?.height || 420,
+					...getInitialWindowSize(appConfig),
 				},
 			};
 
@@ -129,9 +129,36 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 		});
 	}, []);
 
+	const resizeWindow = useCallback((targetAppId: string, width: number, height: number): void => {
+		setOpenedApps((prev) => {
+			if (!prev[targetAppId]) return prev;
+
+			return {
+				...prev,
+				[targetAppId]: {
+					...prev[targetAppId],
+					windowConfig: {
+						...prev[targetAppId].windowConfig,
+						width,
+						height,
+					},
+				},
+			};
+		});
+	}, []);
+
 	return (
 		<DesktopContext.Provider
-			value={{ openedApps, openApp, closeApp, maximizeApp, minimizeApp, focusApp, moveWindow }}
+			value={{
+				openedApps,
+				openApp,
+				closeApp,
+				maximizeApp,
+				minimizeApp,
+				focusApp,
+				moveWindow,
+				resizeWindow,
+			}}
 		>
 			{children}
 		</DesktopContext.Provider>
@@ -148,6 +175,7 @@ export type DesktopContextValue = {
 	minimizeApp: (targetAppId: string) => void;
 	focusApp: (targetAppId: string) => void;
 	moveWindow: (targetAppId: string, x: number, y: number) => void;
+	resizeWindow: (targetAppId: string, width: number, height: number) => void;
 };
 
 //  --- UTILS ---
