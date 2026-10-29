@@ -206,6 +206,18 @@ export function createTSFValidatorFromCustomValidation<InputValue, StepValues>(
 	};
 }
 
+/** `localStorage` key of the cached Colombia states/cities dataset used by step 2. */
+export const COLOMBIA_STORAGE_KEY = "data:colombia-locations";
+
+/** Removes every value the form saved under `scope` (submitted values, current step and per-input drafts). */
+export function clearPersistedForm(scope: FormScope): void {
+	const prefix = `${scope}:form:`;
+
+	Object.keys(window.localStorage)
+		.filter((key) => key.startsWith(prefix))
+		.forEach((key) => window.localStorage.removeItem(key));
+}
+
 export function clearPersistedInputs(scope: FormScope, inputNames: FormInputName[]): void {
 	inputNames.forEach((inputName) => {
 		window.localStorage.removeItem(composeLocalStorageKeyForInput(scope, inputName));

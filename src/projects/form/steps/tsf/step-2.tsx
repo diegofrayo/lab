@@ -12,6 +12,7 @@ import { useMultiStepForm } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
 	clearPersistedInputs,
+	COLOMBIA_STORAGE_KEY,
 	createTSFValidatorFromInputShape,
 	formSchema,
 	getFieldMessageId,
@@ -180,8 +181,6 @@ const ValidationRules = {
 } satisfies TSFValidationRules<Step2Values>;
 
 // --- HOOKS ---
-
-const COLOMBIA_STORAGE_KEY = "data:colombia-locations";
 
 type RawColombiaStateItem = {
 	id: number;

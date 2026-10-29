@@ -13,6 +13,7 @@ import { useMultiStepForm } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
 	clearPersistedInputs,
+	COLOMBIA_STORAGE_KEY,
 	createRHFInputValidator,
 	formSchema,
 	getFieldMessageId,
@@ -209,8 +210,6 @@ const ValidationRules: {
 };
 
 // --- HOOKS ---
-
-const COLOMBIA_STORAGE_KEY = "data:colombia-locations";
 
 type RawColombiaStateItem = {
 	id: number;

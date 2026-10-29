@@ -4,7 +4,7 @@ import { createContext, useCallback, useMemo } from "react";
 import type { JSX, ReactNode } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { composeLocalStorageKeyForInput } from "../utils/form";
+import { clearPersistedForm, composeLocalStorageKeyForInput } from "../utils/form";
 import { STEPS } from "../utils/types";
 import type { FormInputName, FormScope, FormValues, StepNumber } from "../utils/types";
 
@@ -82,14 +82,10 @@ function FormProvider({ children, scope }: FormProviderProps): JSX.Element {
 
 	const resetForm = useCallback(
 		function resetForm() {
-			Object.keys(DEFAULT_VALUES).forEach((inputName) => {
-				window.localStorage.removeItem(composeLocalStorageKeyForInput(scope, inputName));
-			});
-			window.localStorage.removeItem(STORAGE_KEYS.values);
-			window.localStorage.removeItem(STORAGE_KEYS.step);
+			clearPersistedForm(scope);
 			window.location.reload();
 		},
-		[scope, STORAGE_KEYS.step, STORAGE_KEYS.values],
+		[scope],
 	);
 
 	// --- COMPUTED STATES ---

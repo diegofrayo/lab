@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 17 of 22 solved (11 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
+**Status:** 18 of 22 solved (12 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -175,7 +175,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 > **Solved (2026-10-29):** every call made during one debounce burst now gets the same promise (`Promise.withResolvers`). It settles with the result of the last call, or rejects if `func` throws. A superseded caller no longer hangs, and it gets the latest result instead of a stale one. The return type is now `Promise<Awaited<Return>>`, so an async `func` no longer gives a nested promise type.
 
-### 13. No error boundary
+### 13. No error boundary ✅ Solved
 
 `missing-error-boundary`
 
@@ -184,6 +184,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Smell:** there's no `error.tsx` anywhere.
 - **Cost:** if `JSON.parse` throws on corrupted localStorage during render (e.g. in `getDefaultValues`), the whole page goes blank.
 - **Fix:** add `src/app/error.tsx` with a "reset saved form" action.
+
+> **Solved (2026-10-29):** added `src/app/form/error.tsx`. It sits on the form segment instead of the root, because a "reset saved form" action means nothing on the other subprojects. It re-exports `pages/form-error.page.tsx`, a neobrutalist fallback with **Try again** (Next's `retry`) and **Reset saved form**. The reset clears every `rhf:form:*` and `tsf:form:*` key with a new `clearPersistedForm(scope)` helper, which `resetForm` now uses too, plus the cached locations dataset (`COLOMBIA_STORAGE_KEY`, now exported from `utils/form.ts`), and then reloads. Verified in the browser: a corrupted locations cache on step 2 shows the fallback, and the reset brings the form back to step 1.
 
 ## Cross-file duplication
 
