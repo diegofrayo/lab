@@ -155,7 +155,7 @@ export function getFieldStatus({
 }
 
 export function composeLocalStorageKeyForInput(scope: FormScope, inputName: string): string {
-	return `form:${scope}:input:${inputName}`;
+	return `${scope}:form:input:${inputName}`;
 }
 
 /**

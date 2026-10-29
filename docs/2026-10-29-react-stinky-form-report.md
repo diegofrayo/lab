@@ -128,7 +128,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 > **Solved (2026-10-29):** `getDefaultValues` is now `<K extends FormInputName>(keys: K[]) => Pick<FormValues, K>`, so the return type comes from the keys and the caller can't choose it. Each step types its `FORM_INPUTS_NAME` as `(keyof StepNValues)[]` and calls `getDefaultValues(FORM_INPUTS_NAME)` with no explicit generic. A key that doesn't belong to the step, like `"state"` in step 1, now fails to compile.
 
-### 9. The same values persisted in two places
+### 9. The same values persisted in two places ✅ Solved
 
 `duplicated-state`
 
@@ -138,6 +138,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Cost:** a new boolean field restores as the string `"false"`, which is truthy, unless someone remembers to add it to the list. `resetForm` has to know about both stores, and works around it with `location.reload()`.
 - **Fix:** keep one store. Either save the draft into the same `formValues` object through `updateFormValues` (debounced), or save the per-input values as JSON so types survive without a list.
 - **Source:** [Choosing the State Structure, avoid duplication](https://react.dev/learn/choosing-the-state-structure#avoid-duplication-in-state)
+
+> **Solved (2026-10-29):** took the JSON option. `usePersistInput` now stores each input with `JSON.stringify`, and `parseLocalStorageValue` reads it back with `JSON.parse` typed as `FormValues[K]`, so booleans keep their type and the `BOOLEAN_FIELD_NAMES` list is gone. The per-input key now uses the same prefix order as the other keys (`${scope}:form:input:<name>`). The draft and the submitted values are still two stores: merging them into `formValues` would make step 5 and the final `parseForm` see unsubmitted drafts.
 
 ### 10. Locations fetch has no cleanup and an unchecked cast
 

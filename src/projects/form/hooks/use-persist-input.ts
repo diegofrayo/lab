@@ -15,7 +15,7 @@ export function usePersistInput(
 		if (inputValue === undefined) return;
 
 		console.log("usePersistInput:", inputName, inputValue);
-		window.localStorage.setItem(composeLocalStorageKeyForInput(scope, inputName), String(inputValue));
+		window.localStorage.setItem(composeLocalStorageKeyForInput(scope, inputName), JSON.stringify(inputValue));
 	}, [inputValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return null;

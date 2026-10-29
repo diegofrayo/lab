@@ -137,12 +137,13 @@ const DEFAULT_VALUES = {
 
 // --- UTILS ---
 
-function parseLocalStorageValue(scope: FormScope, inputName: FormInputName): string | boolean | null {
+function parseLocalStorageValue<K extends FormInputName>(scope: FormScope, inputName: K): FormValues[K] | null {
 	const rawValue = window.localStorage.getItem(composeLocalStorageKeyForInput(scope, inputName));
 	if (rawValue === null) return rawValue;
 
-	const BOOLEAN_FIELD_NAMES: FormInputName[] = ["hasCollegeDegree", "stillStudying"];
-	const value = BOOLEAN_FIELD_NAMES.includes(inputName) ? rawValue === "true" : rawValue;
-
-	return value;
+	try {
+		return JSON.parse(rawValue) as FormValues[K];
+	} catch {
+		return null;
+	}
 }
