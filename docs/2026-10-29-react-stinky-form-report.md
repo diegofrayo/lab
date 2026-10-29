@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 18 of 22 solved (12 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
+**Status:** 19 of 22 solved (13 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -189,13 +189,15 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 ## Cross-file duplication
 
-### 14. `useColombiaLocations` copied in both step-2 files
+### 14. `useColombiaLocations` copied in both step-2 files ✅ Solved
 
 `duplicate-implementation` (Funky)
 
 - **Smell:** `useColombiaLocations`, `fetchColombiaData`, `readColombiaDataFromStorage`, `toStateOption`/`toCityOption` and `RawColombiaStateItem` (about 85 lines) are identical in `steps/rhf/step-2.tsx:202-288` and `steps/tsf/step-2.tsx:163-249`.
 - **Risk:** the missing-cleanup fix (#10) would have to be made twice.
 - **Fix:** move it to `hooks/use-colombia-locations.ts`.
+
+> **Solved (2026-10-29):** `useColombiaLocations`, `fetchColombiaData`, `readColombiaDataFromStorage`, `toStateOption`/`toCityOption` and `RawColombiaStateItem` now live once in `hooks/use-colombia-locations.ts`. Both step-2 files import the hook, so the #10 fix (still open) only has to be made in one place.
 
 ### 15. Step controller boilerplate repeated in 8 hooks
 
