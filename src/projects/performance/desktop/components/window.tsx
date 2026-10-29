@@ -7,6 +7,7 @@ import cn from "@diegofrayo-pkg/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
+import { useWindowDrag } from "../hooks/use-window-drag.hook";
 import { getMinWindowSize } from "../utils/window-size";
 
 type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
@@ -18,11 +19,11 @@ type WindowProps = {
 
 function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	// --- HOOKS ---
-	const { closeApp, minimizeApp, maximizeApp, restoreApp, focusApp, moveWindow } = useDesktop();
-
-	// --- STATES & REFS ---
-	const isDragging = useRef(false);
-	const dragStart = useRef({ mouseX: 0, mouseY: 0, windowX: 0, windowY: 0 });
+	const { closeApp, minimizeApp, maximizeApp, restoreApp, focusApp } = useDesktop();
+	const { containerRef, startDrag } = useWindowDrag({
+		appId: openedApp.id,
+		windowConfig: openedApp.windowConfig,
+	});
 
 	// --- COMPUTED STATES ---
 	const { id, appConfig, windowConfig, isFocused, status } = openedApp;
@@ -58,13 +59,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 
 	// --- HANDLERS ---
 	function handleTitleBarMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
-		isDragging.current = true;
-		dragStart.current = {
-			mouseX: e.clientX,
-			mouseY: e.clientY,
-			windowX: windowConfig.x,
-			windowY: windowConfig.y,
-		};
+		startDrag(e);
 		focusApp(id);
 	}
 
@@ -111,35 +106,11 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 		};
 	}
 
-	// --- EFFECTS ---
-	useEffect(
-		function setupDragListeners() {
-			function handleMouseMove(e: MouseEvent): void {
-				if (!isDragging.current) return;
-				const dx = e.clientX - dragStart.current.mouseX;
-				const dy = e.clientY - dragStart.current.mouseY;
-				moveWindow(id, dragStart.current.windowX + dx, dragStart.current.windowY + dy);
-			}
-
-			function handleMouseUp(): void {
-				isDragging.current = false;
-			}
-
-			document.addEventListener("mousemove", handleMouseMove);
-			document.addEventListener("mouseup", handleMouseUp);
-
-			return (): void => {
-				document.removeEventListener("mousemove", handleMouseMove);
-				document.removeEventListener("mouseup", handleMouseUp);
-			};
-		},
-		[id, moveWindow],
-	);
-
 	if (status === "MINIMIZED") return null;
 
 	return (
 		<div
+			ref={containerRef}
 			className={classes.container}
 			style={getWindowStyles()}
 			role="dialog"
