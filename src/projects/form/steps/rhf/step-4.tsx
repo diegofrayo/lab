@@ -5,12 +5,11 @@ import { Controller, useForm } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 import { toast } from "sonner";
 
-import cn from "~/lib/cn";
-
 import Form from "../../components/form";
-import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
+import RadioGroup from "../../components/primitive/radio-group";
+import type { RadioGroupOption } from "../../components/primitive/radio-group";
 import { useFormNavigation } from "../../context/form.hook";
 import { usePersistInput } from "../../hooks/use-persist-input";
 import {
@@ -19,6 +18,7 @@ import {
 	CustomValidations,
 	formSchema,
 	fromHtmlDateValue,
+	getFieldMessageId,
 	getFieldStatus,
 	parseForm,
 	toHtmlDateValue,
@@ -56,12 +56,6 @@ function Step4(): JSX.Element {
 		hasValue: Boolean(formValues.endDate),
 	});
 
-	// --- STYLES ---
-	const classes = {
-		checkboxGroup: cn("flex flex-row items-center gap-5"),
-		checkboxOption: cn("flex items-center gap-2"),
-	};
-
 	return (
 		<Form onSubmit={onSubmit}>
 			<Form.Body>
@@ -79,6 +73,7 @@ function Step4(): JSX.Element {
 						render={({ field }) => (
 							<Input
 								id="startDate"
+								aria-describedby={getFieldMessageId("startDate")}
 								type="date"
 								data-state={startDateStatus}
 								aria-invalid={startDateStatus === "invalid"}
@@ -91,57 +86,43 @@ function Step4(): JSX.Element {
 							/>
 						)}
 					/>
-					<Form.FieldMessage status={startDateStatus}>{errors.startDate?.message}</Form.FieldMessage>
+					<Form.FieldMessage
+						inputId="startDate"
+						status={startDateStatus}
+					>
+						{errors.startDate?.message}
+					</Form.FieldMessage>
 				</Form.Field>
 
 				<Form.Field>
-					<Label data-state={stillStudyingStatus}>Still studying?</Label>
+					<Label
+						id="stillStudyingLabel"
+						data-state={stillStudyingStatus}
+					>
+						Still studying?
+					</Label>
 					<Controller
 						name="stillStudying"
 						control={control}
 						rules={ValidationRules.stillStudying}
-						render={({ field }) => (
-							<div className={classes.checkboxGroup}>
-								<div className={classes.checkboxOption}>
-									<Checkbox
-										id="stillStudyingYes"
-										checked={field.value === true}
-										data-state={stillStudyingStatus}
-										onCheckedChange={(checked) => {
-											if (!checked) return;
-											field.onChange(true);
-											handleStillStudyingChange(true);
-										}}
-									/>
-									<Label
-										htmlFor="stillStudyingYes"
-										className="cursor-pointer"
-										data-state={stillStudyingStatus}
-									>
-										Yes
-									</Label>
-								</div>
-								<div className={classes.checkboxOption}>
-									<Checkbox
-										id="stillStudyingNo"
-										checked={field.value === false}
-										data-state={stillStudyingStatus}
-										onCheckedChange={(checked) => {
-											if (!checked) return;
-											field.onChange(false);
-											handleStillStudyingChange(false);
-										}}
-									/>
-									<Label
-										htmlFor="stillStudyingNo"
-										className="cursor-pointer"
-										data-state={stillStudyingStatus}
-									>
-										No
-									</Label>
-								</div>
-							</div>
-						)}
+						render={({ field }) => {
+							function handleStillStudyingValueChange(value: boolean): void {
+								field.onChange(value);
+								handleStillStudyingChange(value);
+							}
+
+							return (
+								<RadioGroup
+									aria-labelledby="stillStudyingLabel"
+									name={field.name}
+									data-state={stillStudyingStatus}
+									items={STILL_STUDYING_OPTIONS}
+									value={field.value ?? null}
+									onBlur={field.onBlur}
+									onValueChange={handleStillStudyingValueChange}
+								/>
+							);
+						}}
 					/>
 				</Form.Field>
 
@@ -160,6 +141,7 @@ function Step4(): JSX.Element {
 							render={({ field }) => (
 								<Input
 									id="endDate"
+									aria-describedby={getFieldMessageId("endDate")}
 									type="date"
 									data-state={endDateStatus}
 									aria-invalid={endDateStatus === "invalid"}
@@ -172,7 +154,12 @@ function Step4(): JSX.Element {
 								/>
 							)}
 						/>
-						<Form.FieldMessage status={endDateStatus}>{errors.endDate?.message}</Form.FieldMessage>
+						<Form.FieldMessage
+							inputId="endDate"
+							status={endDateStatus}
+						>
+							{errors.endDate?.message}
+						</Form.FieldMessage>
 					</Form.Field>
 				)}
 			</Form.Body>
@@ -279,3 +266,8 @@ const ValidationRules: {
 		},
 	},
 };
+
+const STILL_STUDYING_OPTIONS: RadioGroupOption<boolean>[] = [
+	{ label: "Yes", value: true },
+	{ label: "No", value: false },
+];

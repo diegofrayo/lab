@@ -15,6 +15,7 @@ import {
 	clearPersistedInputs,
 	createRHFInputValidator,
 	formSchema,
+	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
 import type { FormInputName, Step2Values, StepFormReturn } from "../../utils/types";
@@ -69,6 +70,7 @@ function Step2(): JSX.Element {
 							return (
 								<Select
 									id="state"
+									aria-describedby={getFieldMessageId("state")}
 									data-state={stateStatus}
 									items={stateOptions}
 									placeholder="Select a state"
@@ -80,7 +82,12 @@ function Step2(): JSX.Element {
 							);
 						}}
 					/>
-					<Form.FieldMessage status={stateStatus}>{errors.state?.message}</Form.FieldMessage>
+					<Form.FieldMessage
+						inputId="state"
+						status={stateStatus}
+					>
+						{errors.state?.message}
+					</Form.FieldMessage>
 				</Form.Field>
 
 				<Form.Field>
@@ -97,6 +104,7 @@ function Step2(): JSX.Element {
 						render={({ field }) => (
 							<Select
 								id="city"
+								aria-describedby={getFieldMessageId("city")}
 								data-state={cityStatus}
 								items={cityOptions}
 								placeholder="Select a city"
@@ -108,7 +116,12 @@ function Step2(): JSX.Element {
 							/>
 						)}
 					/>
-					<Form.FieldMessage status={cityStatus}>{errors.city?.message}</Form.FieldMessage>
+					<Form.FieldMessage
+						inputId="city"
+						status={cityStatus}
+					>
+						{errors.city?.message}
+					</Form.FieldMessage>
 				</Form.Field>
 			</Form.Body>
 

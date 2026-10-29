@@ -209,3 +209,7 @@ export function clearPersistedInputs(scope: FormScope, inputNames: FormInputName
 		window.localStorage.removeItem(composeLocalStorageKeyForInput(scope, inputName));
 	});
 }
+
+export function getFieldMessageId(inputId: string): string {
+	return `${inputId}-message`;
+}

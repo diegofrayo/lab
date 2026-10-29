@@ -13,6 +13,7 @@ import {
 	clearPersistedInputs,
 	createTSFValidatorFromInputShape,
 	formSchema,
+	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
 import type { FormInputName, Step1Values } from "../../utils/types";
@@ -46,6 +47,7 @@ function Step1(): JSX.Element {
 								</Label>
 								<Input
 									id="name"
+									aria-describedby={getFieldMessageId("name")}
 									name={field.name}
 									data-state={nameStatus}
 									aria-invalid={nameStatus === "invalid"}
@@ -53,7 +55,12 @@ function Step1(): JSX.Element {
 									onBlur={field.handleBlur}
 									onChange={(event) => field.handleChange(event.target.value)}
 								/>
-								<Form.FieldMessage status={nameStatus}>{field.state.meta.errors[0]}</Form.FieldMessage>
+								<Form.FieldMessage
+									inputId="name"
+									status={nameStatus}
+								>
+									{field.state.meta.errors[0]}
+								</Form.FieldMessage>
 							</Form.Field>
 						);
 					}}
@@ -86,9 +93,13 @@ function Step1(): JSX.Element {
 								>
 									Email
 								</Label>
-								<Form.FieldWithLoader isLoading={isCheckingEmail}>
+								<Form.FieldWithLoader
+									isLoading={isCheckingEmail}
+									loadingLabel="Checking email availability"
+								>
 									<Input
 										id="email"
+										aria-describedby={getFieldMessageId("email")}
 										name={field.name}
 										data-state={emailStatus}
 										aria-invalid={emailStatus === "invalid"}
@@ -97,7 +108,10 @@ function Step1(): JSX.Element {
 										onChange={(event) => field.handleChange(event.target.value)}
 									/>
 								</Form.FieldWithLoader>
-								<Form.FieldMessage status={emailStatus}>
+								<Form.FieldMessage
+									inputId="email"
+									status={emailStatus}
+								>
 									{emailStatus === "valid" ? "Email available" : field.state.meta.errors[0]}
 								</Form.FieldMessage>
 							</Form.Field>
@@ -126,9 +140,13 @@ function Step1(): JSX.Element {
 								>
 									Username
 								</Label>
-								<Form.FieldWithLoader isLoading={isCheckingUsername}>
+								<Form.FieldWithLoader
+									isLoading={isCheckingUsername}
+									loadingLabel="Checking username availability"
+								>
 									<Input
 										id="username"
+										aria-describedby={getFieldMessageId("username")}
 										name={field.name}
 										data-state={usernameStatus}
 										aria-invalid={usernameStatus === "invalid"}
@@ -137,7 +155,10 @@ function Step1(): JSX.Element {
 										onChange={(event) => field.handleChange(event.target.value)}
 									/>
 								</Form.FieldWithLoader>
-								<Form.FieldMessage status={usernameStatus}>
+								<Form.FieldMessage
+									inputId="username"
+									status={usernameStatus}
+								>
 									{usernameStatus === "valid" ? "Username available" : field.state.meta.errors[0]}
 								</Form.FieldMessage>
 							</Form.Field>

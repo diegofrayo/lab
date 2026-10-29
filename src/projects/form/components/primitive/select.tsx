@@ -20,6 +20,7 @@ type SelectProps = {
 	value: string | null;
 
 	// Optional props — alphabetical order
+	"aria-describedby"?: string;
 	disabled?: boolean;
 	id?: string;
 	placeholder?: string;
@@ -30,6 +31,7 @@ type SelectProps = {
 
 const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(
 	{
+		"aria-describedby": ariaDescribedBy,
 		id,
 		items,
 		placeholder = "Select an option",
@@ -89,6 +91,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(
 				id={id}
 				data-state={dataState}
 				aria-invalid={dataState === "invalid"}
+				aria-describedby={ariaDescribedBy}
 				className={classes.trigger}
 				onBlur={onBlur}
 			>

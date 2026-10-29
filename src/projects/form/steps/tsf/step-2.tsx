@@ -14,6 +14,7 @@ import {
 	clearPersistedInputs,
 	createTSFValidatorFromInputShape,
 	formSchema,
+	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
 import type { FormInputName, Step2Values } from "../../utils/types";
@@ -54,6 +55,7 @@ function Step2(): JSX.Element {
 								</Label>
 								<Select
 									id="state"
+									aria-describedby={getFieldMessageId("state")}
 									data-state={stateStatus}
 									items={stateOptions}
 									placeholder="Select a state"
@@ -61,7 +63,12 @@ function Step2(): JSX.Element {
 									onBlur={field.handleBlur}
 									onValueChange={handleValueChange}
 								/>
-								<Form.FieldMessage status={stateStatus}>{field.state.meta.errors[0]}</Form.FieldMessage>
+								<Form.FieldMessage
+									inputId="state"
+									status={stateStatus}
+								>
+									{field.state.meta.errors[0]}
+								</Form.FieldMessage>
 							</Form.Field>
 						);
 					}}
@@ -88,6 +95,7 @@ function Step2(): JSX.Element {
 								</Label>
 								<Select
 									id="city"
+									aria-describedby={getFieldMessageId("city")}
 									data-state={cityStatus}
 									items={cityOptions}
 									placeholder="Select a city"
@@ -96,7 +104,12 @@ function Step2(): JSX.Element {
 									onBlur={field.handleBlur}
 									onValueChange={(value) => field.handleChange(value ?? "")}
 								/>
-								<Form.FieldMessage status={cityStatus}>{field.state.meta.errors[0]}</Form.FieldMessage>
+								<Form.FieldMessage
+									inputId="city"
+									status={cityStatus}
+								>
+									{field.state.meta.errors[0]}
+								</Form.FieldMessage>
 							</Form.Field>
 						);
 					}}

@@ -13,6 +13,7 @@ import {
 	clearPersistedInputs,
 	createRHFInputValidator,
 	formSchema,
+	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
 import type { FormInputName, Step1Values, StepFormReturn } from "../../utils/types";
@@ -62,11 +63,17 @@ function Step1(): JSX.Element {
 					</Label>
 					<Input
 						id="name"
+						aria-describedby={getFieldMessageId("name")}
 						data-state={nameStatus}
 						aria-invalid={nameStatus === "invalid"}
 						{...register("name", ValidationRules.name)}
 					/>
-					<Form.FieldMessage status={nameStatus}>{errors.name?.message}</Form.FieldMessage>
+					<Form.FieldMessage
+						inputId="name"
+						status={nameStatus}
+					>
+						{errors.name?.message}
+					</Form.FieldMessage>
 				</Form.Field>
 
 				<Form.Field>
@@ -76,15 +83,22 @@ function Step1(): JSX.Element {
 					>
 						Email
 					</Label>
-					<Form.FieldWithLoader isLoading={isCheckingEmail}>
+					<Form.FieldWithLoader
+						isLoading={isCheckingEmail}
+						loadingLabel="Checking email availability"
+					>
 						<Input
 							id="email"
+							aria-describedby={getFieldMessageId("email")}
 							data-state={emailStatus}
 							aria-invalid={emailStatus === "invalid"}
 							{...register("email", ValidationRules.email)}
 						/>
 					</Form.FieldWithLoader>
-					<Form.FieldMessage status={emailStatus}>
+					<Form.FieldMessage
+						inputId="email"
+						status={emailStatus}
+					>
 						{emailStatus === "valid" ? "Email available" : errors.email?.message}
 					</Form.FieldMessage>
 				</Form.Field>
@@ -96,16 +110,23 @@ function Step1(): JSX.Element {
 					>
 						Username
 					</Label>
-					<Form.FieldWithLoader isLoading={isCheckingUsername}>
+					<Form.FieldWithLoader
+						isLoading={isCheckingUsername}
+						loadingLabel="Checking username availability"
+					>
 						<Input
 							id="username"
+							aria-describedby={getFieldMessageId("username")}
 							data-state={usernameStatus}
 							aria-invalid={usernameStatus === "invalid"}
 							{...register("username", ValidationRules.username)}
 						/>
 					</Form.FieldWithLoader>
 
-					<Form.FieldMessage status={usernameStatus}>
+					<Form.FieldMessage
+						inputId="username"
+						status={usernameStatus}
+					>
 						{usernameStatus === "valid" ? "Username available" : errors.username?.message}
 					</Form.FieldMessage>
 				</Form.Field>

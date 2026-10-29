@@ -5,6 +5,7 @@ import type { JSX, ReactNode } from "react";
 import cn from "~/lib/cn";
 
 import { useFormNavigation } from "../context/form.hook";
+import { getFieldMessageId } from "../utils/form";
 import type { FieldStatus } from "../utils/types";
 import Button from "./primitive/button";
 
@@ -75,12 +76,16 @@ function FormField({ className, children, ...props }: FormFieldProps): JSX.Eleme
 	);
 }
 
-type FormFieldMessageProps = React.ComponentPropsWithoutRef<"span"> & {
+type FormFieldMessageProps = Omit<React.ComponentPropsWithoutRef<"span">, "id"> & {
+	// The `id` of the control this message describes; it must set
+	// `aria-describedby={getFieldMessageId(inputId)}`.
+	inputId: string;
 	status: FieldStatus;
 };
 
 function FormFieldMessage({
 	className,
+	inputId,
 	status,
 	children,
 	...props
@@ -98,6 +103,7 @@ function FormFieldMessage({
 
 	return (
 		<span
+			id={getFieldMessageId(inputId)}
 			className={classes.message}
 			{...props}
 		>
@@ -153,9 +159,10 @@ function FormNavigation({
 type FieldWithLoaderProps = {
 	children: ReactNode;
 	isLoading: boolean;
+	loadingLabel: string;
 };
 
-function FieldWithLoader({ isLoading, children }: FieldWithLoaderProps): JSX.Element {
+function FieldWithLoader({ isLoading, loadingLabel, children }: FieldWithLoaderProps): JSX.Element {
 	return (
 		<div className="relative">
 			{children}
@@ -163,7 +170,7 @@ function FieldWithLoader({ isLoading, children }: FieldWithLoaderProps): JSX.Ele
 				<span
 					className="absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin rounded-full border-2 border-black border-t-transparent"
 					role="status"
-					aria-label="Checking email availability"
+					aria-label={loadingLabel}
 				/>
 			)}
 		</div>

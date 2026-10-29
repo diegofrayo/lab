@@ -15,6 +15,7 @@ import {
 	createTSFValidatorFromInputShape,
 	CustomValidations,
 	formSchema,
+	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
 import type { FormInputName, Step3Values } from "../../utils/types";
@@ -74,6 +75,7 @@ function Step3(): JSX.Element {
 									</Label>
 									<Input
 										id="collegeName"
+										aria-describedby={getFieldMessageId("collegeName")}
 										name={field.name}
 										data-state={collegeNameStatus}
 										aria-invalid={collegeNameStatus === "invalid"}
@@ -81,7 +83,10 @@ function Step3(): JSX.Element {
 										onBlur={field.handleBlur}
 										onChange={(event) => field.handleChange(event.target.value)}
 									/>
-									<Form.FieldMessage status={collegeNameStatus}>
+									<Form.FieldMessage
+										inputId="collegeName"
+										status={collegeNameStatus}
+									>
 										{field.state.meta.errors[0]}
 									</Form.FieldMessage>
 								</Form.Field>

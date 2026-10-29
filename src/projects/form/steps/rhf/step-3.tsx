@@ -15,6 +15,7 @@ import {
 	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
+	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
 import type { FormInputName, Step3Values, StepFormReturn } from "../../utils/types";
@@ -81,11 +82,15 @@ function Step3(): JSX.Element {
 						</Label>
 						<Input
 							id="collegeName"
+							aria-describedby={getFieldMessageId("collegeName")}
 							data-state={collegeNameStatus}
 							aria-invalid={collegeNameStatus === "invalid"}
 							{...register("collegeName", ValidationRules.collegeName)}
 						/>
-						<Form.FieldMessage status={collegeNameStatus}>
+						<Form.FieldMessage
+							inputId="collegeName"
+							status={collegeNameStatus}
+						>
 							{errors.collegeName?.message}
 						</Form.FieldMessage>
 					</Form.Field>

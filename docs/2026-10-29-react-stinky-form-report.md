@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 1 of 22 solved (#1).
+**Status:** 4 of 22 solved (#1, #2, #3, #4: all Rancid).
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -39,7 +39,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
   Steps 1-3 get the same fix. That removes the effect and its `eslint-disable`.
 - **Source:** [You Might Not Need an Effect, sending a POST request](https://react.dev/learn/you-might-not-need-an-effect#sending-a-post-request)
 
-### 2. Yes/no question built from checkboxes
+### 2. Yes/no question built from checkboxes ✅ Solved
 
 `semantic-html` / `label-association` (a11y)
 
@@ -47,10 +47,12 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 - **Smell:** "Still studying?" is a pair of mutually exclusive checkboxes. Clicking the checked one does nothing (`if (!checked) return`). The `<Label>` "Still studying?" has no `htmlFor` and isn't linked to the group.
 - **Cost:** screen readers announce two separate checkboxes with no question attached. They behave like a radio group but don't say so.
+> **Solved (2026-10-29):** new `primitive/radio-group.tsx` wraps Base UI `RadioGroup` + `Radio`; both step-4 files use it, labelled by the "Still studying?" label via `aria-labelledby`.
+
 - **Fix:** add a `primitive/radio-group.tsx` that wraps Base UI's `RadioGroup` + `Radio`, and label the group with `aria-labelledby` (or use `<fieldset>`/`<legend>`). The "can't uncheck" behaviour then comes for free.
 - **Source:** [MDN, radiogroup role](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/radiogroup_role)
 
-### 3. Error messages not linked to their fields
+### 3. Error messages not linked to their fields ✅ Solved
 
 `accessibility-props` (a11y)
 
@@ -58,10 +60,12 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 - **Smell:** controls get `aria-invalid`, but `Form.FieldMessage` has no `id` and no control points at it with `aria-describedby`.
 - **Cost:** a screen reader says "invalid" without giving the reason.
+> **Solved (2026-10-29):** `Form.FieldMessage` takes an `inputId` and sets its own `id` from `getFieldMessageId`; every `Input`/`Select` that shows a message sets `aria-describedby` to the same id.
+
 - **Fix:** have `Form.FieldMessage` take an `id` (e.g. `` `${name}-message` ``) and add `aria-describedby` on the control. A composite field component (see the duplication section) would make this one change instead of 19.
 - **Source:** [MDN, aria-describedby](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby)
 
-### 4. Loader label hard-coded to "email"
+### 4. Loader label hard-coded to "email" ✅ Solved
 
 `accessibility-props` (a11y)
 
@@ -70,6 +74,8 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **Smell:** `FieldWithLoader` always uses `aria-label="Checking email availability"`, but it also wraps the username field.
 - **Cost:** on the username field, screen readers announce the wrong thing.
 - **Fix:** make the label a required prop: `loadingLabel: string`.
+
+> **Solved (2026-10-29):** `FieldWithLoader` takes a required `loadingLabel`; the email and username call sites pass their own label.
 - **Source:** [MDN, aria-label](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label)
 
 ## Funky
