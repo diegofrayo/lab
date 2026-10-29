@@ -65,18 +65,17 @@ function FormProvider({ children, scope }: FormProviderProps): JSX.Element {
 
 	const getDefaultValues = useCallback(
 		function getDefaultValues<K extends FormInputName>(keys: K[]) {
-			const values = keys.reduce((result, inputName) => {
-				const lsValue = parseLocalStorageValue(scope, inputName);
+			return keys.reduce(
+				(result, inputName) => {
+					const lsValue = parseLocalStorageValue(scope, inputName);
 
-				return {
-					...result,
-					[inputName]: lsValue ?? formValues[inputName] ?? DEFAULT_VALUES[inputName],
-				};
-			}, {} as Pick<FormValues, K>);
-
-			console.log("getDefaultValues:", values);
-
-			return values;
+					return {
+						...result,
+						[inputName]: lsValue ?? formValues[inputName] ?? DEFAULT_VALUES[inputName],
+					};
+				},
+				{} as Pick<FormValues, K>,
+			);
 		},
 		[formValues, scope],
 	);
@@ -137,7 +136,10 @@ const DEFAULT_VALUES = {
 
 // --- UTILS ---
 
-function parseLocalStorageValue<K extends FormInputName>(scope: FormScope, inputName: K): FormValues[K] | null {
+function parseLocalStorageValue<K extends FormInputName>(
+	scope: FormScope,
+	inputName: K,
+): FormValues[K] | null {
 	const rawValue = window.localStorage.getItem(composeLocalStorageKeyForInput(scope, inputName));
 	if (rawValue === null) return rawValue;
 

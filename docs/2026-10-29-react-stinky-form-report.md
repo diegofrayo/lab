@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 4 of 22 solved (#1, #2, #3, #4: all Rancid).
+**Status:** 10 of 22 solved (9 of 16 numbered findings, 1 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -213,7 +213,7 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 - **`utils/types.ts:25-28`:** `TOTAL_STEPS = 5` and `StepNumber = 1|2|3|4|5` can drift apart, which forces `as StepNumber` casts in the context. Derive one from the other.
 - **`utils/form.ts:114-122`:** `parseForm` mutates its argument and takes `Record<string, unknown>`. It's safe today because callers pass a fresh spread, but it's a trap. Copy first and type the parameter as `Partial<FormValues>`. In `createTSFValidatorFromCustomValidation`, the generic parameter `FormValues` hides the imported `FormValues` type.
 - **`hooks/use-form-submitted.ts`:** three positional params, one of which (`goToNextStep`) it could read from the context it already uses. This goes away with fix #1.
-- **Debug output:** leftover `console.log` calls in `getDefaultValues`, `usePersistInput`, `useFormSubmitted` and `asyncCheck`.
+- **Debug output:** leftover `console.log` calls in `getDefaultValues`, `usePersistInput`, `useFormSubmitted` and `asyncCheck`. ✅ **Solved (2026-10-29):** the calls in `getDefaultValues`, `usePersistInput` and `asyncCheck` are removed; the one in `useFormSubmitted` went away with #1.
 
 ## Not covered
 
