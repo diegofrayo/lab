@@ -1,26 +1,24 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { useForm, useSelector } from "@tanstack/react-form";
+import type { JSX } from "react";
 
 import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
-import { useMultiStepForm } from "../../context/form.hook";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useTSFStep } from "../../hooks/use-form-step";
 import { asyncCheck } from "../../utils/async";
 import {
-	clearPersistedInputs,
 	createTSFValidatorFromInputShape,
 	formSchema,
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
+import { STEP_1_INPUT_NAMES } from "../../utils/types";
 import type { Step1Values, TSFValidationRules } from "../../utils/types";
 
 function Step1(): JSX.Element {
 	// --- HOOKS ---
-	const { form, onSubmit } = useStep1Form();
+	const { form, onSubmit } = useTSFStep({ inputNames: STEP_1_INPUT_NAMES });
 	const isValidating = form.state.isValidating;
 
 	return (
@@ -169,44 +167,6 @@ function Step1(): JSX.Element {
 }
 
 export default Step1;
-
-// --- CONTROLLER ---
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
-function useStep1Form() {
-	// --- HOOKS ---
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step1Values)[] = useMemo(() => ["name", "email", "username"], []);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm({
-		defaultValues: DEFAULT_VALUES,
-		onSubmit: ({ value }) => {
-			updateFormValues(value);
-			clearPersistedInputs(scope, FORM_INPUTS_NAME);
-			goToNextStep();
-		},
-	});
-
-	// --- HANDLERS ---
-	function onSubmit(event?: React.SubmitEvent): void {
-		event?.preventDefault();
-		event?.stopPropagation();
-		void form.handleSubmit();
-	}
-
-	// --- COMPUTED STATES ---
-	const formValues = useSelector(form.store, (state) => state.values);
-
-	// --- EFFECTS ---
-	usePersistInput("name", formValues.name);
-	usePersistInput("email", formValues.email);
-	usePersistInput("username", formValues.username);
-
-	return { form, onSubmit };
-}
 
 // --- VALIDATION RULES ---
 

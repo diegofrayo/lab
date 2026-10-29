@@ -1,23 +1,22 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { Controller, useForm } from "react-hook-form";
+import type { JSX } from "react";
+import { Controller } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 
 import Form from "../../components/form";
 import Label from "../../components/primitive/label";
 import Select from "../../components/primitive/select";
 import type { SelectOption } from "../../components/primitive/select";
-import { useMultiStepForm } from "../../context/form.hook";
 import { useColombiaLocations } from "../../hooks/use-colombia-locations";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useRHFStep } from "../../hooks/use-form-step";
 import {
-	clearPersistedInputs,
 	createRHFInputValidator,
 	formSchema,
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
+import { STEP_2_INPUT_NAMES } from "../../utils/types";
 import type { Step2Values, StepFormReturn } from "../../utils/types";
 
 function Step2(): JSX.Element {
@@ -146,48 +145,17 @@ type UseStep2FormReturn = StepFormReturn<Step2Values> & {
 function useStep2Form(): UseStep2FormReturn {
 	// --- HOOKS ---
 	const { stateOptions, getCitiesOptions } = useColombiaLocations();
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step2Values)[] = useMemo(() => ["state", "city"], []);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm<Step2Values>({
-		mode: "onChange",
-		defaultValues: DEFAULT_VALUES,
-	});
+	const step = useRHFStep({ inputNames: STEP_2_INPUT_NAMES });
 
 	// --- HANDLERS ---
-	const submitForm = form.handleSubmit(function handleValidSubmit(data) {
-		updateFormValues(data);
-		clearPersistedInputs(scope, FORM_INPUTS_NAME);
-		goToNextStep();
-	});
-
-	function onSubmit(event?: React.BaseSyntheticEvent): void {
-		void submitForm(event);
-	}
-
 	function handleStateChange(): void {
-		form.setValue("city", "", { shouldValidate: true, shouldDirty: true });
+		step.setValue("city", "", { shouldValidate: true, shouldDirty: true });
 	}
 
 	// --- COMPUTED STATES ---
-	const formValues = form.watch();
-	const cityOptions = formValues.state ? getCitiesOptions(formValues.state) : [];
+	const cityOptions = step.formValues.state ? getCitiesOptions(step.formValues.state) : [];
 
-	// --- EFFECTS ---
-	usePersistInput("state", formValues.state);
-	usePersistInput("city", formValues.city);
-
-	return {
-		...form,
-		formValues,
-		onSubmit,
-		stateOptions,
-		cityOptions,
-		handleStateChange,
-	};
+	return { ...step, stateOptions, cityOptions, handleStateChange };
 }
 
 // --- VALIDATION RULES ---

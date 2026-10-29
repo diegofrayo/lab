@@ -1,18 +1,15 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { useForm, useSelector } from "@tanstack/react-form";
-import { toast } from "sonner";
+import type { JSX } from "react";
+import { useSelector } from "@tanstack/react-form";
 
 import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import RadioGroup from "../../components/primitive/radio-group";
 import type { RadioGroupOption } from "../../components/primitive/radio-group";
-import { useMultiStepForm } from "../../context/form.hook";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useTSFStep } from "../../hooks/use-form-step";
 import {
-	clearPersistedInputs,
 	createTSFValidatorFromCustomValidation,
 	createTSFValidatorFromInputShape,
 	CustomValidations,
@@ -20,14 +17,14 @@ import {
 	fromHtmlDateValue,
 	getFieldMessageId,
 	getFieldStatus,
-	parseForm,
 	toHtmlDateValue,
 } from "../../utils/form";
+import { STEP_4_INPUT_NAMES } from "../../utils/types";
 import type { Step4Values, TSFValidationRules } from "../../utils/types";
 
 function Step4(): JSX.Element {
 	// --- HOOKS ---
-	const { form, onSubmit } = useStep4Form();
+	const { form, onSubmit } = useTSFStep({ inputNames: STEP_4_INPUT_NAMES, isFinalStep: true });
 	const stillStudying = useSelector(form.store, (state) => state.values.stillStudying);
 
 	return (
@@ -162,63 +159,6 @@ function Step4(): JSX.Element {
 }
 
 export default Step4;
-
-// --- CONTROLLER ---
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
-function useStep4Form() {
-	// --- HOOKS ---
-	const {
-		formValues: contextFormValues,
-		scope,
-		updateFormValues,
-		getDefaultValues,
-		goToNextStep,
-	} = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step4Values)[] = useMemo(
-		() => ["startDate", "stillStudying", "endDate"],
-		[],
-	);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm({
-		defaultValues: DEFAULT_VALUES,
-		onSubmit: ({ value }) => {
-			updateFormValues(value);
-
-			const finalFormValues = { ...contextFormValues, ...value };
-			const result = parseForm(finalFormValues);
-
-			if (result.error) {
-				const message = result.error.issues.map((issue) => issue.message).join("\n");
-				toast.error(message || "Please complete all fields correctly");
-				return;
-			}
-
-			clearPersistedInputs(scope, FORM_INPUTS_NAME);
-			goToNextStep();
-		},
-	});
-
-	// --- HANDLERS ---
-	function onSubmit(event?: React.SubmitEvent): void {
-		event?.preventDefault();
-		event?.stopPropagation();
-		void form.handleSubmit();
-	}
-
-	// --- COMPUTED STATES ---
-	const formValues = useSelector(form.store, (state) => state.values);
-
-	// --- EFFECTS ---
-	usePersistInput("startDate", formValues.startDate);
-	usePersistInput("stillStudying", formValues.stillStudying);
-	usePersistInput("endDate", formValues.endDate);
-
-	return { form, onSubmit };
-}
 
 // --- VALIDATION RULES ---
 

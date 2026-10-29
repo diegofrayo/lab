@@ -1,28 +1,25 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { Controller, useForm } from "react-hook-form";
+import type { JSX } from "react";
+import { Controller } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
-import { toast } from "sonner";
 
 import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
 import RadioGroup from "../../components/primitive/radio-group";
 import type { RadioGroupOption } from "../../components/primitive/radio-group";
-import { useMultiStepForm } from "../../context/form.hook";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useRHFStep } from "../../hooks/use-form-step";
 import {
-	clearPersistedInputs,
 	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
 	fromHtmlDateValue,
 	getFieldMessageId,
 	getFieldStatus,
-	parseForm,
 	toHtmlDateValue,
 } from "../../utils/form";
+import { STEP_4_INPUT_NAMES } from "../../utils/types";
 import type { Step4Values, StepFormReturn } from "../../utils/types";
 
 function Step4(): JSX.Element {
@@ -177,65 +174,19 @@ type UseStep4FormReturn = StepFormReturn<Step4Values> & {
 
 function useStep4Form(): UseStep4FormReturn {
 	// --- HOOKS ---
-	const {
-		formValues: contextFormValues,
-		scope,
-		updateFormValues,
-		getDefaultValues,
-		goToNextStep,
-	} = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step4Values)[] = useMemo(
-		() => ["startDate", "stillStudying", "endDate"],
-		[],
-	);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm<Step4Values>({
-		mode: "onChange",
-		defaultValues: DEFAULT_VALUES,
-	});
+	const step = useRHFStep({ inputNames: STEP_4_INPUT_NAMES, isFinalStep: true });
 
 	// --- HANDLERS ---
-	const submitForm = form.handleSubmit(function handleFinalSubmit(data) {
-		updateFormValues(data);
-
-		const finalFormValues = { ...contextFormValues, ...data };
-		const result = parseForm(finalFormValues);
-
-		if (result.error) {
-			const message = result.error.issues.map((issue) => issue.message).join("\n");
-			toast.error(message || "Please complete all fields correctly");
-			return;
-		}
-
-		clearPersistedInputs(scope, FORM_INPUTS_NAME);
-		goToNextStep();
-	});
-
-	function onSubmit(event?: React.BaseSyntheticEvent): void {
-		void submitForm(event);
-	}
-
 	function handleStillStudyingChange(value: boolean): void {
 		if (value) {
-			form.setValue("endDate", "", { shouldValidate: true });
+			step.setValue("endDate", "", { shouldValidate: true });
 			return;
 		}
 
-		void form.trigger("endDate");
+		void step.trigger("endDate");
 	}
 
-	// --- COMPUTED STATES ---
-	const formValues = form.watch();
-
-	// --- EFFECTS ---
-	usePersistInput("startDate", formValues.startDate);
-	usePersistInput("stillStudying", formValues.stillStudying);
-	usePersistInput("endDate", formValues.endDate);
-
-	return { ...form, formValues, onSubmit, handleStillStudyingChange };
+	return { ...step, handleStillStudyingChange };
 }
 
 // --- VALIDATION RULES ---

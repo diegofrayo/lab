@@ -17,7 +17,7 @@ export type FormContextValue = {
 	updateFormValues: (partial: Partial<FormValues>) => void;
 	goToNextStep: () => void;
 	goToPreviousStep: () => void;
-	getDefaultValues: <K extends FormInputName>(keys: K[]) => Pick<FormValues, K>;
+	getDefaultValues: <K extends FormInputName>(keys: readonly K[]) => Pick<FormValues, K>;
 	resetForm: () => void;
 };
 
@@ -64,7 +64,7 @@ function FormProvider({ children, scope }: FormProviderProps): JSX.Element {
 	);
 
 	const getDefaultValues = useCallback(
-		function getDefaultValues<K extends FormInputName>(keys: K[]) {
+		function getDefaultValues<K extends FormInputName>(keys: readonly K[]) {
 			return keys.reduce(
 				(result, inputName) => {
 					const lsValue = parseLocalStorageValue(scope, inputName);

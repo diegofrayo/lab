@@ -1,16 +1,14 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { useForm, useSelector } from "@tanstack/react-form";
+import type { JSX } from "react";
+import { useSelector } from "@tanstack/react-form";
 
 import Form from "../../components/form";
 import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
-import { useMultiStepForm } from "../../context/form.hook";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useTSFStep } from "../../hooks/use-form-step";
 import {
-	clearPersistedInputs,
 	createTSFValidatorFromCustomValidation,
 	createTSFValidatorFromInputShape,
 	CustomValidations,
@@ -18,11 +16,12 @@ import {
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
+import { STEP_3_INPUT_NAMES } from "../../utils/types";
 import type { Step3Values, TSFValidationRules } from "../../utils/types";
 
 function Step3(): JSX.Element {
 	// --- HOOKS ---
-	const { form, onSubmit } = useStep3Form();
+	const { form, onSubmit } = useTSFStep({ inputNames: STEP_3_INPUT_NAMES });
 	const hasCollegeDegree = useSelector(form.store, (state) => Boolean(state.values.hasCollegeDegree));
 
 	return (
@@ -103,43 +102,6 @@ function Step3(): JSX.Element {
 }
 
 export default Step3;
-
-// --- CONTROLLER ---
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the form API's return type has too many generic parameters to spell out usefully
-function useStep3Form() {
-	// --- HOOKS ---
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step3Values)[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm({
-		defaultValues: DEFAULT_VALUES,
-		onSubmit: ({ value }) => {
-			updateFormValues(value);
-			clearPersistedInputs(scope, FORM_INPUTS_NAME);
-			goToNextStep();
-		},
-	});
-
-	// --- HANDLERS ---
-	function onSubmit(event?: React.SubmitEvent): void {
-		event?.preventDefault();
-		event?.stopPropagation();
-		void form.handleSubmit();
-	}
-
-	// --- COMPUTED STATES ---
-	const formValues = useSelector(form.store, (state) => state.values);
-
-	// --- EFFECTS ---
-	usePersistInput("hasCollegeDegree", formValues.hasCollegeDegree);
-	usePersistInput("collegeName", formValues.collegeName);
-
-	return { form, onSubmit };
-}
 
 // --- VALIDATION RULES ---
 

@@ -8,7 +8,7 @@ Every finding below was checked against the catalog's exceptions. One was a conf
 
 **Summary:** 4 rancid, 12 funky (3 of them cross-file duplication) and 6 whiffs across 28 files.
 
-**Status:** 19 of 22 solved (13 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
+**Status:** 20 of 22 solved (14 of 16 numbered findings, 6 of 6 whiffs). #10 is intentionally left open.
 
 The highest-value fix is the step-4 submit: moving navigation into the submit handler fixes that bug and removes `useFormSubmitted`. Doing it inside a shared `useRHFStep`/`useTSFStep` hook also clears most of the duplication.
 
@@ -199,12 +199,14 @@ The highest-value fix is the step-4 submit: moving navigation into the submit ha
 
 > **Solved (2026-10-29):** `useColombiaLocations`, `fetchColombiaData`, `readColombiaDataFromStorage`, `toStateOption`/`toCityOption` and `RawColombiaStateItem` now live once in `hooks/use-colombia-locations.ts`. Both step-2 files import the hook, so the #10 fix (still open) only has to be made in one place.
 
-### 15. Step controller boilerplate repeated in 8 hooks
+### 15. Step controller boilerplate repeated in 8 hooks ✅ Solved
 
 `duplicate-implementation` (Funky)
 
 - **Smell:** each `useStepNForm` hook repeats the `FORM_INPUTS_NAME` `useMemo`, the `DEFAULT_VALUES` `useMemo`, one `usePersistInput` per field, `useFormSubmitted`, and in TSF the same `preventDefault/stopPropagation/handleSubmit` wrapper four times. The `useMemo(() => [...], [])` around a constant array is really a module-level constant.
 - **Fix:** add one hook per library, e.g. `useRHFStep<K>(inputNames: readonly K[])` and `useTSFStep<K>(...)`, that owns defaults, persistence and the submit-then-navigate flow. This is also the one place the Rancid submit fix (#1) would need to go.
+
+> **Solved (2026-10-29):** added `hooks/use-form-step.ts` with `useRHFStep({ inputNames, isFinalStep? })` and `useTSFStep(...)`. A private `useFormStep` they share owns the default values, the submit-then-navigate flow and, with `isFinalStep`, the whole-form `parseForm` check and its toast, which steps 4 had duplicated. Each hook also owns draft persistence through a new `usePersistInputs(values)`, which replaces the per-field `usePersistInput` calls, and the TSF `preventDefault/stopPropagation/handleSubmit` wrapper. The input-name lists are now module-level `STEP_N_INPUT_NAMES` constants in `utils/types.ts`, and `StepNValues` is derived from them, so the `useMemo(() => [...], [])` wrappers are gone. Steps 1 and 3 (TSF) and step 1 (RHF) call the shared hook directly; the other steps keep a small `useStepNForm` only for their step-specific handlers. Verified in the browser for both libraries: steps 1-4 through to the summary, drafts restored after a reload, drafts cleared after each submit, and step 4 blocked with the toast when earlier steps are missing.
 
 ### 16. Field status and field markup repeated
 

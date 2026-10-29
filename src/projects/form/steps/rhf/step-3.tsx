@@ -1,23 +1,22 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { Controller, useForm } from "react-hook-form";
+import type { JSX } from "react";
+import { Controller } from "react-hook-form";
 import type { Control, RegisterOptions } from "react-hook-form";
 
 import Form from "../../components/form";
 import Checkbox from "../../components/primitive/checkbox";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
-import { useMultiStepForm } from "../../context/form.hook";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useRHFStep } from "../../hooks/use-form-step";
 import {
-	clearPersistedInputs,
 	createRHFInputValidator,
 	CustomValidations,
 	formSchema,
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
+import { STEP_3_INPUT_NAMES } from "../../utils/types";
 import type { Step3Values, StepFormReturn } from "../../utils/types";
 
 function Step3(): JSX.Element {
@@ -114,45 +113,19 @@ type UseStep3FormReturn = StepFormReturn<Step3Values> & {
 
 function useStep3Form(): UseStep3FormReturn {
 	// --- HOOKS ---
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step3Values)[] = useMemo(() => ["hasCollegeDegree", "collegeName"], []);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm<Step3Values>({
-		mode: "onChange",
-		defaultValues: DEFAULT_VALUES,
-	});
+	const step = useRHFStep({ inputNames: STEP_3_INPUT_NAMES });
 
 	// --- HANDLERS ---
-	const submitForm = form.handleSubmit(function handleValidSubmit(data) {
-		updateFormValues(data);
-		clearPersistedInputs(scope, FORM_INPUTS_NAME);
-		goToNextStep();
-	});
-
-	function onSubmit(event?: React.BaseSyntheticEvent): void {
-		void submitForm(event);
-	}
-
 	function handleHasCollegeDegreeChange(checked: boolean): void {
 		if (checked) {
-			void form.trigger("collegeName");
+			void step.trigger("collegeName");
 			return;
 		}
 
-		form.setValue("collegeName", "", { shouldValidate: true });
+		step.setValue("collegeName", "", { shouldValidate: true });
 	}
 
-	// --- COMPUTED STATES ---
-	const formValues = form.watch();
-
-	// --- EFFECTS ---
-	usePersistInput("hasCollegeDegree", formValues.hasCollegeDegree);
-	usePersistInput("collegeName", formValues.collegeName);
-
-	return { ...form, formValues, onSubmit, handleHasCollegeDegreeChange };
+	return { ...step, handleHasCollegeDegreeChange };
 }
 
 // --- VALIDATION RULES ---

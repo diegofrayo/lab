@@ -218,7 +218,7 @@ export function clearPersistedForm(scope: FormScope): void {
 		.forEach((key) => window.localStorage.removeItem(key));
 }
 
-export function clearPersistedInputs(scope: FormScope, inputNames: FormInputName[]): void {
+export function clearPersistedInputs(scope: FormScope, inputNames: readonly FormInputName[]): void {
 	inputNames.forEach((inputName) => {
 		window.localStorage.removeItem(composeLocalStorageKeyForInput(scope, inputName));
 	});

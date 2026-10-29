@@ -1,21 +1,19 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { useForm, useSelector } from "@tanstack/react-form";
+import type { JSX } from "react";
 
 import Form from "../../components/form";
 import Label from "../../components/primitive/label";
 import Select from "../../components/primitive/select";
-import { useMultiStepForm } from "../../context/form.hook";
 import { useColombiaLocations } from "../../hooks/use-colombia-locations";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useTSFStep } from "../../hooks/use-form-step";
 import {
-	clearPersistedInputs,
 	createTSFValidatorFromInputShape,
 	formSchema,
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
+import { STEP_2_INPUT_NAMES } from "../../utils/types";
 import type { Step2Values, TSFValidationRules } from "../../utils/types";
 
 function Step2(): JSX.Element {
@@ -130,39 +128,15 @@ export default Step2;
 function useStep2Form() {
 	// --- HOOKS ---
 	const { stateOptions, getCitiesOptions } = useColombiaLocations();
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step2Values)[] = useMemo(() => ["state", "city"], []);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm({
-		defaultValues: DEFAULT_VALUES,
-		onSubmit: ({ value }) => {
-			updateFormValues(value);
-			clearPersistedInputs(scope, FORM_INPUTS_NAME);
-			goToNextStep();
-		},
-	});
+	const { form, formValues, onSubmit } = useTSFStep({ inputNames: STEP_2_INPUT_NAMES });
 
 	// --- HANDLERS ---
-	function onSubmit(event?: React.SubmitEvent): void {
-		event?.preventDefault();
-		event?.stopPropagation();
-		void form.handleSubmit();
-	}
-
 	function handleStateChange(): void {
 		form.setFieldValue("city", "");
 	}
 
 	// --- COMPUTED STATES ---
-	const formValues = useSelector(form.store, (state) => state.values);
 	const cityOptions = formValues.state ? getCitiesOptions(formValues.state) : [];
-
-	// --- EFFECTS ---
-	usePersistInput("state", formValues.state);
-	usePersistInput("city", formValues.city);
 
 	return { form, onSubmit, stateOptions, cityOptions, handleStateChange };
 }

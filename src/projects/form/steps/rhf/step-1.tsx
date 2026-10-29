@@ -1,22 +1,21 @@
 "use client";
 
-import { useMemo, type JSX } from "react";
-import { useForm, type RegisterOptions } from "react-hook-form";
+import type { JSX } from "react";
+import type { RegisterOptions } from "react-hook-form";
 
 import Form from "../../components/form";
 import Input from "../../components/primitive/input";
 import Label from "../../components/primitive/label";
-import { useMultiStepForm } from "../../context/form.hook";
-import { usePersistInput } from "../../hooks/use-persist-input";
+import { useRHFStep } from "../../hooks/use-form-step";
 import { asyncCheck, debounce } from "../../utils/async";
 import {
-	clearPersistedInputs,
 	createRHFInputValidator,
 	formSchema,
 	getFieldMessageId,
 	getFieldStatus,
 } from "../../utils/form";
-import type { Step1Values, StepFormReturn } from "../../utils/types";
+import { STEP_1_INPUT_NAMES } from "../../utils/types";
+import type { Step1Values } from "../../utils/types";
 
 function Step1(): JSX.Element {
 	// --- HOOKS ---
@@ -25,7 +24,7 @@ function Step1(): JSX.Element {
 		formValues,
 		formState: { errors, isValidating, validatingFields, touchedFields, dirtyFields, isSubmitted },
 		onSubmit,
-	} = useStep1Form();
+	} = useRHFStep({ inputNames: STEP_1_INPUT_NAMES });
 
 	// --- COMPUTED STATES ---
 	const isCheckingUsername = Boolean(validatingFields.username);
@@ -135,43 +134,6 @@ function Step1(): JSX.Element {
 }
 
 export default Step1;
-
-// --- CONTROLLER ---
-
-function useStep1Form(): StepFormReturn<Step1Values> {
-	// --- HOOKS ---
-	const { scope, updateFormValues, goToNextStep, getDefaultValues } = useMultiStepForm();
-	const FORM_INPUTS_NAME: (keyof Step1Values)[] = useMemo(() => ["name", "email", "username"], []);
-	const DEFAULT_VALUES = useMemo(
-		() => getDefaultValues(FORM_INPUTS_NAME),
-		[getDefaultValues, FORM_INPUTS_NAME],
-	);
-	const form = useForm<Step1Values>({
-		mode: "onChange",
-		defaultValues: DEFAULT_VALUES,
-	});
-
-	// --- HANDLERS ---
-	const submitForm = form.handleSubmit(function handleValidSubmit(data) {
-		updateFormValues(data);
-		clearPersistedInputs(scope, FORM_INPUTS_NAME);
-		goToNextStep();
-	});
-
-	function onSubmit(event?: React.BaseSyntheticEvent): void {
-		void submitForm(event);
-	}
-
-	// --- COMPUTED STATES ---
-	const formValues = form.watch();
-
-	// --- EFFECTS ---
-	usePersistInput("name", formValues.name);
-	usePersistInput("email", formValues.email);
-	usePersistInput("username", formValues.username);
-
-	return { ...form, formValues, onSubmit };
-}
 
 // --- VALIDATION RULES ---
 
