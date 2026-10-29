@@ -28,7 +28,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	// --- STYLES ---
 	const classes = {
 		container: cn(
-			"absolute flex flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow",
+			"pointer-events-auto absolute flex flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow",
 			isFocused ? "z-50 shadow-black/30" : "z-10 shadow-black/10",
 		),
 		titleBar: cn(

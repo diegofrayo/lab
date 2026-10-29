@@ -23,7 +23,7 @@ function Desktop(): JSX.Element {
 			"relative flex-1 overflow-hidden bg-linear-to-br from-blue-900 via-blue-800 to-indigo-900",
 		),
 		iconsArea: cn("flex flex-col items-start gap-2 p-4"),
-		windowsArea: cn("absolute inset-0"),
+		windowsArea: cn("pointer-events-none absolute inset-0"),
 	};
 
 	return (
