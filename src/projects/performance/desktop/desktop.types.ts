@@ -2,6 +2,10 @@ export type AppConfig = {
 	id: string;
 	name: string;
 	icon: string;
+	// Replaces `icon` in the window and the taskbar with an image built from the params (e.g. a product photo)
+	getWindowIconUrl?: (params: AppParams) => string | undefined;
+	// Replaces `name` in the window and the taskbar with a title built from the params (e.g. a product name)
+	getWindowTitle?: (params: AppParams) => string | undefined;
 	// Apps that need params (e.g. a product) are opened by other apps, not from the desktop
 	isHiddenFromDesktop?: boolean;
 	allowMultipleInstances?: boolean;

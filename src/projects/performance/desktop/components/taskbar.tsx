@@ -6,6 +6,8 @@ import cn from "@diegofrayo-pkg/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
+import { getWindowTitle } from "../utils/window-title";
+import WindowIcon from "./window-icon";
 
 function Taskbar(): JSX.Element {
 	// --- HOOKS ---
@@ -47,6 +49,9 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 	// --- HOOKS ---
 	const { minimizeApp, restoreApp, focusApp } = useDesktop();
 
+	// --- COMPUTED STATES ---
+	const title = getWindowTitle(openedApp);
+
 	// --- STYLES ---
 	const classes = {
 		button: cn(
@@ -56,7 +61,7 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 				: "text-white/70 hover:bg-white/10 hover:text-white",
 			openedApp.status === "MINIMIZED" && "opacity-60",
 		),
-		icon: cn("text-base"),
+		title: cn("max-w-40 truncate"),
 	};
 
 	// --- HANDLERS ---
@@ -74,10 +79,10 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 		<button
 			className={classes.button}
 			onClick={handleClick}
-			aria-label={openedApp.appConfig.name}
+			aria-label={title}
 		>
-			<span className={classes.icon}>{openedApp.appConfig.icon}</span>
-			<span>{openedApp.appConfig.name}</span>
+			<WindowIcon openedApp={openedApp} />
+			<span className={classes.title}>{title}</span>
 		</button>
 	);
 }

@@ -31,7 +31,11 @@ function ProductsApp(): JSX.Element {
 
 	// --- HANDLERS ---
 	function handleProductSelect(product: Product): void {
-		openApp("product-details", { productId: product.id, productName: product.name });
+		openApp("product-details", {
+			productId: product.id,
+			productName: product.name,
+			productPhoto: product.photo,
+		});
 	}
 
 	// --- UTILS ---

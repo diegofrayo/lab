@@ -10,6 +10,8 @@ export const APPS_REPOSITORY: AppsRepository = {
 		id: "product-details",
 		name: "Product Details",
 		icon: "🧾",
+		getWindowIconUrl: (params) => params["productPhoto"],
+		getWindowTitle: (params) => params["productName"],
 		isHiddenFromDesktop: true,
 		allowMultipleInstances: true,
 		windowConfig: {

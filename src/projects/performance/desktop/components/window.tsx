@@ -9,6 +9,8 @@ import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 import { useWindowDrag } from "../hooks/use-window-drag.hook";
 import { getMinWindowSize } from "../utils/window-size";
+import { getWindowTitle } from "../utils/window-title";
+import WindowIcon from "./window-icon";
 
 type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
 
@@ -30,6 +32,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	const isMaximized = status === "MAXIMIZED";
 	const isResizable = (appConfig.isResizable ?? true) && !isMaximized;
 	const minWindowSize = getMinWindowSize(appConfig);
+	const title = getWindowTitle(openedApp);
 
 	// --- STYLES ---
 	const classes = {
@@ -42,8 +45,8 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 			isFocused ? "bg-gray-200" : "bg-gray-100",
 			isMaximized ? "cursor-default" : "cursor-grab",
 		),
-		titleInfo: cn("flex items-center gap-2 text-sm font-medium text-gray-700"),
-		titleIcon: cn("text-base"),
+		titleInfo: cn("flex min-w-0 items-center gap-2 text-sm font-medium text-gray-700"),
+		title: cn("truncate"),
 		titleButtons: cn("flex items-center gap-1.5"),
 		btnClose: cn(
 			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-red-500 hover:bg-red-600 focus:outline-none",
@@ -114,7 +117,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 			className={classes.container}
 			style={getWindowStyles()}
 			role="dialog"
-			aria-label={appConfig.name}
+			aria-label={title}
 			onMouseDown={handleContainerMouseDown}
 		>
 			<header
@@ -122,8 +125,8 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 				onMouseDown={handleTitleBarMouseDown}
 			>
 				<div className={classes.titleInfo}>
-					<span className={classes.titleIcon}>{appConfig.icon}</span>
-					<span>{appConfig.name}</span>
+					<WindowIcon openedApp={openedApp} />
+					<span className={classes.title}>{title}</span>
 				</div>
 				<div className={classes.titleButtons}>
 					<button
