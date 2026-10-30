@@ -5,6 +5,8 @@ import type { JSX } from "react";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
 import type { AppConfig, AppParams, OpenedApp, OpenedApps } from "../desktop.types";
+import { usePersistOpenedApps } from "../hooks/use-persist-opened-apps.hook";
+import { readOpenedApps } from "../utils/opened-apps-storage";
 import { getInitialWindowSize } from "../utils/window-size";
 
 export const DesktopContext = createContext<DesktopContextValue | null>(null);
@@ -14,7 +16,9 @@ type DesktopProviderProps = {
 };
 
 export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element {
-	const [openedApps, setOpenedApps] = useState<OpenedApps>({});
+	// The opened apps are read from the local storage, so this provider must be rendered only on the client
+	const [openedApps, setOpenedApps] = useState<OpenedApps>(readOpenedApps);
+	usePersistOpenedApps(openedApps);
 
 	const openApp = useCallback((targetAppId: string, params: AppParams = {}): void => {
 		const appConfig = APPS_REPOSITORY[targetAppId];
