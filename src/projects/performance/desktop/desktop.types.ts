@@ -8,6 +8,7 @@ export type AppConfig = {
 	getWindowTitle?: (params: AppParams) => string | undefined;
 	// Apps that need params (e.g. a product) are opened by other apps, not from the desktop
 	isHiddenFromDesktop?: boolean;
+	// Opens a window per set of params instead of reusing a single window
 	allowMultipleInstances?: boolean;
 	// Defaults to true
 	isResizable?: boolean;
@@ -34,6 +35,7 @@ export type AppProps = {
 export type AppsRepository = Record<string, AppConfig>;
 
 export type OpenedApp = {
+	// The window id. It's the app id, or the app id plus its params when the app allows multiple instances
 	id: string;
 	appConfig: AppConfig;
 	status: "MAXIMIZED" | "MINIMIZED" | "VISIBLE";

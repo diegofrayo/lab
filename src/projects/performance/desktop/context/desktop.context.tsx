@@ -4,7 +4,7 @@ import { createContext, useCallback, useState, type ReactNode } from "react";
 import type { JSX } from "react";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
-import type { AppParams, OpenedApp, OpenedApps } from "../desktop.types";
+import type { AppConfig, AppParams, OpenedApp, OpenedApps } from "../desktop.types";
 import { getInitialWindowSize } from "../utils/window-size";
 
 export const DesktopContext = createContext<DesktopContextValue | null>(null);
@@ -20,18 +20,18 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 		const appConfig = APPS_REPOSITORY[targetAppId];
 		if (!appConfig) return;
 
+		const windowId = getWindowId(appConfig, params);
+
 		setOpenedApps((prev) => {
 			const updatedState = unfocusAllApps(prev);
+			const openedApp = updatedState[windowId];
 
-			if (updatedState[targetAppId]) {
+			if (openedApp) {
 				return {
 					...updatedState,
-					[targetAppId]: {
-						...updatedState[targetAppId],
-						status:
-							updatedState[targetAppId].status === "MINIMIZED"
-								? getRestoredStatus(updatedState[targetAppId])
-								: updatedState[targetAppId].status,
+					[windowId]: {
+						...openedApp,
+						status: openedApp.status === "MINIMIZED" ? getRestoredStatus(openedApp) : openedApp.status,
 						isFocused: true,
 						params,
 					},
@@ -40,7 +40,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 
 			const offset = Object.keys(prev).length * 30;
 			const newApp: OpenedApp = {
-				id: targetAppId,
+				id: windowId,
 				appConfig,
 				status: "VISIBLE",
 				isFocused: true,
@@ -54,7 +54,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 
 			return {
 				...updatedState,
-				[targetAppId]: newApp,
+				[windowId]: newApp,
 			};
 		});
 	}, []);
@@ -201,6 +201,18 @@ export type DesktopContextValue = {
 };
 
 //  --- UTILS ---
+
+// Apps with multiple instances get one window per set of params (e.g. one per product),
+// so opening the same params again focuses the existing window instead of creating a new one
+function getWindowId(appConfig: AppConfig, params: AppParams): string {
+	if (!appConfig.allowMultipleInstances) return appConfig.id;
+
+	const searchParams = new URLSearchParams(
+		Object.entries(params).sort(([a], [b]) => a.localeCompare(b)),
+	);
+
+	return `${appConfig.id}?${searchParams.toString()}`;
+}
 
 function getRestoredStatus(app: OpenedApp): OpenedApp["status"] {
 	if (app.status === "MINIMIZED") return app.statusBeforeMinimize ?? "VISIBLE";

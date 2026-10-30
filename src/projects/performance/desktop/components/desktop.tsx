@@ -31,7 +31,7 @@ function Desktop(): JSX.Element {
 			<section className={classes.desktop}>
 				<div className={classes.windowsArea}>
 					{Object.values(openedApps).map((openedApp) => {
-						const AppComponent = APPS_COMPONENTS[openedApp.id];
+						const AppComponent = APPS_COMPONENTS[openedApp.appConfig.id];
 						if (!AppComponent) return null;
 
 						return (
