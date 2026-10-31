@@ -7,7 +7,7 @@ import {
 	DesktopStateContext,
 	type DesktopActions,
 	type DesktopState,
-} from "./desktop.context";
+} from "./desktop.contexts";
 
 export function useDesktopState(): DesktopState {
 	const context = useContext(DesktopStateContext);
