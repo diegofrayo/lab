@@ -32,6 +32,8 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 	const isMaximized = status === "MAXIMIZED";
 	const isMinimized = status === "MINIMIZED";
 	const isResizable = (appConfig.isResizable ?? true) && !isMaximized;
+	// A window restored as maximized (e.g. from the local storage) keeps the button to restore it
+	const hasMaximizeButton = (appConfig.isMaximizable ?? true) || isMaximized;
 	const minWindowSize = getMinWindowSize(appConfig);
 	const title = getWindowTitle(openedApp);
 
@@ -135,11 +137,13 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 						onClick={handleMinimizeClick}
 						aria-label="Minimize"
 					/>
-					<button
-						className={classes.btnMaximize}
-						onClick={handleMaximizeClick}
-						aria-label={isMaximized ? "Restore" : "Maximize"}
-					/>
+					{hasMaximizeButton && (
+						<button
+							className={classes.btnMaximize}
+							onClick={handleMaximizeClick}
+							aria-label={isMaximized ? "Restore" : "Maximize"}
+						/>
+					)}
 					<button
 						className={classes.btnClose}
 						onClick={handleCloseClick}

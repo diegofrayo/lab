@@ -11,6 +11,8 @@ export type AppConfig = {
 	// Opens a window per set of params instead of reusing a single window
 	allowMultipleInstances?: boolean;
 	// Defaults to true
+	isMaximizable?: boolean;
+	// Defaults to true
 	isResizable?: boolean;
 	// Defaults to 768 x 768
 	minWindowSize?: {

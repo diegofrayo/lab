@@ -21,4 +21,21 @@ export const APPS_REPOSITORY: AppsRepository = {
 			height: 480,
 		},
 	},
+	"data-orchestrator": {
+		id: "data-orchestrator",
+		name: "Data Orchestrator",
+		icon: "🎛️",
+		isMaximizable: false,
+		isResizable: false,
+		minWindowSize: {
+			width: 360,
+			height: 280,
+		},
+		windowConfig: {
+			x: 0,
+			y: 0,
+			width: 420,
+			height: 320,
+		},
+	},
 };

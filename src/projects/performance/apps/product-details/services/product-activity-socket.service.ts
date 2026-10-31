@@ -15,8 +15,6 @@ type ProductActivitySocketHandler<TEventName extends ProductActivitySocketEventN
 	data: ProductActivitySocketEvents[TEventName],
 ) => void;
 
-const NEW_ORDERS_INTERVAL_MS = 5000;
-
 let connectionsCount = 0;
 
 export class ProductActivitySocket {
@@ -50,7 +48,6 @@ export class ProductActivitySocket {
 			connectionId: this.connectionId,
 			dataSource: this.dataSource,
 			eventNames: { initialData: "PRODUCT_DETAILS:ORDERS", updates: "PRODUCT_DETAILS:ORDERS" },
-			updateIntervalMs: NEW_ORDERS_INTERVAL_MS,
 		});
 	}
 

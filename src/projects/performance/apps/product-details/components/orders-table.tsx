@@ -42,7 +42,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	// --- STYLES ---
 	const classes = {
 		scrollElement: cn("h-full overflow-auto rounded border border-gray-200"),
-		table: cn("grid min-w-[710px] text-sm"),
+		table: cn("grid min-w-177 text-sm"),
 		thead: cn("sticky top-0 z-10 grid bg-gray-100"),
 		headerRow: cn("grid border-b border-gray-200"),
 		th: cn("px-2 py-2 text-left text-xs font-semibold text-gray-600 uppercase"),

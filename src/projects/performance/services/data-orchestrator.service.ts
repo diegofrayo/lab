@@ -24,7 +24,16 @@ export type DataSource<TData> = {
 	getUpdates: (previousData: TData) => TData;
 };
 
+export type DataOrchestratorSettings = {
+	// While false, the connections only receive their initial data
+	isDispatchingUpdates: boolean;
+	// Used by all the connections
+	defaultUpdateIntervalMs: number;
+};
+
 type Connection = {
+	// Undefined until the initial data is sent, the updates can't start before that
+	dispatchUpdate?: () => void;
 	latencyTimeoutId: ReturnType<typeof setTimeout>;
 	updatesIntervalId: ReturnType<typeof setInterval> | null;
 };
@@ -37,22 +46,27 @@ type ConnectParams<TEventName extends DataOrchestratorEventName> = {
 		updates: TEventName;
 	};
 	latencyMs?: number;
-	updateIntervalMs?: number;
 };
 
 const DEFAULT_LATENCY_MS = 300;
 const DEFAULT_UPDATE_INTERVAL_MS = 1000;
+export const MIN_UPDATE_INTERVAL_MS = 100;
 
 class DataOrchestrator {
 	private eventTarget = new EventTarget();
 	private connections = new Map<string, Connection>();
+	// Replaced (never mutated) on every change, so it can be used as a React external store snapshot
+	private settings: DataOrchestratorSettings = {
+		isDispatchingUpdates: true,
+		defaultUpdateIntervalMs: DEFAULT_UPDATE_INTERVAL_MS,
+	};
+	private settingsListeners = new Set<() => void>();
 
 	connect<TEventName extends DataOrchestratorEventName>({
 		connectionId,
 		dataSource,
 		eventNames,
 		latencyMs = DEFAULT_LATENCY_MS,
-		updateIntervalMs = DEFAULT_UPDATE_INTERVAL_MS,
 	}: ConnectParams<TEventName>): void {
 		this.disconnect(connectionId);
 
@@ -62,10 +76,11 @@ class DataOrchestrator {
 				let data = dataSource.getInitialData();
 				this.dispatch(eventNames.initialData, { connectionId, data });
 
-				connection.updatesIntervalId = setInterval(() => {
+				connection.dispatchUpdate = (): void => {
 					data = dataSource.getUpdates(data);
 					this.dispatch(eventNames.updates, { connectionId, data });
-				}, updateIntervalMs);
+				};
+				this.startUpdates(connection);
 			}, latencyMs),
 		};
 
@@ -77,8 +92,31 @@ class DataOrchestrator {
 		if (!connection) return;
 
 		clearTimeout(connection.latencyTimeoutId);
-		if (connection.updatesIntervalId !== null) clearInterval(connection.updatesIntervalId);
+		this.stopUpdates(connection);
 		this.connections.delete(connectionId);
+	}
+
+	getSettings(): DataOrchestratorSettings {
+		return this.settings;
+	}
+
+	// The live connections are restarted, so the changes apply right away
+	updateSettings(settings: Partial<DataOrchestratorSettings>): void {
+		this.settings = { ...this.settings, ...settings };
+
+		this.connections.forEach((connection) => {
+			this.stopUpdates(connection);
+			this.startUpdates(connection);
+		});
+		this.settingsListeners.forEach((listener) => listener());
+	}
+
+	subscribeToSettings(listener: () => void): () => void {
+		this.settingsListeners.add(listener);
+
+		return (): void => {
+			this.settingsListeners.delete(listener);
+		};
 	}
 
 	subscribe<TEventName extends DataOrchestratorEventName>(
@@ -95,6 +133,22 @@ class DataOrchestrator {
 		return (): void => {
 			this.eventTarget.removeEventListener(eventName, handleEvent);
 		};
+	}
+
+	private startUpdates(connection: Connection): void {
+		if (!connection.dispatchUpdate || !this.settings.isDispatchingUpdates) return;
+
+		connection.updatesIntervalId = setInterval(
+			connection.dispatchUpdate,
+			this.settings.defaultUpdateIntervalMs,
+		);
+	}
+
+	private stopUpdates(connection: Connection): void {
+		if (connection.updatesIntervalId === null) return;
+
+		clearInterval(connection.updatesIntervalId);
+		connection.updatesIntervalId = null;
 	}
 
 	private dispatch<TEventName extends DataOrchestratorEventName>(

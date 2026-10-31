@@ -71,7 +71,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 
 	const maximizeApp = useCallback((targetAppId: string): void => {
 		setOpenedApps((prev) => {
-			if (!prev[targetAppId]) return prev;
+			if (!prev[targetAppId] || !isMaximizable(prev[targetAppId].appConfig)) return prev;
 
 			const updatedState = unfocusAllApps(prev);
 
@@ -216,6 +216,10 @@ function getWindowId(appConfig: AppConfig, params: AppParams): string {
 	);
 
 	return `${appConfig.id}?${searchParams.toString()}`;
+}
+
+function isMaximizable(appConfig: AppConfig): boolean {
+	return appConfig.isMaximizable ?? true;
 }
 
 function getRestoredStatus(app: OpenedApp): OpenedApp["status"] {
