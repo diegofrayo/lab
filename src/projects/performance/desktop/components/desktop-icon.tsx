@@ -1,10 +1,10 @@
 "use client";
 
-import type { JSX } from "react";
+import { memo, type JSX } from "react";
 
 import cn from "~/lib/cn";
 
-import { useDesktop } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hook";
 import type { AppConfig, AppIdWithoutParams } from "../desktop.types";
 
 type DesktopIconProps = {
@@ -13,7 +13,7 @@ type DesktopIconProps = {
 
 function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 	// --- HOOKS ---
-	const { openApp } = useDesktop();
+	const { openApp } = useDesktopActions();
 
 	// --- STYLES ---
 	const classes = {
@@ -41,4 +41,6 @@ function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 	);
 }
 
-export default DesktopIcon;
+// Memoized so it doesn't re-render when the desktop re-renders (e.g. on every frame of a window drag),
+// since its only prop is a static app config
+export default memo(DesktopIcon);

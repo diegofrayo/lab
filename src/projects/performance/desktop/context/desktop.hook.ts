@@ -2,13 +2,28 @@
 
 import { useContext } from "react";
 
-import { DesktopContext, type DesktopContextValue } from "./desktop.context";
+import {
+	DesktopActionsContext,
+	DesktopStateContext,
+	type DesktopActions,
+	type DesktopState,
+} from "./desktop.context";
 
-export function useDesktop(): DesktopContextValue {
-	const context = useContext(DesktopContext);
+export function useDesktopState(): DesktopState {
+	const context = useContext(DesktopStateContext);
 
 	if (!context) {
-		throw new Error("useDesktop must be used within a DesktopProvider");
+		throw new Error("useDesktopState must be used within a DesktopProvider");
+	}
+
+	return context;
+}
+
+export function useDesktopActions(): DesktopActions {
+	const context = useContext(DesktopActionsContext);
+
+	if (!context) {
+		throw new Error("useDesktopActions must be used within a DesktopProvider");
 	}
 
 	return context;
