@@ -10,18 +10,9 @@ import { SOCKET_STATUS_LABELS } from "../../utils/socket-status-labels";
 import OrdersTable from "./components/orders-table";
 import { useProductActivitySocket } from "./hooks/use-product-activity-socket.hook";
 
-function ProductDetailsApp({ params, isMinimized }: AppProps): JSX.Element {
+function ProductDetailsApp({ params, isMinimized }: AppProps<"PRODUCT_DETAILS">): JSX.Element {
 	// --- COMPUTED STATES ---
-	const { productId, productName = "" } = params;
-
-	// --- STYLES ---
-	const classes = {
-		emptyState: cn("text-sm text-gray-500"),
-	};
-
-	if (productId === undefined) {
-		return <p className={classes.emptyState}>Select a product to see its details.</p>;
-	}
+	const { id: productId, name: productName } = params.product;
 
 	// The key resets the orders (and the socket) when another product is opened in this window
 	return (

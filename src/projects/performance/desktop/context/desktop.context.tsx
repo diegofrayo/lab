@@ -4,7 +4,7 @@ import { createContext, useCallback, useState, type ReactNode } from "react";
 import type { JSX } from "react";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
-import type { AppConfig, AppParams, OpenedApp, OpenedApps } from "../desktop.types";
+import type { AppConfig, AppParams, OpenAppParams, OpenedApp, OpenedApps } from "../desktop.types";
 import { usePersistOpenedApps } from "../hooks/use-persist-opened-apps.hook";
 import { readOpenedApps } from "../utils/opened-apps-storage";
 import { getInitialWindowSize } from "../utils/window-size";
@@ -20,10 +20,9 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 	const [openedApps, setOpenedApps] = useState<OpenedApps>(readOpenedApps);
 	usePersistOpenedApps(openedApps);
 
-	const openApp = useCallback((targetAppId: string, params: AppParams = {}): void => {
-		const appConfig = APPS_REPOSITORY[targetAppId];
-		if (!appConfig) return;
-
+	const openApp = useCallback((openAppParams: OpenAppParams): void => {
+		const appConfig: AppConfig = APPS_REPOSITORY[openAppParams.appId];
+		const params = "params" in openAppParams ? openAppParams.params : undefined;
 		const windowId = getWindowId(appConfig, params);
 
 		setOpenedApps((prev) => {
@@ -194,7 +193,7 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 
 export type DesktopContextValue = {
 	openedApps: OpenedApps;
-	openApp: (targetAppId: string, params?: AppParams) => void;
+	openApp: (openAppParams: OpenAppParams) => void;
 	closeApp: (targetAppId: string) => void;
 	maximizeApp: (targetAppId: string) => void;
 	restoreApp: (targetAppId: string) => void;
@@ -206,16 +205,12 @@ export type DesktopContextValue = {
 
 //  --- UTILS ---
 
-// Apps with multiple instances get one window per set of params (e.g. one per product),
-// so opening the same params again focuses the existing window instead of creating a new one
+// Apps with multiple instances get one window per instance id (e.g. one per product),
+// so opening the same instance again focuses the existing window instead of creating a new one
 function getWindowId(appConfig: AppConfig, params: AppParams): string {
-	if (!appConfig.allowMultipleInstances) return appConfig.id;
+	if (!appConfig.getInstanceId) return appConfig.id;
 
-	const searchParams = new URLSearchParams(
-		Object.entries(params).sort(([a], [b]) => a.localeCompare(b)),
-	);
-
-	return `${appConfig.id}?${searchParams.toString()}`;
+	return `${appConfig.id}?${appConfig.getInstanceId(params)}`;
 }
 
 function isMaximizable(appConfig: AppConfig): boolean {

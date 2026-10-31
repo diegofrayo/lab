@@ -5,10 +5,10 @@ import type { JSX } from "react";
 import cn from "@diegofrayo-pkg/cn";
 
 import { useDesktop } from "../context/desktop.hook";
-import type { AppConfig } from "../desktop.types";
+import type { AppConfig, AppIdWithoutParams } from "../desktop.types";
 
 type DesktopIconProps = {
-	appConfig: AppConfig;
+	appConfig: AppConfig<AppIdWithoutParams>;
 };
 
 function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
@@ -26,7 +26,7 @@ function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 
 	// --- HANDLERS ---
 	function handleClick(): void {
-		openApp(appConfig.id);
+		openApp({ appId: appConfig.id });
 	}
 
 	return (

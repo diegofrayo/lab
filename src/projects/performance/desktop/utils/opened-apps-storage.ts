@@ -1,5 +1,5 @@
 import { APPS_REPOSITORY } from "../constants/apps-repository";
-import type { OpenedApp, OpenedApps } from "../desktop.types";
+import type { AppId, OpenedApp, OpenedApps } from "../desktop.types";
 
 // The app config has functions, so it's not stored. It's restored from the apps repository using its id
 type StoredOpenedApp = Omit<OpenedApp, "appConfig"> & {
@@ -15,10 +15,9 @@ export function readOpenedApps(): OpenedApps {
 
 		return Object.fromEntries(
 			storedApps.flatMap(({ appId, ...storedApp }) => {
-				const appConfig = APPS_REPOSITORY[appId];
-				if (!appConfig) return [];
+				if (!isAppId(appId)) return [];
 
-				return [[storedApp.id, { ...storedApp, appConfig }]];
+				return [[storedApp.id, { ...storedApp, appConfig: APPS_REPOSITORY[appId] }]];
 			}),
 		);
 	} catch {
@@ -37,6 +36,13 @@ export function saveOpenedApps(openedApps: OpenedApps): void {
 	} catch {
 		// The storage can be full or blocked. The apps are still usable, they just won't be restored
 	}
+}
+
+// --- UTILS ---
+
+// The stored apps can come from an older version where an app had another id or didn't exist
+function isAppId(value: string): value is AppId {
+	return Object.hasOwn(APPS_REPOSITORY, value);
 }
 
 // --- CONSTANTS ---

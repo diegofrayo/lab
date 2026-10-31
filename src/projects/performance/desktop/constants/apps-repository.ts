@@ -1,19 +1,19 @@
 import type { AppsRepository } from "../desktop.types";
 
 export const APPS_REPOSITORY: AppsRepository = {
-	products: {
-		id: "products",
+	PRODUCTS: {
+		id: "PRODUCTS",
 		name: "Products",
 		icon: "📦",
 	},
-	"product-details": {
-		id: "product-details",
+	PRODUCT_DETAILS: {
+		id: "PRODUCT_DETAILS",
 		name: "Product Details",
 		icon: "🧾",
-		getWindowIconUrl: (params) => params["productPhoto"],
-		getWindowTitle: (params) => params["productName"],
+		getWindowIconUrl: (params) => params.product.photo,
+		getWindowTitle: (params) => params.product.name,
+		getInstanceId: (params) => params.product.id,
 		isHiddenFromDesktop: true,
-		allowMultipleInstances: true,
 		windowConfig: {
 			x: 0,
 			y: 0,
@@ -21,8 +21,8 @@ export const APPS_REPOSITORY: AppsRepository = {
 			height: 480,
 		},
 	},
-	"data-orchestrator": {
-		id: "data-orchestrator",
+	DATA_ORCHESTRATOR: {
+		id: "DATA_ORCHESTRATOR",
 		name: "Data Orchestrator",
 		icon: "🎛️",
 		isMaximizable: false,

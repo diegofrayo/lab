@@ -1,6 +1,6 @@
 "use client";
 
-import type { JSX } from "react";
+import type { ComponentType, JSX } from "react";
 
 import cn from "@diegofrayo-pkg/cn";
 
@@ -8,6 +8,7 @@ import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
 import { useDesktop } from "../context/desktop.hook";
+import type { AppConfig, AppIdWithoutParams, AppProps } from "../desktop.types";
 import DesktopIcon from "./desktop-icon";
 import Taskbar from "./taskbar";
 import Window from "./window";
@@ -31,8 +32,8 @@ function Desktop(): JSX.Element {
 			<section className={classes.desktop}>
 				<div className={classes.windowsArea}>
 					{Object.values(openedApps).map((openedApp) => {
-						const AppComponent = APPS_COMPONENTS[openedApp.appConfig.id];
-						if (!AppComponent) return null;
+						// TS can't relate the component to the params of the same app, but both come from the same app id
+						const AppComponent = APPS_COMPONENTS[openedApp.appConfig.id] as ComponentType<AppProps>;
 
 						return (
 							<Window
@@ -65,6 +66,11 @@ export default Desktop;
 
 // --- CONSTANTS ---
 
-const DESKTOP_APPS = Object.values(APPS_REPOSITORY).filter(
-	(appConfig) => !appConfig.isHiddenFromDesktop,
-);
+const DESKTOP_APPS = Object.values(APPS_REPOSITORY).filter(isDesktopApp);
+
+// --- UTILS ---
+
+// Apps that need params are hidden from the desktop, so the visible ones can be opened without params
+function isDesktopApp(appConfig: AppConfig): appConfig is AppConfig<AppIdWithoutParams> {
+	return !appConfig.isHiddenFromDesktop;
+}

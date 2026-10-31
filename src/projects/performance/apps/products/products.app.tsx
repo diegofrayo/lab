@@ -34,11 +34,7 @@ function ProductsApp({ isMinimized }: AppProps): JSX.Element {
 
 	// --- HANDLERS ---
 	function handleProductSelect(product: Product): void {
-		openApp("product-details", {
-			productId: product.id,
-			productName: product.name,
-			productPhoto: product.photo,
-		});
+		openApp({ appId: "PRODUCT_DETAILS", params: { product } });
 	}
 
 	// --- UTILS ---
