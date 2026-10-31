@@ -8,7 +8,7 @@ Overall the code is in good shape. Socket payloads are validated with zod at the
 
 **Summary:** 1 rancid, 8 funky (3 of them cross-file duplication) and 5 whiffs across 13 files.
 
-**Status:** 4 of 14 solved (#1, #3, #4, #5). Escape handling from #3 is left out on purpose.
+**Status:** 5 of 14 solved (#1, #3, #4, #5, #6). Escape handling from #3 is left out on purpose.
 
 The biggest wins:
 
@@ -91,7 +91,7 @@ The biggest wins:
 - **Fix:** validate each entry with a zod schema (zod is already a dependency) and drop the invalid ones, the same way `parseProducts` does.
 - **Source:** [TypeScript, type assertions](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#type-assertions)
 
-### 6. No error boundary
+### 6. No error boundary ✅
 
 `missing-error-boundary` (async and errors)
 

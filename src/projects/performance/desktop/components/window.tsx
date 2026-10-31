@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
-import type { CSSProperties, JSX } from "react";
+import type { CSSProperties, JSX, ReactNode } from "react";
 
 import cn from "~/lib/cn";
 
@@ -9,9 +8,11 @@ import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 import { usePointerDrag } from "../hooks/use-pointer-drag.hook";
 import { useWindowDrag } from "../hooks/use-window-drag.hook";
+import { useWindowKeyboardFocus } from "../hooks/use-window-keyboard-focus.hook";
 import { getTaskbarButtonId } from "../utils/taskbar-button-id";
 import { getMinWindowSize } from "../utils/window-size";
 import { getWindowTitle } from "../utils/window-title";
+import AppErrorBoundary from "./app-error-boundary";
 import WindowIcon from "./window-icon";
 
 type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
@@ -34,9 +35,10 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 		appId: openedApp.id,
 		windowConfig: openedApp.windowConfig,
 	});
-
-	// --- STATES & REFS ---
-	const openerRef = useRef<HTMLElement | null>(null);
+	const { returnFocusToOpener } = useWindowKeyboardFocus({
+		containerRef,
+		isFocused: openedApp.isFocused,
+	});
 
 	// --- COMPUTED STATES ---
 	const { id, appConfig, windowConfig, isFocused, status } = openedApp;
@@ -87,11 +89,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 
 	function handleCloseClick(e: React.MouseEvent<HTMLButtonElement>): void {
 		e.stopPropagation();
-		closeApp(id);
-
-		if (openerRef.current?.isConnected) {
-			openerRef.current.focus();
-		}
+		closeWindow();
 	}
 
 	function handleMinimizeClick(e: React.MouseEvent<HTMLButtonElement>): void {
@@ -110,32 +108,12 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 		}
 	}
 
-	// --- EFFECTS ---
-	// Saves the element that opened the window, so the focus goes back to it when the window is closed.
-	// The element inside the check skips the second run of the strict mode, when the window has the focus
-	useEffect(
-		function saveOpenerElement() {
-			const activeElement = document.activeElement;
-
-			if (activeElement instanceof HTMLElement && !containerRef.current?.contains(activeElement)) {
-				openerRef.current = activeElement;
-			}
-		},
-		[containerRef],
-	);
-
-	useEffect(
-		function moveKeyboardFocusIntoWindow() {
-			const container = containerRef.current;
-
-			if (!isFocused || !container || container.contains(document.activeElement)) return;
-
-			container.focus({ preventScroll: true });
-		},
-		[isFocused, containerRef],
-	);
-
 	// --- UTILS ---
+	function closeWindow(): void {
+		closeApp(id);
+		returnFocusToOpener();
+	}
+
 	function getWindowStyles(): CSSProperties {
 		if (isMaximized) {
 			return {
@@ -193,7 +171,14 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 					/>
 				</div>
 			</header>
-			<section className={classes.content}>{children}</section>
+			<section className={classes.content}>
+				<AppErrorBoundary
+					appName={title}
+					onClose={closeWindow}
+				>
+					{children}
+				</AppErrorBoundary>
+			</section>
 			{isResizable ? (
 				<WindowResizeHandles
 					appId={id}

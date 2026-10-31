@@ -43,6 +43,14 @@ export function saveOpenedApps(openedApps: OpenedApps): void {
 	}
 }
 
+export function clearOpenedApps(): void {
+	try {
+		window.localStorage.removeItem(OPENED_APPS_STORAGE_KEY);
+	} catch {
+		// The storage can be blocked. There is nothing to clear in that case
+	}
+}
+
 // --- UTILS ---
 
 // Invalid entries are dropped (and logged), so a single malformed app does not discard the others
