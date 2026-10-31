@@ -5,8 +5,8 @@ import type { JSX } from "react";
 
 import cn from "~/lib/cn";
 
+import { useDataOrchestratorSettings } from "../../hooks/use-data-orchestrator-settings.hook";
 import { MIN_UPDATE_INTERVAL_MS } from "../../services/data-orchestrator.service";
-import { useDataOrchestratorSettings } from "./hooks/use-data-orchestrator-settings.hook";
 
 // The orchestrator doesn't belong to this window, so minimizing it doesn't pause anything
 function DataOrchestratorApp(): JSX.Element {

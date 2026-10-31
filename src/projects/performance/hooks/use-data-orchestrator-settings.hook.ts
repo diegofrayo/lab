@@ -2,10 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-import {
-	dataOrchestrator,
-	type DataOrchestratorSettings,
-} from "../../../services/data-orchestrator.service";
+import { dataOrchestrator, type DataOrchestratorSettings } from "../services/data-orchestrator.service";
 
 type UseDataOrchestratorSettingsReturn = {
 	settings: DataOrchestratorSettings;

@@ -8,7 +8,7 @@ Overall the code already follows the composition patterns. There is no boolean p
 
 **Summary:** 2 fixes, 1 optional refactor and 1 minor coupling issue.
 
-**Status:** 2 of 4 solved (#1 and #2).
+**Status:** 3 of 4 solved (#1, #2 and #4). The optional refactor (#3) is left for later.
 
 ## Fixes
 
@@ -54,7 +54,7 @@ Overall the code already follows the composition patterns. There is no boolean p
 
 ## Minor
 
-### 4. One app imports a hook from another app's folder
+### 4. One app imports a hook from another app's folder ✅
 
 `state-decouple-implementation` (state management)
 

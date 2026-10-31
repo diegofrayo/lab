@@ -8,7 +8,7 @@ import SocketStatusBadge from "../../components/socket-status-badge";
 import WindowLoader from "../../desktop/components/window-loader";
 import { useDesktopActions } from "../../desktop/context/desktop.hook";
 import type { AppProps } from "../../desktop/desktop.types";
-import { useDataOrchestratorSettings } from "../data-orchestrator/hooks/use-data-orchestrator-settings.hook";
+import { useDataOrchestratorSettings } from "../../hooks/use-data-orchestrator-settings.hook";
 import PlainList from "./components/plain-list";
 import ProductRow from "./components/product-row";
 import VirtualList from "./components/virtual-list";
