@@ -4,9 +4,9 @@ import type { JSX } from "react";
 
 import cn from "~/lib/cn";
 
+import SocketStatusBadge from "../../components/socket-status-badge";
 import WindowLoader from "../../desktop/components/window-loader";
 import type { AppProps } from "../../desktop/desktop.types";
-import { SOCKET_STATUS_LABELS } from "../../utils/socket-status-labels";
 import OrdersTable from "./components/orders-table";
 import { useProductActivitySocket } from "./hooks/use-product-activity-socket.hook";
 
@@ -46,10 +46,6 @@ function ProductActivity({ isMinimized, productId, productName }: ProductActivit
 		title: cn("truncate text-2xl font-semibold text-gray-800"),
 		meta: cn("flex shrink-0 items-center gap-2"),
 		count: cn("text-xs text-gray-500 tabular-nums"),
-		status: cn(
-			"rounded-full px-2 py-0.5 text-xs font-medium",
-			status === "LIVE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600",
-		),
 		table: cn("min-h-0 flex-1"),
 	};
 
@@ -59,7 +55,7 @@ function ProductActivity({ isMinimized, productId, productName }: ProductActivit
 				<h1 className={classes.title}>{productName}</h1>
 				<div className={classes.meta}>
 					<span className={classes.count}>{orders.length.toLocaleString("en-US")} orders</span>
-					<span className={classes.status}>{SOCKET_STATUS_LABELS[status]}</span>
+					<SocketStatusBadge status={status} />
 				</div>
 			</header>
 			<div className={classes.table}>

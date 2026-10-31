@@ -8,7 +8,7 @@ Overall the code is in good shape. Socket payloads are validated with zod at the
 
 **Summary:** 1 rancid, 8 funky (3 of them cross-file duplication) and 5 whiffs across 13 files.
 
-**Status:** 6 of 14 solved (#1, #3, #4, #5, #6, #7). Escape handling from #3 is left out on purpose.
+**Status:** 7 of 14 solved (#1, #3, #4, #5, #6, #7, #8). Escape handling from #3 is left out on purpose, and #9 is skipped.
 
 The biggest wins:
 
@@ -114,7 +114,7 @@ The biggest wins:
 - **Drift risk:** a fix to reconnect or notify logic lands in one socket and not the other.
 - **Fix:** one generic `OrchestratorSocket<TEventName>` in `services/`, configured with `{ connectionId, dataSource, eventNames }`. The two hooks' "status + RECONNECTING on cleanup" logic could then become a shared `useSocketStatus`.
 
-### 8. Status pill copied in both apps
+### 8. Status pill copied in both apps ✅
 
 `duplicate-implementation` (Funky)
 

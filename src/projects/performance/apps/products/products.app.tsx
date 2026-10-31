@@ -4,10 +4,10 @@ import type { JSX } from "react";
 
 import cn from "~/lib/cn";
 
+import SocketStatusBadge from "../../components/socket-status-badge";
 import WindowLoader from "../../desktop/components/window-loader";
 import { useDesktop } from "../../desktop/context/desktop.hook";
 import type { AppProps } from "../../desktop/desktop.types";
-import { SOCKET_STATUS_LABELS } from "../../utils/socket-status-labels";
 import { useDataOrchestratorSettings } from "../data-orchestrator/hooks/use-data-orchestrator-settings.hook";
 import PlainList from "./components/plain-list";
 import ProductRow from "./components/product-row";
@@ -28,10 +28,6 @@ function ProductsApp({ isMinimized }: AppProps): JSX.Element {
 		container: cn("flex h-full flex-col gap-3"),
 		header: cn("flex items-center justify-between"),
 		title: cn("text-2xl font-semibold text-gray-800"),
-		status: cn(
-			"rounded-full px-2 py-0.5 text-xs font-medium",
-			status === "LIVE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600",
-		),
 		list: cn("min-h-0 flex-1"),
 	};
 
@@ -55,7 +51,7 @@ function ProductsApp({ isMinimized }: AppProps): JSX.Element {
 		<section className={classes.container}>
 			<header className={classes.header}>
 				<h1 className={classes.title}>List of Products</h1>
-				<span className={classes.status}>{SOCKET_STATUS_LABELS[status]}</span>
+				<SocketStatusBadge status={status} />
 			</header>
 			<div className={classes.list}>
 				{settings.isVirtualizingProducts ? (
