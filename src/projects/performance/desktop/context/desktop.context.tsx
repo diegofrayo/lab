@@ -163,9 +163,9 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 	);
 
 	return (
-		<DesktopActionsContext.Provider value={actions}>
-			<DesktopStateContext.Provider value={state}>{children}</DesktopStateContext.Provider>
-		</DesktopActionsContext.Provider>
+		<DesktopActionsContext value={actions}>
+			<DesktopStateContext value={state}>{children}</DesktopStateContext>
+		</DesktopActionsContext>
 	);
 }
 
