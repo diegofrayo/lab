@@ -24,21 +24,16 @@ function AppErrorBoundary({ appName, children, onClose }: AppErrorBoundaryProps)
 		setResetKey((prev) => prev + 1);
 	}
 
-	// --- UTILS ---
-	function renderFallback(): ReactNode {
-		return (
-			<AppCrashed
-				appName={appName}
-				onCloseClick={onClose}
-				onReloadClick={handleReloadClick}
-			/>
-		);
-	}
-
 	return (
 		<ErrorBoundary
 			key={resetKey}
-			renderFallback={renderFallback}
+			fallback={
+				<AppCrashed
+					appName={appName}
+					onCloseClick={onClose}
+					onReloadClick={handleReloadClick}
+				/>
+			}
 		>
 			{children}
 		</ErrorBoundary>
@@ -51,7 +46,7 @@ export default AppErrorBoundary;
 
 type ErrorBoundaryProps = {
 	children: ReactNode;
-	renderFallback: () => ReactNode;
+	fallback: ReactNode;
 };
 
 type ErrorBoundaryState = {
@@ -70,7 +65,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 	}
 
 	override render(): ReactNode {
-		if (this.state.hasError) return this.props.renderFallback();
+		if (this.state.hasError) return this.props.fallback;
 
 		return this.props.children;
 	}

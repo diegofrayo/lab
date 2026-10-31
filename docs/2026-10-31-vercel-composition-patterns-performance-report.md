@@ -8,7 +8,7 @@ Overall the code already follows the composition patterns. There is no boolean p
 
 **Summary:** 2 fixes, 1 optional refactor and 1 minor coupling issue.
 
-**Status:** 1 of 4 solved (#1).
+**Status:** 2 of 4 solved (#1 and #2).
 
 ## Fixes
 
@@ -22,7 +22,7 @@ Overall the code already follows the composition patterns. There is no boolean p
 - **Fix:** use `use(...)` instead of `useContext(...)`, and render `<XContext value>` directly.
 - **Cost of the fix:** a small change with no behavior change.
 
-### 2. Replace a render prop that passes no data
+### 2. Replace a render prop that passes no data ✅
 
 `patterns-children-over-render-props` (implementation patterns)
 
