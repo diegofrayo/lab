@@ -1,6 +1,6 @@
 "use client";
 
-import type { JSX } from "react";
+import { memo, type JSX } from "react";
 
 import cn from "~/lib/cn";
 
@@ -41,4 +41,6 @@ function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 	);
 }
 
-export default DesktopIcon;
+// Memoized so it doesn't re-render when the desktop re-renders (e.g. on every frame of a window drag),
+// since its only prop is a static app config
+export default memo(DesktopIcon);
