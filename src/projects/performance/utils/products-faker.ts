@@ -1,4 +1,5 @@
 import type { RawProduct } from "../performance.types";
+import { getRandomInteger, getRandomNumber, roundToCents } from "./random";
 
 const PRODUCT_NAMES = [
 	"Wireless Headphones",
@@ -54,18 +55,4 @@ export function updateProducts(products: RawProduct[]): RawProduct[] {
 			total_sales: product.total_sales + newSales,
 		};
 	});
-}
-
-// --- UTILS ---
-
-function getRandomNumber(min: number, max: number): number {
-	return Math.random() * (max - min) + min;
-}
-
-function getRandomInteger(min: number, max: number): number {
-	return Math.floor(getRandomNumber(min, max + 1));
-}
-
-function roundToCents(value: number): number {
-	return Math.round(value * 100) / 100;
 }

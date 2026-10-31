@@ -40,7 +40,7 @@ type Connection = {
 	updatesIntervalId: ReturnType<typeof setInterval> | null;
 };
 
-type ConnectParams<TEventName extends DataOrchestratorEventName> = {
+export type DataOrchestratorConnectParams<TEventName extends DataOrchestratorEventName> = {
 	connectionId: string;
 	dataSource: DataSource<DataOrchestratorEvents[TEventName]>;
 	eventNames: {
@@ -70,7 +70,7 @@ class DataOrchestrator {
 		dataSource,
 		eventNames,
 		latencyMs = DEFAULT_LATENCY_MS,
-	}: ConnectParams<TEventName>): void {
+	}: DataOrchestratorConnectParams<TEventName>): void {
 		this.disconnect(connectionId);
 
 		const connection: Connection = {

@@ -1,18 +1,27 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
-import type { CSSProperties, JSX } from "react";
+import type { CSSProperties, JSX, ReactNode } from "react";
 
 import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
+import { usePointerDrag } from "../hooks/use-pointer-drag.hook";
 import { useWindowDrag } from "../hooks/use-window-drag.hook";
+import { useWindowKeyboardFocus } from "../hooks/use-window-keyboard-focus.hook";
+import { getTaskbarButtonId } from "../utils/taskbar-button-id";
 import { getMinWindowSize } from "../utils/window-size";
 import { getWindowTitle } from "../utils/window-title";
+import AppErrorBoundary from "./app-error-boundary";
 import WindowIcon from "./window-icon";
 
 type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
+
+type ResizeStart = {
+	direction: ResizeDirection;
+	width: number;
+	height: number;
+};
 
 type WindowProps = {
 	openedApp: OpenedApp;
@@ -25,6 +34,10 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 	const { containerRef, startDrag } = useWindowDrag({
 		appId: openedApp.id,
 		windowConfig: openedApp.windowConfig,
+	});
+	const { returnFocusToOpener } = useWindowKeyboardFocus({
+		containerRef,
+		isFocused: openedApp.isFocused,
 	});
 
 	// --- COMPUTED STATES ---
@@ -40,7 +53,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 	// --- STYLES ---
 	const classes = {
 		container: cn(
-			"pointer-events-auto absolute flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow",
+			"pointer-events-auto absolute flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow outline-none",
 			isFocused ? "z-50 shadow-black/30" : "z-10 shadow-black/10",
 			isMinimized ? "hidden" : "flex",
 		),
@@ -53,13 +66,13 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 		title: cn("truncate"),
 		titleButtons: cn("flex items-center gap-1.5"),
 		btnClose: cn(
-			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-red-500 hover:bg-red-600 focus:outline-none",
+			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-red-500 hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
 		),
 		btnMinimize: cn(
-			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-yellow-400 hover:bg-yellow-500 focus:outline-none",
+			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
 		),
 		btnMaximize: cn(
-			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-green-500 hover:bg-green-600 focus:outline-none",
+			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-green-500 hover:bg-green-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
 		),
 		content: cn("relative flex-1 overflow-auto bg-white p-4"),
 	};
@@ -76,12 +89,13 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 
 	function handleCloseClick(e: React.MouseEvent<HTMLButtonElement>): void {
 		e.stopPropagation();
-		closeApp(id);
+		closeWindow();
 	}
 
 	function handleMinimizeClick(e: React.MouseEvent<HTMLButtonElement>): void {
 		e.stopPropagation();
 		minimizeApp(id);
+		document.getElementById(getTaskbarButtonId(id))?.focus();
 	}
 
 	function handleMaximizeClick(e: React.MouseEvent<HTMLButtonElement>): void {
@@ -95,6 +109,11 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 	}
 
 	// --- UTILS ---
+	function closeWindow(): void {
+		closeApp(id);
+		returnFocusToOpener();
+	}
+
 	function getWindowStyles(): CSSProperties {
 		if (isMaximized) {
 			return {
@@ -121,6 +140,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 			style={getWindowStyles()}
 			role="dialog"
 			aria-label={title}
+			tabIndex={-1}
 			onMouseDown={handleContainerMouseDown}
 		>
 			<header
@@ -151,7 +171,14 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 					/>
 				</div>
 			</header>
-			<section className={classes.content}>{children}</section>
+			<section className={classes.content}>
+				<AppErrorBoundary
+					appName={title}
+					onClose={closeWindow}
+				>
+					{children}
+				</AppErrorBoundary>
+			</section>
 			{isResizable ? (
 				<WindowResizeHandles
 					appId={id}
@@ -186,10 +213,18 @@ function WindowResizeHandles({
 }: WindowResizeHandlesProps): JSX.Element {
 	// --- HOOKS ---
 	const { focusApp, resizeWindow } = useDesktop();
+	const { startPointerDrag } = usePointerDrag<ResizeStart>({
+		onMove: ({ deltaX, deltaY, start }) => {
+			const canResizeWidth = start.direction !== "BOTTOM";
+			const canResizeHeight = start.direction !== "RIGHT";
 
-	// --- STATES & REFS ---
-	const resizeDirection = useRef<ResizeDirection | null>(null);
-	const resizeStart = useRef({ mouseX: 0, mouseY: 0, width: 0, height: 0 });
+			resizeWindow(
+				appId,
+				canResizeWidth ? Math.max(minWidth, start.width + deltaX) : start.width,
+				canResizeHeight ? Math.max(minHeight, start.height + deltaY) : start.height,
+			);
+		},
+	});
 
 	// --- STYLES ---
 	const classes = {
@@ -201,42 +236,13 @@ function WindowResizeHandles({
 	// --- HANDLERS ---
 	function handleHandleMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
 		e.preventDefault();
-		resizeDirection.current = e.currentTarget.dataset["direction"] as ResizeDirection;
-		resizeStart.current = { mouseX: e.clientX, mouseY: e.clientY, width, height };
+		startPointerDrag(e, {
+			direction: e.currentTarget.dataset["direction"] as ResizeDirection,
+			width,
+			height,
+		});
 		focusApp(appId);
 	}
-
-	// --- EFFECTS ---
-	useEffect(
-		function setupResizeListeners() {
-			function handleMouseMove(e: MouseEvent): void {
-				if (!resizeDirection.current) return;
-
-				const start = resizeStart.current;
-				const canResizeWidth = resizeDirection.current !== "BOTTOM";
-				const canResizeHeight = resizeDirection.current !== "RIGHT";
-
-				resizeWindow(
-					appId,
-					canResizeWidth ? Math.max(minWidth, start.width + e.clientX - start.mouseX) : start.width,
-					canResizeHeight ? Math.max(minHeight, start.height + e.clientY - start.mouseY) : start.height,
-				);
-			}
-
-			function handleMouseUp(): void {
-				resizeDirection.current = null;
-			}
-
-			document.addEventListener("mousemove", handleMouseMove);
-			document.addEventListener("mouseup", handleMouseUp);
-
-			return (): void => {
-				document.removeEventListener("mousemove", handleMouseMove);
-				document.removeEventListener("mouseup", handleMouseUp);
-			};
-		},
-		[appId, minWidth, minHeight, resizeWindow],
-	);
 
 	return (
 		<>

@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type MouseEvent as ReactMouseEvent, type RefObject } from "react";
+import { useRef, type MouseEvent as ReactMouseEvent, type RefObject } from "react";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
+import { usePointerDrag } from "./use-pointer-drag.hook";
 
 type DragStart = {
-	mouseX: number;
-	mouseY: number;
 	windowX: number;
 	windowY: number;
 	windowWidth: number;
@@ -34,65 +33,32 @@ type UseWindowDragReturn = {
 export function useWindowDrag({ appId, windowConfig }: UseWindowDragParams): UseWindowDragReturn {
 	const { moveWindow } = useDesktop();
 	const containerRef = useRef<HTMLDivElement>(null);
-	const isDragging = useRef(false);
-	const dragStart = useRef<DragStart>({
-		mouseX: 0,
-		mouseY: 0,
-		windowX: 0,
-		windowY: 0,
-		windowWidth: 0,
-		windowHeight: 0,
-		areaWidth: 0,
-		areaHeight: 0,
+	const { startPointerDrag } = usePointerDrag<DragStart>({
+		onMove: ({ deltaX, deltaY, start }) => {
+			const halfWidth = start.windowWidth / 2;
+			const halfHeight = start.windowHeight / 2;
+
+			moveWindow(
+				appId,
+				clamp(start.windowX + deltaX, -halfWidth, start.areaWidth - halfWidth),
+				clamp(start.windowY + deltaY, 0, start.areaHeight - halfHeight),
+			);
+		},
 	});
 
 	function startDrag(e: ReactMouseEvent<HTMLElement>): void {
 		// The window is positioned relative to the windows area, so that is what it is kept inside of
 		const windowsArea = containerRef.current?.offsetParent;
 
-		isDragging.current = true;
-		dragStart.current = {
-			mouseX: e.clientX,
-			mouseY: e.clientY,
+		startPointerDrag(e, {
 			windowX: windowConfig.x,
 			windowY: windowConfig.y,
 			windowWidth: windowConfig.width,
 			windowHeight: windowConfig.height,
 			areaWidth: windowsArea?.clientWidth ?? window.innerWidth,
 			areaHeight: windowsArea?.clientHeight ?? window.innerHeight,
-		};
+		});
 	}
-
-	useEffect(
-		function setupDragListeners() {
-			function handleMouseMove(e: MouseEvent): void {
-				if (!isDragging.current) return;
-
-				const start = dragStart.current;
-				const halfWidth = start.windowWidth / 2;
-				const halfHeight = start.windowHeight / 2;
-
-				moveWindow(
-					appId,
-					clamp(start.windowX + e.clientX - start.mouseX, -halfWidth, start.areaWidth - halfWidth),
-					clamp(start.windowY + e.clientY - start.mouseY, 0, start.areaHeight - halfHeight),
-				);
-			}
-
-			function handleMouseUp(): void {
-				isDragging.current = false;
-			}
-
-			document.addEventListener("mousemove", handleMouseMove);
-			document.addEventListener("mouseup", handleMouseUp);
-
-			return (): void => {
-				document.removeEventListener("mousemove", handleMouseMove);
-				document.removeEventListener("mouseup", handleMouseUp);
-			};
-		},
-		[appId, moveWindow],
-	);
 
 	return { containerRef, startDrag };
 }

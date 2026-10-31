@@ -6,6 +6,7 @@ import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
+import { getTaskbarButtonId } from "../utils/taskbar-button-id";
 import { getWindowTitle } from "../utils/window-title";
 import WindowIcon from "./window-icon";
 
@@ -77,9 +78,10 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 
 	return (
 		<button
+			id={getTaskbarButtonId(openedApp.id)}
 			className={classes.button}
+			aria-pressed={openedApp.isFocused}
 			onClick={handleClick}
-			aria-label={title}
 		>
 			<WindowIcon openedApp={openedApp} />
 			<span className={classes.title}>{title}</span>

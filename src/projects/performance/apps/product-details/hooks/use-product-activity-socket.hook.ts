@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import type { RawProductOrder, SocketStatus } from "../../../performance.types";
-import { ProductActivitySocket } from "../services/product-activity-socket.service";
+import { createProductActivitySocket } from "../services/product-activity-socket.service";
 import { parseOrders, type Order } from "../utils/orders-parser";
 
 type UseProductActivitySocketParams = {
@@ -28,7 +28,7 @@ export function useProductActivitySocket({
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [status, setStatus] = useState<SocketStatus>("CONNECTING");
 	// The same socket is reused across reconnections, so the product keeps its order prices
-	const [socket] = useState(() => new ProductActivitySocket(productId));
+	const [socket] = useState(() => createProductActivitySocket(productId));
 
 	useEffect(
 		function connectToProductActivitySocket() {
