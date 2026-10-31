@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, JSX, ReactNode } from "react";
+import { useRef, type CSSProperties, type JSX, type ReactNode, type RefObject } from "react";
 
 import cn from "~/lib/cn";
 
@@ -19,6 +19,11 @@ type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
 
 type ResizeStart = {
 	direction: ResizeDirection;
+	width: number;
+	height: number;
+};
+
+type ResizeSize = {
 	width: number;
 	height: number;
 };
@@ -79,7 +84,8 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 
 	// --- HANDLERS ---
 	function handleTitleBarMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
-		startDrag(e);
+		// The drag moves the window element directly, so a maximized window would leave its full-size spot
+		if (!isMaximized) startDrag(e);
 		focusApp(id);
 	}
 
@@ -182,6 +188,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 			{isResizable ? (
 				<WindowResizeHandles
 					appId={id}
+					containerRef={containerRef}
 					width={windowConfig.width}
 					height={windowConfig.height}
 					minWidth={minWindowSize.width}
@@ -198,14 +205,18 @@ export default Window;
 
 type WindowResizeHandlesProps = {
 	appId: string;
+	containerRef: RefObject<HTMLDivElement | null>;
 	width: number;
 	height: number;
 	minWidth: number;
 	minHeight: number;
 };
 
+// While resizing, the size is kept in a ref and written straight to the window element, so the
+// desktop state (and every component reading it) is updated only once, when the resize ends
 function WindowResizeHandles({
 	appId,
+	containerRef,
 	width,
 	height,
 	minWidth,
@@ -213,16 +224,31 @@ function WindowResizeHandles({
 }: WindowResizeHandlesProps): JSX.Element {
 	// --- HOOKS ---
 	const { focusApp, resizeWindow } = useDesktopActions();
+	const resizeSizeRef = useRef<ResizeSize | null>(null);
 	const { startPointerDrag } = usePointerDrag<ResizeStart>({
 		onMove: ({ deltaX, deltaY, start }) => {
 			const canResizeWidth = start.direction !== "BOTTOM";
 			const canResizeHeight = start.direction !== "RIGHT";
+			const size = {
+				width: canResizeWidth ? Math.max(minWidth, start.width + deltaX) : start.width,
+				height: canResizeHeight ? Math.max(minHeight, start.height + deltaY) : start.height,
+			};
 
-			resizeWindow(
-				appId,
-				canResizeWidth ? Math.max(minWidth, start.width + deltaX) : start.width,
-				canResizeHeight ? Math.max(minHeight, start.height + deltaY) : start.height,
-			);
+			resizeSizeRef.current = size;
+
+			if (containerRef.current) {
+				containerRef.current.style.width = `${size.width}px`;
+				containerRef.current.style.height = `${size.height}px`;
+			}
+		},
+		onEnd: () => {
+			const size = resizeSizeRef.current;
+			resizeSizeRef.current = null;
+
+			// A click on a handle without moving the mouse doesn't change the size
+			if (size) {
+				resizeWindow(appId, size.width, size.height);
+			}
 		},
 	});
 
@@ -236,6 +262,7 @@ function WindowResizeHandles({
 	// --- HANDLERS ---
 	function handleHandleMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
 		e.preventDefault();
+		resizeSizeRef.current = null;
 		startPointerDrag(e, {
 			direction: e.currentTarget.dataset["direction"] as ResizeDirection,
 			width,

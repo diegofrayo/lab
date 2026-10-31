@@ -25,30 +25,55 @@ type UseWindowDragReturn = {
 	startDrag: (e: ReactMouseEvent<HTMLElement>) => void;
 };
 
+type DragPosition = {
+	x: number;
+	y: number;
+};
+
 /**
  * Moves a window while the mouse is dragged. The top edge of the windows area is a hard limit so
  * the title bar always stays reachable. The left, right and bottom edges can be exceeded, but half
  * of the window must stay visible.
+ *
+ * While dragging, the position is kept in a ref and written straight to the window element, so the
+ * desktop state (and every component reading it) is updated only once, when the drag ends.
  */
 export function useWindowDrag({ appId, windowConfig }: UseWindowDragParams): UseWindowDragReturn {
 	const { moveWindow } = useDesktopActions();
 	const containerRef = useRef<HTMLDivElement>(null);
+	const dragPositionRef = useRef<DragPosition | null>(null);
 	const { startPointerDrag } = usePointerDrag<DragStart>({
 		onMove: ({ deltaX, deltaY, start }) => {
 			const halfWidth = start.windowWidth / 2;
 			const halfHeight = start.windowHeight / 2;
+			const position = {
+				x: clamp(start.windowX + deltaX, -halfWidth, start.areaWidth - halfWidth),
+				y: clamp(start.windowY + deltaY, 0, start.areaHeight - halfHeight),
+			};
 
-			moveWindow(
-				appId,
-				clamp(start.windowX + deltaX, -halfWidth, start.areaWidth - halfWidth),
-				clamp(start.windowY + deltaY, 0, start.areaHeight - halfHeight),
-			);
+			dragPositionRef.current = position;
+
+			if (containerRef.current) {
+				containerRef.current.style.left = `${position.x}px`;
+				containerRef.current.style.top = `${position.y}px`;
+			}
+		},
+		onEnd: () => {
+			const position = dragPositionRef.current;
+			dragPositionRef.current = null;
+
+			// A click on the title bar without moving the mouse doesn't change the position
+			if (position) {
+				moveWindow(appId, position.x, position.y);
+			}
 		},
 	});
 
 	function startDrag(e: ReactMouseEvent<HTMLElement>): void {
 		// The window is positioned relative to the windows area, so that is what it is kept inside of
 		const windowsArea = containerRef.current?.offsetParent;
+
+		dragPositionRef.current = null;
 
 		startPointerDrag(e, {
 			windowX: windowConfig.x,
