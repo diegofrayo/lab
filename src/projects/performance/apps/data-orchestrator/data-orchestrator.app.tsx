@@ -45,6 +45,10 @@ function DataOrchestratorApp(): JSX.Element {
 		updateSettings({ isDispatchingUpdates: e.target.checked });
 	}
 
+	function handleVirtualizingProductsChange(e: ChangeEvent<HTMLInputElement>): void {
+		updateSettings({ isVirtualizingProducts: e.target.checked });
+	}
+
 	function handleIntervalChange(e: ChangeEvent<HTMLInputElement>): void {
 		setIntervalDraft(e.target.value);
 	}
@@ -101,6 +105,18 @@ function DataOrchestratorApp(): JSX.Element {
 				</div>
 				<IntervalHint isIntervalValid={isIntervalValid} />
 			</form>
+			<div className={classes.field}>
+				<label className={classes.checkboxLabel}>
+					<input
+						type="checkbox"
+						className={classes.checkbox}
+						checked={settings.isVirtualizingProducts}
+						onChange={handleVirtualizingProductsChange}
+					/>
+					Virtualize the products list
+				</label>
+				<p className={classes.hint}>While disabled, all the product rows are rendered at once.</p>
+			</div>
 		</section>
 	);
 }

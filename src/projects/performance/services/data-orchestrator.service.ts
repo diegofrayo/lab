@@ -29,6 +29,8 @@ export type DataOrchestratorSettings = {
 	isDispatchingUpdates: boolean;
 	// Used by all the connections
 	defaultUpdateIntervalMs: number;
+	// While false, the products list renders all its rows at once
+	isVirtualizingProducts: boolean;
 };
 
 type Connection = {
@@ -59,6 +61,7 @@ class DataOrchestrator {
 	private settings: DataOrchestratorSettings = {
 		isDispatchingUpdates: true,
 		defaultUpdateIntervalMs: DEFAULT_UPDATE_INTERVAL_MS,
+		isVirtualizingProducts: true,
 	};
 	private settingsListeners = new Set<() => void>();
 
@@ -100,14 +103,21 @@ class DataOrchestrator {
 		return this.settings;
 	}
 
-	// The live connections are restarted, so the changes apply right away
+	// The live connections are restarted when the updates settings change, so they apply right away
 	updateSettings(settings: Partial<DataOrchestratorSettings>): void {
+		const previousSettings = this.settings;
 		this.settings = { ...this.settings, ...settings };
 
-		this.connections.forEach((connection) => {
-			this.stopUpdates(connection);
-			this.startUpdates(connection);
-		});
+		const haveUpdatesSettingsChanged =
+			previousSettings.isDispatchingUpdates !== this.settings.isDispatchingUpdates ||
+			previousSettings.defaultUpdateIntervalMs !== this.settings.defaultUpdateIntervalMs;
+
+		if (haveUpdatesSettingsChanged) {
+			this.connections.forEach((connection) => {
+				this.stopUpdates(connection);
+				this.startUpdates(connection);
+			});
+		}
 		this.settingsListeners.forEach((listener) => listener());
 	}
 

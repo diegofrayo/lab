@@ -8,6 +8,8 @@ import WindowLoader from "../../desktop/components/window-loader";
 import { useDesktop } from "../../desktop/context/desktop.hook";
 import type { AppProps } from "../../desktop/desktop.types";
 import { SOCKET_STATUS_LABELS } from "../../utils/socket-status-labels";
+import { useDataOrchestratorSettings } from "../data-orchestrator/hooks/use-data-orchestrator-settings.hook";
+import PlainList from "./components/plain-list";
 import ProductRow from "./components/product-row";
 import VirtualList from "./components/virtual-list";
 import { useProductsSocket } from "./hooks/use-products-socket.hook";
@@ -19,6 +21,7 @@ function ProductsApp({ isMinimized }: AppProps): JSX.Element {
 	// --- HOOKS ---
 	const { products, trends, status } = useProductsSocket({ isPaused: isMinimized });
 	const { openApp } = useDesktop();
+	const { settings } = useDataOrchestratorSettings();
 
 	// --- STYLES ---
 	const classes = {
@@ -55,12 +58,20 @@ function ProductsApp({ isMinimized }: AppProps): JSX.Element {
 				<span className={classes.status}>{SOCKET_STATUS_LABELS[status]}</span>
 			</header>
 			<div className={classes.list}>
-				<VirtualList
-					items={products}
-					estimatedItemSize={PRODUCT_ROW_HEIGHT}
-					getItemKey={getProductKey}
-					renderItem={renderProduct}
-				/>
+				{settings.isVirtualizingProducts ? (
+					<VirtualList
+						items={products}
+						estimatedItemSize={PRODUCT_ROW_HEIGHT}
+						getItemKey={getProductKey}
+						renderItem={renderProduct}
+					/>
+				) : (
+					<PlainList
+						items={products}
+						getItemKey={getProductKey}
+						renderItem={renderProduct}
+					/>
+				)}
 			</div>
 			{status === "RECONNECTING" && <WindowLoader text="Refreshing data" />}
 		</section>
