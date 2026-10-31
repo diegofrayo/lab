@@ -24,6 +24,9 @@ const productSchema = z
 		totalSales: rawProduct.total_sales,
 	}));
 
+// The payload the socket sends, derived from the schema so the contract and the validator can't drift apart
+export type RawProduct = z.input<typeof productSchema>;
+
 export type Product = z.output<typeof productSchema>;
 
 /**

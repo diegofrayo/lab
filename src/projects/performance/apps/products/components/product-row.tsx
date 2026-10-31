@@ -2,6 +2,7 @@ import type { JSX } from "react";
 
 import cn from "~/lib/cn";
 
+import { formatCurrency } from "../../../utils/formatters";
 import type { Product } from "../utils/products-parser";
 import type { ProductTrends, Trend } from "../utils/products-trends";
 
@@ -40,7 +41,8 @@ function ProductRow({ product, trends, onSelect }: ProductRowProps): JSX.Element
 			<img
 				className={classes.photo}
 				src={product.photo}
-				alt={product.name}
+				// Decorative: the product name is the button right next to it
+				alt=""
 				loading="lazy"
 			/>
 			<h2 className={classes.name}>
@@ -114,12 +116,7 @@ function ProductMetric({ label, value, trend = "EQUAL" }: ProductMetricProps): J
 
 // --- UTILS ---
 
-const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
-
-function formatCurrency(value: number): string {
-	return currencyFormatter.format(value);
-}
 
 function formatNumber(value: number): string {
 	return numberFormatter.format(value);

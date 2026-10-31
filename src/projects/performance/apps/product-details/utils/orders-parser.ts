@@ -18,6 +18,9 @@ const orderSchema = z
 		date: new Date(rawOrder.date),
 	}));
 
+// The payload the socket sends, derived from the schema so the contract and the validator can't drift apart
+export type RawProductOrder = z.input<typeof orderSchema>;
+
 export type Order = z.output<typeof orderSchema>;
 
 /**

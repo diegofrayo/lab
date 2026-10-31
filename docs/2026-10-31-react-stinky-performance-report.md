@@ -8,7 +8,7 @@ Overall the code is in good shape. Socket payloads are validated with zod at the
 
 **Summary:** 1 rancid, 8 funky (3 of them cross-file duplication) and 5 whiffs across 13 files.
 
-**Status:** 7 of 14 solved (#1, #3, #4, #5, #6, #7, #8). Escape handling from #3 is left out on purpose, and #9 is skipped.
+**Status:** 12 of 14 solved (#1, #3, #4, #5, #6, #7, #8 and the 5 whiffs). #2 is pending. Escape handling from #3 is left out on purpose, and #9 is skipped.
 
 The biggest wins:
 
@@ -132,7 +132,7 @@ The biggest wins:
 - **Smell:** `parseProducts` and `parseOrders` contain the same array-check, safeParse and drop-and-warn loop.
 - **Fix:** write a single `parseList(schema, data, label)` and keep only the schemas in each file.
 
-## Whiff
+## Whiff ✅
 
 - **`apps/data-orchestrator/data-orchestrator.app.tsx:89-97, 106`:** the interval input's invalid state is shown only by red text in `IntervalHint`. The input has no `aria-invalid` and no `aria-describedby` linking it to the hint. The checkbox hints at lines 76 and 118 aren't linked either. Give the hint an `id` and add `aria-describedby={hintId}` and `aria-invalid={!isIntervalValid}` to the input.
 - **`apps/products/components/product-row.tsx:43`:** `alt={product.name}` sits right next to a button with the same text, so screen readers announce the name twice. Use `alt=""`, since the photo is decorative here.

@@ -69,11 +69,17 @@ function DataOrchestratorApp(): JSX.Element {
 						type="checkbox"
 						className={classes.checkbox}
 						checked={settings.isDispatchingUpdates}
+						aria-describedby={DISPATCHING_UPDATES_HINT_ID}
 						onChange={handleDispatchingUpdatesChange}
 					/>
 					Dispatch updates automatically
 				</label>
-				<p className={classes.hint}>While stopped, the connections only receive their initial data.</p>
+				<p
+					id={DISPATCHING_UPDATES_HINT_ID}
+					className={classes.hint}
+				>
+					While stopped, the connections only receive their initial data.
+				</p>
 			</div>
 			<form
 				className={classes.field}
@@ -93,6 +99,8 @@ function DataOrchestratorApp(): JSX.Element {
 						min={MIN_UPDATE_INTERVAL_MS}
 						step={100}
 						value={intervalDraft}
+						aria-describedby={UPDATE_INTERVAL_HINT_ID}
+						aria-invalid={!isIntervalValid}
 						onChange={handleIntervalChange}
 					/>
 					<button
@@ -103,7 +111,10 @@ function DataOrchestratorApp(): JSX.Element {
 						Apply
 					</button>
 				</div>
-				<IntervalHint isIntervalValid={isIntervalValid} />
+				<IntervalHint
+					id={UPDATE_INTERVAL_HINT_ID}
+					isIntervalValid={isIntervalValid}
+				/>
 			</form>
 			<div className={classes.field}>
 				<label className={classes.checkboxLabel}>
@@ -111,11 +122,17 @@ function DataOrchestratorApp(): JSX.Element {
 						type="checkbox"
 						className={classes.checkbox}
 						checked={settings.isVirtualizingProducts}
+						aria-describedby={VIRTUALIZING_PRODUCTS_HINT_ID}
 						onChange={handleVirtualizingProductsChange}
 					/>
 					Virtualize the products list
 				</label>
-				<p className={classes.hint}>While disabled, all the product rows are rendered at once.</p>
+				<p
+					id={VIRTUALIZING_PRODUCTS_HINT_ID}
+					className={classes.hint}
+				>
+					While disabled, all the product rows are rendered at once.
+				</p>
 			</div>
 		</section>
 	);
@@ -123,20 +140,30 @@ function DataOrchestratorApp(): JSX.Element {
 
 export default DataOrchestratorApp;
 
+// --- CONSTANTS ---
+
+const DISPATCHING_UPDATES_HINT_ID = "data-orchestrator-dispatching-updates-hint";
+const UPDATE_INTERVAL_HINT_ID = "data-orchestrator-update-interval-hint";
+const VIRTUALIZING_PRODUCTS_HINT_ID = "data-orchestrator-virtualizing-products-hint";
+
 // --- COMPONENTS ---
 
 type IntervalHintProps = {
+	id: string;
 	isIntervalValid: boolean;
 };
 
-function IntervalHint({ isIntervalValid }: IntervalHintProps): JSX.Element {
+function IntervalHint({ id, isIntervalValid }: IntervalHintProps): JSX.Element {
 	// --- STYLES ---
 	const classes = {
 		hint: cn("text-xs", isIntervalValid ? "text-gray-500" : "text-red-600"),
 	};
 
 	return (
-		<p className={classes.hint}>
+		<p
+			id={id}
+			className={classes.hint}
+		>
 			{isIntervalValid
 				? "Used by all the connections."
 				: `It must be an integer of at least ${MIN_UPDATE_INTERVAL_MS} ms.`}

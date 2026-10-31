@@ -7,6 +7,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 import cn from "~/lib/cn";
 
+import { formatCurrency } from "../../../utils/formatters";
 import type { Order } from "../utils/orders-parser";
 
 /**
@@ -143,12 +144,7 @@ const NUMERIC_COLUMNS = new Set(["quantity", "price", "total"]);
 
 // --- UTILS ---
 
-const currencyFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "medium" });
-
-function formatCurrency(value: number): string {
-	return currencyFormatter.format(value);
-}
 
 function formatDate(value: Date): string {
 	return dateFormatter.format(value);

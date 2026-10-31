@@ -80,8 +80,8 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 		<button
 			id={getTaskbarButtonId(openedApp.id)}
 			className={classes.button}
+			aria-pressed={openedApp.isFocused}
 			onClick={handleClick}
-			aria-label={title}
 		>
 			<WindowIcon openedApp={openedApp} />
 			<span className={classes.title}>{title}</span>

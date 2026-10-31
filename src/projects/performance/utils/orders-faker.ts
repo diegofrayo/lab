@@ -1,5 +1,6 @@
 import type { RawProductOrder } from "../performance.types";
 import type { DataSource } from "../services/data-orchestrator.service";
+import { getRandomInteger, getRandomNumber, roundToCents } from "./random";
 
 const BUYERS = [
 	"Ada Lovelace",
@@ -56,16 +57,4 @@ function createOrder(basePrice: number, date: Date): RawProductOrder {
 		buyer: BUYERS[getRandomInteger(0, BUYERS.length - 1)] ?? "Anonymous",
 		date: date.toISOString(),
 	};
-}
-
-function getRandomNumber(min: number, max: number): number {
-	return Math.random() * (max - min) + min;
-}
-
-function getRandomInteger(min: number, max: number): number {
-	return Math.floor(getRandomNumber(min, max + 1));
-}
-
-function roundToCents(value: number): number {
-	return Math.round(value * 100) / 100;
 }
