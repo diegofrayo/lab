@@ -1,9 +1,18 @@
+import type { RawProduct, RawProductOrder } from "../performance.types";
+
 /**
  * Fake server that simulates socket connections. Each connection receives its initial data once
  * (after a simulated latency) and then periodic updates, all delivered as `CustomEvent`s.
  */
 
-export type DataOrchestratorEventName = "FETCH_INITIAL_DATA" | "GET_UPDATES" | "PRODUCT_ORDERS";
+// The payload each event sends, like the contract of a real socket API
+export type DataOrchestratorEvents = {
+	"PRODUCTS:INITIAL_LIST": RawProduct[];
+	"PRODUCTS:LIST_UPDATES": RawProduct[];
+	"PRODUCT_DETAILS:ORDERS": RawProductOrder[];
+};
+
+export type DataOrchestratorEventName = keyof DataOrchestratorEvents;
 
 export type DataOrchestratorEventDetail<TData> = {
 	connectionId: string;
@@ -20,12 +29,12 @@ type Connection = {
 	updatesIntervalId: ReturnType<typeof setInterval> | null;
 };
 
-type ConnectParams<TData> = {
+type ConnectParams<TEventName extends DataOrchestratorEventName> = {
 	connectionId: string;
-	dataSource: DataSource<TData>;
-	eventNames?: {
-		initialData: DataOrchestratorEventName;
-		updates: DataOrchestratorEventName;
+	dataSource: DataSource<DataOrchestratorEvents[TEventName]>;
+	eventNames: {
+		initialData: TEventName;
+		updates: TEventName;
 	};
 	latencyMs?: number;
 	updateIntervalMs?: number;
@@ -33,22 +42,18 @@ type ConnectParams<TData> = {
 
 const DEFAULT_LATENCY_MS = 300;
 const DEFAULT_UPDATE_INTERVAL_MS = 1000;
-const DEFAULT_EVENT_NAMES = {
-	initialData: "FETCH_INITIAL_DATA",
-	updates: "GET_UPDATES",
-} as const;
 
 class DataOrchestrator {
 	private eventTarget = new EventTarget();
 	private connections = new Map<string, Connection>();
 
-	connect<TData>({
+	connect<TEventName extends DataOrchestratorEventName>({
 		connectionId,
 		dataSource,
-		eventNames = DEFAULT_EVENT_NAMES,
+		eventNames,
 		latencyMs = DEFAULT_LATENCY_MS,
 		updateIntervalMs = DEFAULT_UPDATE_INTERVAL_MS,
-	}: ConnectParams<TData>): void {
+	}: ConnectParams<TEventName>): void {
 		this.disconnect(connectionId);
 
 		const connection: Connection = {
@@ -76,13 +81,13 @@ class DataOrchestrator {
 		this.connections.delete(connectionId);
 	}
 
-	subscribe<TData>(
-		eventName: DataOrchestratorEventName,
-		listener: (detail: DataOrchestratorEventDetail<TData>) => void,
+	subscribe<TEventName extends DataOrchestratorEventName>(
+		eventName: TEventName,
+		listener: (detail: DataOrchestratorEventDetail<DataOrchestratorEvents[TEventName]>) => void,
 	): () => void {
 		function handleEvent(event: Event): void {
 			if (!(event instanceof CustomEvent)) return;
-			listener(event.detail as DataOrchestratorEventDetail<TData>);
+			listener(event.detail as DataOrchestratorEventDetail<DataOrchestratorEvents[TEventName]>);
 		}
 
 		this.eventTarget.addEventListener(eventName, handleEvent);
@@ -92,9 +97,9 @@ class DataOrchestrator {
 		};
 	}
 
-	private dispatch<TData>(
-		eventName: DataOrchestratorEventName,
-		detail: DataOrchestratorEventDetail<TData>,
+	private dispatch<TEventName extends DataOrchestratorEventName>(
+		eventName: TEventName,
+		detail: DataOrchestratorEventDetail<DataOrchestratorEvents[TEventName]>,
 	): void {
 		this.eventTarget.dispatchEvent(new CustomEvent(eventName, { detail }));
 	}

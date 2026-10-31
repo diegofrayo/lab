@@ -1,13 +1,19 @@
 import {
 	dataOrchestrator,
 	type DataOrchestratorEventDetail,
+	type DataOrchestratorEvents,
 } from "../../../services/data-orchestrator.service";
 import { createOrdersDataSource } from "../../../utils/orders-faker";
 
-// Like a real socket, the payload is not trusted: consumers must validate it
-type ProductActivitySocketHandler = (data: unknown) => void;
+type ProductActivitySocketEvents = Pick<DataOrchestratorEvents, "PRODUCT_DETAILS:ORDERS">;
 
-type ProductActivitySocketEventName = "PRODUCT_ORDERS";
+type ProductActivitySocketEventName = keyof ProductActivitySocketEvents;
+
+// The payload is typed by the API contract but, like a real socket, it is not trusted: consumers
+// must validate it
+type ProductActivitySocketHandler<TEventName extends ProductActivitySocketEventName> = (
+	data: ProductActivitySocketEvents[TEventName],
+) => void;
 
 const NEW_ORDERS_INTERVAL_MS = 5000;
 
@@ -16,8 +22,10 @@ let connectionsCount = 0;
 export class ProductActivitySocket {
 	private connectionId: string;
 	private isConnected = false;
-	private handlers: Record<ProductActivitySocketEventName, Set<ProductActivitySocketHandler>> = {
-		PRODUCT_ORDERS: new Set(),
+	private handlers: {
+		[TEventName in ProductActivitySocketEventName]: Set<ProductActivitySocketHandler<TEventName>>;
+	} = {
+		"PRODUCT_DETAILS:ORDERS": new Set(),
 	};
 	private unsubscribers: Array<() => void> = [];
 
@@ -30,8 +38,8 @@ export class ProductActivitySocket {
 
 		this.isConnected = true;
 		this.unsubscribers = [
-			dataOrchestrator.subscribe<unknown>("PRODUCT_ORDERS", (detail) => {
-				this.notify("PRODUCT_ORDERS", detail);
+			dataOrchestrator.subscribe("PRODUCT_DETAILS:ORDERS", (detail) => {
+				this.notify("PRODUCT_DETAILS:ORDERS", detail);
 			}),
 		];
 
@@ -39,7 +47,7 @@ export class ProductActivitySocket {
 		dataOrchestrator.connect({
 			connectionId: this.connectionId,
 			dataSource: createOrdersDataSource(),
-			eventNames: { initialData: "PRODUCT_ORDERS", updates: "PRODUCT_ORDERS" },
+			eventNames: { initialData: "PRODUCT_DETAILS:ORDERS", updates: "PRODUCT_DETAILS:ORDERS" },
 			updateIntervalMs: NEW_ORDERS_INTERVAL_MS,
 		});
 	}
@@ -54,7 +62,10 @@ export class ProductActivitySocket {
 		dataOrchestrator.disconnect(this.connectionId);
 	}
 
-	on(eventName: ProductActivitySocketEventName, handler: ProductActivitySocketHandler): () => void {
+	on<TEventName extends ProductActivitySocketEventName>(
+		eventName: TEventName,
+		handler: ProductActivitySocketHandler<TEventName>,
+	): () => void {
 		this.handlers[eventName].add(handler);
 
 		return (): void => {
@@ -62,9 +73,9 @@ export class ProductActivitySocket {
 		};
 	}
 
-	private notify(
-		eventName: ProductActivitySocketEventName,
-		{ connectionId, data }: DataOrchestratorEventDetail<unknown>,
+	private notify<TEventName extends ProductActivitySocketEventName>(
+		eventName: TEventName,
+		{ connectionId, data }: DataOrchestratorEventDetail<ProductActivitySocketEvents[TEventName]>,
 	): void {
 		if (connectionId !== this.connectionId) return;
 		this.handlers[eventName].forEach((handler) => handler(data));

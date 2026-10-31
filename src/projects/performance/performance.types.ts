@@ -8,7 +8,7 @@ export type RawProduct = {
 	total_sales: number;
 };
 
-export type RawOrder = {
+export type RawProductOrder = {
 	id: string;
 	quantity: number;
 	price: number;

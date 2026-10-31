@@ -1,4 +1,4 @@
-import type { RawOrder } from "../performance.types";
+import type { RawProductOrder } from "../performance.types";
 import type { DataSource } from "../services/data-orchestrator.service";
 
 const BUYERS = [
@@ -24,11 +24,11 @@ const MINUTE_MS = 60 * 1000;
  * Each data source keeps its own base price, so the orders of a product have consistent prices.
  * The initial data is the order history (newest first) and each update sends only the new orders.
  */
-export function createOrdersDataSource(): DataSource<RawOrder[]> {
+export function createOrdersDataSource(): DataSource<RawProductOrder[]> {
 	const basePrice = getRandomNumber(10, 500);
 
 	return {
-		getInitialData: (): RawOrder[] => {
+		getInitialData: (): RawProductOrder[] => {
 			let dateMs = Date.now();
 
 			return Array.from({ length: INITIAL_ORDERS_COUNT }, () => {
@@ -36,7 +36,7 @@ export function createOrdersDataSource(): DataSource<RawOrder[]> {
 				return createOrder(basePrice, new Date(dateMs));
 			});
 		},
-		getUpdates: (): RawOrder[] => {
+		getUpdates: (): RawProductOrder[] => {
 			return Array.from({ length: NEW_ORDERS_COUNT }, () => createOrder(basePrice, new Date()));
 		},
 	};
@@ -44,7 +44,7 @@ export function createOrdersDataSource(): DataSource<RawOrder[]> {
 
 // --- UTILS ---
 
-function createOrder(basePrice: number, date: Date): RawOrder {
+function createOrder(basePrice: number, date: Date): RawProductOrder {
 	const quantity = getRandomInteger(1, 10);
 	const price = roundToCents(basePrice * getRandomNumber(0.95, 1.05));
 

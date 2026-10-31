@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import type { RawProduct } from "../../../performance.types";
 import { ProductsSocket } from "../services/products-socket.service";
 import { parseProducts, type Product } from "../utils/products-parser";
 import { getProductsTrends, type ProductsTrends } from "../utils/products-trends";
@@ -22,7 +23,7 @@ export function useProductsSocket(): UseProductsSocketReturn {
 	useEffect(function connectToProductsSocket() {
 		const socket = new ProductsSocket();
 
-		function handleInitialData(data: unknown): void {
+		function handleInitialData(data: RawProduct[]): void {
 			const products = parseProducts(data);
 			if (!products) return;
 
@@ -30,7 +31,7 @@ export function useProductsSocket(): UseProductsSocketReturn {
 			setIsConnected(true);
 		}
 
-		function handleUpdates(data: unknown): void {
+		function handleUpdates(data: RawProduct[]): void {
 			const products = parseProducts(data);
 			if (!products) return;
 
@@ -40,8 +41,8 @@ export function useProductsSocket(): UseProductsSocketReturn {
 			}));
 		}
 
-		const unsubscribeInitialData = socket.on("FETCH_INITIAL_DATA", handleInitialData);
-		const unsubscribeUpdates = socket.on("GET_UPDATES", handleUpdates);
+		const unsubscribeInitialData = socket.on("PRODUCTS:INITIAL_LIST", handleInitialData);
+		const unsubscribeUpdates = socket.on("PRODUCTS:LIST_UPDATES", handleUpdates);
 
 		socket.connect();
 

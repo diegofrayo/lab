@@ -1,22 +1,33 @@
 import {
 	dataOrchestrator,
 	type DataOrchestratorEventDetail,
+	type DataOrchestratorEvents,
 } from "../../../services/data-orchestrator.service";
 import { createProducts, updateProducts } from "../../../utils/products-faker";
 
-// Like a real socket, the payload is not trusted: consumers must validate it
-type ProductsSocketHandler = (data: unknown) => void;
+type ProductsSocketEvents = Pick<
+	DataOrchestratorEvents,
+	"PRODUCTS:INITIAL_LIST" | "PRODUCTS:LIST_UPDATES"
+>;
 
-type ProductsSocketEventName = "FETCH_INITIAL_DATA" | "GET_UPDATES";
+type ProductsSocketEventName = keyof ProductsSocketEvents;
+
+// The payload is typed by the API contract but, like a real socket, it is not trusted: consumers
+// must validate it
+type ProductsSocketHandler<TEventName extends ProductsSocketEventName> = (
+	data: ProductsSocketEvents[TEventName],
+) => void;
 
 let connectionsCount = 0;
 
 export class ProductsSocket {
 	private connectionId = `products-socket-${++connectionsCount}`;
 	private isConnected = false;
-	private handlers: Record<ProductsSocketEventName, Set<ProductsSocketHandler>> = {
-		FETCH_INITIAL_DATA: new Set(),
-		GET_UPDATES: new Set(),
+	private handlers: {
+		[TEventName in ProductsSocketEventName]: Set<ProductsSocketHandler<TEventName>>;
+	} = {
+		"PRODUCTS:INITIAL_LIST": new Set(),
+		"PRODUCTS:LIST_UPDATES": new Set(),
 	};
 	private unsubscribers: Array<() => void> = [];
 
@@ -25,11 +36,11 @@ export class ProductsSocket {
 
 		this.isConnected = true;
 		this.unsubscribers = [
-			dataOrchestrator.subscribe<unknown>("FETCH_INITIAL_DATA", (detail) => {
-				this.notify("FETCH_INITIAL_DATA", detail);
+			dataOrchestrator.subscribe("PRODUCTS:INITIAL_LIST", (detail) => {
+				this.notify("PRODUCTS:INITIAL_LIST", detail);
 			}),
-			dataOrchestrator.subscribe<unknown>("GET_UPDATES", (detail) => {
-				this.notify("GET_UPDATES", detail);
+			dataOrchestrator.subscribe("PRODUCTS:LIST_UPDATES", (detail) => {
+				this.notify("PRODUCTS:LIST_UPDATES", detail);
 			}),
 		];
 
@@ -39,6 +50,7 @@ export class ProductsSocket {
 				getInitialData: createProducts,
 				getUpdates: updateProducts,
 			},
+			eventNames: { initialData: "PRODUCTS:INITIAL_LIST", updates: "PRODUCTS:LIST_UPDATES" },
 		});
 	}
 
@@ -52,7 +64,10 @@ export class ProductsSocket {
 		dataOrchestrator.disconnect(this.connectionId);
 	}
 
-	on(eventName: ProductsSocketEventName, handler: ProductsSocketHandler): () => void {
+	on<TEventName extends ProductsSocketEventName>(
+		eventName: TEventName,
+		handler: ProductsSocketHandler<TEventName>,
+	): () => void {
 		this.handlers[eventName].add(handler);
 
 		return (): void => {
@@ -60,9 +75,9 @@ export class ProductsSocket {
 		};
 	}
 
-	private notify(
-		eventName: ProductsSocketEventName,
-		{ connectionId, data }: DataOrchestratorEventDetail<unknown>,
+	private notify<TEventName extends ProductsSocketEventName>(
+		eventName: TEventName,
+		{ connectionId, data }: DataOrchestratorEventDetail<ProductsSocketEvents[TEventName]>,
 	): void {
 		if (connectionId !== this.connectionId) return;
 		this.handlers[eventName].forEach((handler) => handler(data));

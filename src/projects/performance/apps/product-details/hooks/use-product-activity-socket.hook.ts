@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import type { RawProductOrder } from "../../../performance.types";
 import { ProductActivitySocket } from "../services/product-activity-socket.service";
 import { parseOrders, type Order } from "../utils/orders-parser";
 
@@ -22,7 +23,7 @@ export function useProductActivitySocket(productId: string): UseProductActivityS
 		function connectToProductActivitySocket() {
 			const socket = new ProductActivitySocket(productId);
 
-			function handleOrders(data: unknown): void {
+			function handleOrders(data: RawProductOrder[]): void {
 				const newOrders = parseOrders(data);
 				if (!newOrders) return;
 
@@ -31,7 +32,7 @@ export function useProductActivitySocket(productId: string): UseProductActivityS
 				setIsConnected(true);
 			}
 
-			const unsubscribeOrders = socket.on("PRODUCT_ORDERS", handleOrders);
+			const unsubscribeOrders = socket.on("PRODUCT_DETAILS:ORDERS", handleOrders);
 
 			socket.connect();
 
