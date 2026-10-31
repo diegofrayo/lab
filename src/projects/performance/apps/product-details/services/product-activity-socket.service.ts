@@ -21,6 +21,8 @@ let connectionsCount = 0;
 
 export class ProductActivitySocket {
 	private connectionId: string;
+	// Created once, so reconnecting keeps the prices of the product
+	private dataSource = createOrdersDataSource();
 	private isConnected = false;
 	private handlers: {
 		[TEventName in ProductActivitySocketEventName]: Set<ProductActivitySocketHandler<TEventName>>;
@@ -46,7 +48,7 @@ export class ProductActivitySocket {
 		// The order history and the new orders arrive through the same event
 		dataOrchestrator.connect({
 			connectionId: this.connectionId,
-			dataSource: createOrdersDataSource(),
+			dataSource: this.dataSource,
 			eventNames: { initialData: "PRODUCT_DETAILS:ORDERS", updates: "PRODUCT_DETAILS:ORDERS" },
 			updateIntervalMs: NEW_ORDERS_INTERVAL_MS,
 		});

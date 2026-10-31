@@ -30,6 +30,8 @@ export type AppParams = Record<string, string>;
 
 export type AppProps = {
 	params: AppParams;
+	// Minimized apps stay mounted (to keep their state) but must stop their background work (e.g. sockets)
+	isMinimized: boolean;
 };
 
 export type AppsRepository = Record<string, AppConfig>;

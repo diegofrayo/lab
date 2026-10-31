@@ -19,7 +19,7 @@ type WindowProps = {
 	children: ReactNode;
 };
 
-function Window({ openedApp, children }: WindowProps): JSX.Element | null {
+function Window({ openedApp, children }: WindowProps): JSX.Element {
 	// --- HOOKS ---
 	const { closeApp, minimizeApp, maximizeApp, restoreApp, focusApp } = useDesktop();
 	const { containerRef, startDrag } = useWindowDrag({
@@ -30,6 +30,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	// --- COMPUTED STATES ---
 	const { id, appConfig, windowConfig, isFocused, status } = openedApp;
 	const isMaximized = status === "MAXIMIZED";
+	const isMinimized = status === "MINIMIZED";
 	const isResizable = (appConfig.isResizable ?? true) && !isMaximized;
 	const minWindowSize = getMinWindowSize(appConfig);
 	const title = getWindowTitle(openedApp);
@@ -37,8 +38,9 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 	// --- STYLES ---
 	const classes = {
 		container: cn(
-			"pointer-events-auto absolute flex flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow",
+			"pointer-events-auto absolute flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow",
 			isFocused ? "z-50 shadow-black/30" : "z-10 shadow-black/10",
+			isMinimized ? "hidden" : "flex",
 		),
 		titleBar: cn(
 			"flex items-center justify-between px-3 py-2 select-none",
@@ -57,7 +59,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 		btnMaximize: cn(
 			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-green-500 hover:bg-green-600 focus:outline-none",
 		),
-		content: cn("flex-1 overflow-auto bg-white p-4"),
+		content: cn("relative flex-1 overflow-auto bg-white p-4"),
 	};
 
 	// --- HANDLERS ---
@@ -109,8 +111,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element | null {
 		};
 	}
 
-	if (status === "MINIMIZED") return null;
-
+	// A minimized window is hidden instead of unmounted, so its app keeps its state
 	return (
 		<div
 			ref={containerRef}

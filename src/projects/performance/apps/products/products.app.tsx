@@ -4,7 +4,10 @@ import type { JSX } from "react";
 
 import cn from "@diegofrayo-pkg/cn";
 
+import WindowLoader from "../../desktop/components/window-loader";
 import { useDesktop } from "../../desktop/context/desktop.hook";
+import type { AppProps } from "../../desktop/desktop.types";
+import { SOCKET_STATUS_LABELS } from "../../utils/socket-status-labels";
 import ProductRow from "./components/product-row";
 import VirtualList from "./components/virtual-list";
 import { useProductsSocket } from "./hooks/use-products-socket.hook";
@@ -12,9 +15,9 @@ import type { Product } from "./utils/products-parser";
 
 const PRODUCT_ROW_HEIGHT = 72;
 
-function ProductsApp(): JSX.Element {
+function ProductsApp({ isMinimized }: AppProps): JSX.Element {
 	// --- HOOKS ---
-	const { products, trends, isConnected } = useProductsSocket();
+	const { products, trends, status } = useProductsSocket({ isPaused: isMinimized });
 	const { openApp } = useDesktop();
 
 	// --- STYLES ---
@@ -24,7 +27,7 @@ function ProductsApp(): JSX.Element {
 		title: cn("text-2xl font-semibold text-gray-800"),
 		status: cn(
 			"rounded-full px-2 py-0.5 text-xs font-medium",
-			isConnected ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600",
+			status === "LIVE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600",
 		),
 		list: cn("min-h-0 flex-1"),
 	};
@@ -53,7 +56,7 @@ function ProductsApp(): JSX.Element {
 		<section className={classes.container}>
 			<header className={classes.header}>
 				<h1 className={classes.title}>List of Products</h1>
-				<span className={classes.status}>{isConnected ? "Live" : "Connecting…"}</span>
+				<span className={classes.status}>{SOCKET_STATUS_LABELS[status]}</span>
 			</header>
 			<div className={classes.list}>
 				<VirtualList
@@ -63,6 +66,7 @@ function ProductsApp(): JSX.Element {
 					renderItem={renderProduct}
 				/>
 			</div>
+			{status === "RECONNECTING" && <WindowLoader text="Refreshing data" />}
 		</section>
 	);
 }
