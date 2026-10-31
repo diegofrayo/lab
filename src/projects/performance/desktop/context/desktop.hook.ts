@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { use } from "react";
 
 import {
 	DesktopActionsContext,
@@ -10,7 +10,7 @@ import {
 } from "./desktop.contexts";
 
 export function useDesktopState(): DesktopState {
-	const context = useContext(DesktopStateContext);
+	const context = use(DesktopStateContext);
 
 	if (!context) {
 		throw new Error("useDesktopState must be used within a DesktopProvider");
@@ -20,7 +20,7 @@ export function useDesktopState(): DesktopState {
 }
 
 export function useDesktopActions(): DesktopActions {
-	const context = useContext(DesktopActionsContext);
+	const context = use(DesktopActionsContext);
 
 	if (!context) {
 		throw new Error("useDesktopActions must be used within a DesktopProvider");
