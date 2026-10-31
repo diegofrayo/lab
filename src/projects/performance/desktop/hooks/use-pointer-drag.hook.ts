@@ -10,6 +10,8 @@ type PointerDragMove<TStart> = {
 
 type UsePointerDragParams<TStart> = {
 	onMove: (move: PointerDragMove<TStart>) => void;
+	// Called on `mouseup`, not when the drag is cut short by an unmount
+	onEnd?: () => void;
 };
 
 type UsePointerDragReturn<TStart> = {
@@ -23,12 +25,15 @@ type UsePointerDragReturn<TStart> = {
  */
 export function usePointerDrag<TStart>({
 	onMove,
+	onEnd,
 }: UsePointerDragParams<TStart>): UsePointerDragReturn<TStart> {
 	const onMoveRef = useRef(onMove);
+	const onEndRef = useRef(onEnd);
 	const stopDragRef = useRef<(() => void) | null>(null);
 
-	useEffect(function updateOnMoveRef() {
+	useEffect(function updateCallbackRefs() {
 		onMoveRef.current = onMove;
+		onEndRef.current = onEnd;
 	});
 
 	useEffect(function stopDragOnUnmount() {
@@ -51,14 +56,19 @@ export function usePointerDrag<TStart>({
 			});
 		}
 
+		function handleMouseUp(): void {
+			stopDrag();
+			onEndRef.current?.();
+		}
+
 		function stopDrag(): void {
 			document.removeEventListener("mousemove", handleMouseMove);
-			document.removeEventListener("mouseup", stopDrag);
+			document.removeEventListener("mouseup", handleMouseUp);
 			stopDragRef.current = null;
 		}
 
 		document.addEventListener("mousemove", handleMouseMove);
-		document.addEventListener("mouseup", stopDrag);
+		document.addEventListener("mouseup", handleMouseUp);
 		stopDragRef.current = stopDrag;
 	}
 
