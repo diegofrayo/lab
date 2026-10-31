@@ -2,9 +2,9 @@
 
 import type { JSX } from "react";
 import { Toaster } from "sonner";
+import { useIsClient } from "usehooks-ts";
 
-import cn from "@diegofrayo-pkg/cn";
-import { useIsClient } from "@diegofrayo-pkg/hooks";
+import cn from "~/lib/cn";
 
 import FormProvider from "../context/form.context";
 import type { FormScope, StepNumber } from "../utils/types";

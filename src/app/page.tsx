@@ -2,9 +2,8 @@ import type { JSX } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import cn from "@diegofrayo-pkg/cn";
-
 import { SUBPROJECTS } from "~/constants";
+import cn from "~/lib/cn";
 import { isProdEnvironment } from "~/utils/environment";
 
 export default function Page(): JSX.Element {

@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 import WindowLoader from "../../desktop/components/window-loader";
 import { useDesktop } from "../../desktop/context/desktop.hook";

@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 import type { FieldStatus } from "../../utils/types";
 

@@ -4,7 +4,7 @@ import { useRef, type ReactNode } from "react";
 import type { JSX } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 /**
  * The only place that knows about TanStack Virtual. Consumers pass plain items and a render

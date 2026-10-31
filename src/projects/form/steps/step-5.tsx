@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 import Button from "../components/primitive/button";
 import { useMultiStepForm } from "../context/form.hook";

@@ -3,7 +3,7 @@
 import { forwardRef } from "react";
 import { Button as LibraryButton } from "@base-ui/react/button";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 type ButtonProps = React.ComponentPropsWithoutRef<"button">;
 

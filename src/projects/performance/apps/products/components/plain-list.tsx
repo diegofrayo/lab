@@ -1,6 +1,6 @@
 import type { JSX, ReactNode } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 /**
  * Renders all the items at once. It has the same API as `VirtualList`, so both can be swapped to

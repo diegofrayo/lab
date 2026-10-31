@@ -2,7 +2,7 @@
 
 import type { JSX } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { AppConfig, AppIdWithoutParams } from "../desktop.types";

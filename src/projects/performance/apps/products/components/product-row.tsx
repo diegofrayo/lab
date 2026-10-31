@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 import type { Product } from "../utils/products-parser";
 import type { ProductTrends, Trend } from "../utils/products-trends";

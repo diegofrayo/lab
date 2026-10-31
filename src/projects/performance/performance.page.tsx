@@ -1,8 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
-
-import { useIsClient } from "@diegofrayo-pkg/hooks";
+import { useIsClient } from "usehooks-ts";
 
 import { Desktop, DesktopProvider } from "./desktop";
 

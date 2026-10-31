@@ -3,7 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import type { JSX } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 import { MIN_UPDATE_INTERVAL_MS } from "../../services/data-orchestrator.service";
 import { useDataOrchestratorSettings } from "./hooks/use-data-orchestrator-settings.hook";

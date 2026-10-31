@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import type { CSSProperties, JSX } from "react";
 
-import cn from "@diegofrayo-pkg/cn";
+import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
