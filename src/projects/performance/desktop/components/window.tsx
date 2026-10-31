@@ -7,6 +7,7 @@ import cn from "~/lib/cn";
 
 import { useDesktop } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
+import { usePointerDrag } from "../hooks/use-pointer-drag.hook";
 import { useWindowDrag } from "../hooks/use-window-drag.hook";
 import { getTaskbarButtonId } from "../utils/taskbar-button-id";
 import { getMinWindowSize } from "../utils/window-size";
@@ -14,6 +15,12 @@ import { getWindowTitle } from "../utils/window-title";
 import WindowIcon from "./window-icon";
 
 type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
+
+type ResizeStart = {
+	direction: ResizeDirection;
+	width: number;
+	height: number;
+};
 
 type WindowProps = {
 	openedApp: OpenedApp;
@@ -221,10 +228,18 @@ function WindowResizeHandles({
 }: WindowResizeHandlesProps): JSX.Element {
 	// --- HOOKS ---
 	const { focusApp, resizeWindow } = useDesktop();
+	const { startPointerDrag } = usePointerDrag<ResizeStart>({
+		onMove: ({ deltaX, deltaY, start }) => {
+			const canResizeWidth = start.direction !== "BOTTOM";
+			const canResizeHeight = start.direction !== "RIGHT";
 
-	// --- STATES & REFS ---
-	const resizeDirection = useRef<ResizeDirection | null>(null);
-	const resizeStart = useRef({ mouseX: 0, mouseY: 0, width: 0, height: 0 });
+			resizeWindow(
+				appId,
+				canResizeWidth ? Math.max(minWidth, start.width + deltaX) : start.width,
+				canResizeHeight ? Math.max(minHeight, start.height + deltaY) : start.height,
+			);
+		},
+	});
 
 	// --- STYLES ---
 	const classes = {
@@ -236,42 +251,13 @@ function WindowResizeHandles({
 	// --- HANDLERS ---
 	function handleHandleMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
 		e.preventDefault();
-		resizeDirection.current = e.currentTarget.dataset["direction"] as ResizeDirection;
-		resizeStart.current = { mouseX: e.clientX, mouseY: e.clientY, width, height };
+		startPointerDrag(e, {
+			direction: e.currentTarget.dataset["direction"] as ResizeDirection,
+			width,
+			height,
+		});
 		focusApp(appId);
 	}
-
-	// --- EFFECTS ---
-	useEffect(
-		function setupResizeListeners() {
-			function handleMouseMove(e: MouseEvent): void {
-				if (!resizeDirection.current) return;
-
-				const start = resizeStart.current;
-				const canResizeWidth = resizeDirection.current !== "BOTTOM";
-				const canResizeHeight = resizeDirection.current !== "RIGHT";
-
-				resizeWindow(
-					appId,
-					canResizeWidth ? Math.max(minWidth, start.width + e.clientX - start.mouseX) : start.width,
-					canResizeHeight ? Math.max(minHeight, start.height + e.clientY - start.mouseY) : start.height,
-				);
-			}
-
-			function handleMouseUp(): void {
-				resizeDirection.current = null;
-			}
-
-			document.addEventListener("mousemove", handleMouseMove);
-			document.addEventListener("mouseup", handleMouseUp);
-
-			return (): void => {
-				document.removeEventListener("mousemove", handleMouseMove);
-				document.removeEventListener("mouseup", handleMouseUp);
-			};
-		},
-		[appId, minWidth, minHeight, resizeWindow],
-	);
 
 	return (
 		<>
