@@ -4,7 +4,7 @@ import type { JSX } from "react";
 
 import cn from "~/lib/cn";
 
-import { useDesktop } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hook";
 import type { AppConfig, AppIdWithoutParams } from "../desktop.types";
 
 type DesktopIconProps = {
@@ -13,7 +13,7 @@ type DesktopIconProps = {
 
 function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 	// --- HOOKS ---
-	const { openApp } = useDesktop();
+	const { openApp } = useDesktopActions();
 
 	// --- STYLES ---
 	const classes = {

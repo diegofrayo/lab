@@ -8,7 +8,7 @@ Overall the code is in good shape. Socket payloads are validated with zod at the
 
 **Summary:** 1 rancid, 8 funky (3 of them cross-file duplication) and 5 whiffs across 13 files.
 
-**Status:** 12 of 14 solved (#1, #3, #4, #5, #6, #7, #8 and the 5 whiffs). #2 is pending. Escape handling from #3 is left out on purpose, and #9 is skipped.
+**Status:** 13 of 14 solved (#1 to #8 and the 5 whiffs). Escape handling from #3 is left out on purpose, and #9 is skipped.
 
 The biggest wins:
 
@@ -31,7 +31,7 @@ The biggest wins:
 
 ## Funky
 
-### 2. Desktop context re-renders every consumer on each drag frame
+### 2. Desktop context re-renders every consumer on each drag frame ✅
 
 `context-structure` (state and data flow)
 

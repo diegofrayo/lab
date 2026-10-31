@@ -2,7 +2,7 @@
 
 import { useRef, type MouseEvent as ReactMouseEvent, type RefObject } from "react";
 
-import { useDesktop } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 import { usePointerDrag } from "./use-pointer-drag.hook";
 
@@ -31,7 +31,7 @@ type UseWindowDragReturn = {
  * of the window must stay visible.
  */
 export function useWindowDrag({ appId, windowConfig }: UseWindowDragParams): UseWindowDragReturn {
-	const { moveWindow } = useDesktop();
+	const { moveWindow } = useDesktopActions();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { startPointerDrag } = usePointerDrag<DragStart>({
 		onMove: ({ deltaX, deltaY, start }) => {

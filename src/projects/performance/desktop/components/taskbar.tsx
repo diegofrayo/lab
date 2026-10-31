@@ -4,7 +4,7 @@ import type { JSX } from "react";
 
 import cn from "~/lib/cn";
 
-import { useDesktop } from "../context/desktop.hook";
+import { useDesktopActions, useDesktopState } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 import { getTaskbarButtonId } from "../utils/taskbar-button-id";
 import { getWindowTitle } from "../utils/window-title";
@@ -12,7 +12,7 @@ import WindowIcon from "./window-icon";
 
 function Taskbar(): JSX.Element {
 	// --- HOOKS ---
-	const { openedApps } = useDesktop();
+	const { openedApps } = useDesktopState();
 
 	// --- STYLES ---
 	const classes = {
@@ -48,7 +48,7 @@ type TaskbarButtonProps = {
 
 function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 	// --- HOOKS ---
-	const { minimizeApp, restoreApp, focusApp } = useDesktop();
+	const { minimizeApp, restoreApp, focusApp } = useDesktopActions();
 
 	// --- COMPUTED STATES ---
 	const title = getWindowTitle(openedApp);

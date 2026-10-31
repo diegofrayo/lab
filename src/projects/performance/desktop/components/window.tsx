@@ -4,7 +4,7 @@ import type { CSSProperties, JSX, ReactNode } from "react";
 
 import cn from "~/lib/cn";
 
-import { useDesktop } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hook";
 import type { OpenedApp } from "../desktop.types";
 import { usePointerDrag } from "../hooks/use-pointer-drag.hook";
 import { useWindowDrag } from "../hooks/use-window-drag.hook";
@@ -30,7 +30,7 @@ type WindowProps = {
 
 function Window({ openedApp, children }: WindowProps): JSX.Element {
 	// --- HOOKS ---
-	const { closeApp, minimizeApp, maximizeApp, restoreApp, focusApp } = useDesktop();
+	const { closeApp, minimizeApp, maximizeApp, restoreApp, focusApp } = useDesktopActions();
 	const { containerRef, startDrag } = useWindowDrag({
 		appId: openedApp.id,
 		windowConfig: openedApp.windowConfig,
@@ -212,7 +212,7 @@ function WindowResizeHandles({
 	minHeight,
 }: WindowResizeHandlesProps): JSX.Element {
 	// --- HOOKS ---
-	const { focusApp, resizeWindow } = useDesktop();
+	const { focusApp, resizeWindow } = useDesktopActions();
 	const { startPointerDrag } = usePointerDrag<ResizeStart>({
 		onMove: ({ deltaX, deltaY, start }) => {
 			const canResizeWidth = start.direction !== "BOTTOM";

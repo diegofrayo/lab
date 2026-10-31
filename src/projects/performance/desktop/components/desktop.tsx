@@ -6,7 +6,7 @@ import cn from "~/lib/cn";
 import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
-import { useDesktop } from "../context/desktop.hook";
+import { useDesktopState } from "../context/desktop.hook";
 import type { AppConfig, AppIdWithoutParams, AppProps } from "../desktop.types";
 import DesktopIcon from "./desktop-icon";
 import Taskbar from "./taskbar";
@@ -14,7 +14,7 @@ import Window from "./window";
 
 function Desktop(): JSX.Element {
 	// --- HOOKS ---
-	const { openedApps } = useDesktop();
+	const { openedApps } = useDesktopState();
 
 	// --- STYLES ---
 	const classes = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useState, type ReactNode } from "react";
+import { createContext, useCallback, useMemo, useState, type ReactNode } from "react";
 import type { JSX } from "react";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
@@ -9,7 +9,11 @@ import { usePersistOpenedApps } from "../hooks/use-persist-opened-apps.hook";
 import { readOpenedApps } from "../utils/opened-apps-storage";
 import { getInitialWindowSize } from "../utils/window-size";
 
-export const DesktopContext = createContext<DesktopContextValue | null>(null);
+// The state and the actions live in separate contexts, so the components that only call actions
+// don't re-render when the opened apps change (e.g. on every frame of a window drag).
+// Every action is a stable callback, so the actions value is created only once
+export const DesktopStateContext = createContext<DesktopState | null>(null);
+export const DesktopActionsContext = createContext<DesktopActions | null>(null);
 
 type DesktopProviderProps = {
 	children: ReactNode;
@@ -135,64 +139,43 @@ export function DesktopProvider({ children }: DesktopProviderProps): JSX.Element
 	}, []);
 
 	const moveWindow = useCallback((targetAppId: string, x: number, y: number): void => {
-		setOpenedApps((prev) => {
-			if (!prev[targetAppId]) return prev;
-
-			return {
-				...prev,
-				[targetAppId]: {
-					...prev[targetAppId],
-					windowConfig: {
-						...prev[targetAppId].windowConfig,
-						x,
-						y,
-					},
-				},
-			};
-		});
+		setOpenedApps((prev) => updateWindowConfig(prev, targetAppId, { x, y }));
 	}, []);
 
 	const resizeWindow = useCallback((targetAppId: string, width: number, height: number): void => {
-		setOpenedApps((prev) => {
-			if (!prev[targetAppId]) return prev;
-
-			return {
-				...prev,
-				[targetAppId]: {
-					...prev[targetAppId],
-					windowConfig: {
-						...prev[targetAppId].windowConfig,
-						width,
-						height,
-					},
-				},
-			};
-		});
+		setOpenedApps((prev) => updateWindowConfig(prev, targetAppId, { width, height }));
 	}, []);
 
+	const state = useMemo<DesktopState>(() => ({ openedApps }), [openedApps]);
+
+	const actions = useMemo<DesktopActions>(
+		() => ({
+			openApp,
+			closeApp,
+			maximizeApp,
+			restoreApp,
+			minimizeApp,
+			focusApp,
+			moveWindow,
+			resizeWindow,
+		}),
+		[openApp, closeApp, maximizeApp, restoreApp, minimizeApp, focusApp, moveWindow, resizeWindow],
+	);
+
 	return (
-		<DesktopContext.Provider
-			value={{
-				openedApps,
-				openApp,
-				closeApp,
-				maximizeApp,
-				restoreApp,
-				minimizeApp,
-				focusApp,
-				moveWindow,
-				resizeWindow,
-			}}
-		>
-			{children}
-		</DesktopContext.Provider>
+		<DesktopActionsContext.Provider value={actions}>
+			<DesktopStateContext.Provider value={state}>{children}</DesktopStateContext.Provider>
+		</DesktopActionsContext.Provider>
 	);
 }
 
 // --- TYPES ---
 
-export type DesktopContextValue = {
+export type DesktopState = {
 	openedApps: OpenedApps;
+};
+
+export type DesktopActions = {
 	openApp: (openAppParams: OpenAppParams) => void;
 	closeApp: (targetAppId: string) => void;
 	maximizeApp: (targetAppId: string) => void;
@@ -229,4 +212,23 @@ function unfocusAllApps(apps: OpenedApps): OpenedApps {
 			return [appId, { ...appConfig, isFocused: false }];
 		}),
 	);
+}
+
+function updateWindowConfig(
+	apps: OpenedApps,
+	targetAppId: string,
+	windowConfig: Partial<OpenedApp["windowConfig"]>,
+): OpenedApps {
+	if (!apps[targetAppId]) return apps;
+
+	return {
+		...apps,
+		[targetAppId]: {
+			...apps[targetAppId],
+			windowConfig: {
+				...apps[targetAppId].windowConfig,
+				...windowConfig,
+			},
+		},
+	};
 }
