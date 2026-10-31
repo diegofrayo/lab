@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import type { RawProduct, SocketStatus } from "../../../performance.types";
-import { ProductsSocket } from "../services/products-socket.service";
+import { createProductsSocket } from "../services/products-socket.service";
 import { parseProducts, type Product } from "../utils/products-parser";
 import { getProductsTrends, type ProductsTrends } from "../utils/products-trends";
 
@@ -29,7 +29,7 @@ export function useProductsSocket({ isPaused }: UseProductsSocketParams): UsePro
 		function connectToProductsSocket() {
 			if (isPaused) return;
 
-			const socket = new ProductsSocket();
+			const socket = createProductsSocket();
 
 			function handleInitialData(data: RawProduct[]): void {
 				const products = parseProducts(data);

@@ -8,7 +8,7 @@ Overall the code is in good shape. Socket payloads are validated with zod at the
 
 **Summary:** 1 rancid, 8 funky (3 of them cross-file duplication) and 5 whiffs across 13 files.
 
-**Status:** 5 of 14 solved (#1, #3, #4, #5, #6). Escape handling from #3 is left out on purpose.
+**Status:** 6 of 14 solved (#1, #3, #4, #5, #6, #7). Escape handling from #3 is left out on purpose.
 
 The biggest wins:
 
@@ -104,7 +104,7 @@ The biggest wins:
 
 ## Cross-file duplication
 
-### 7. The two socket classes are the same class
+### 7. The two socket classes are the same class ✅
 
 `duplicate-implementation` (Funky)
 
