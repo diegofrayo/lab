@@ -43,13 +43,13 @@ function DataOrchestratorApp(): JSX.Element {
 	}
 
 	return (
-		<section className={dataOrchestratorClasses.container}>
-			<h1 className={dataOrchestratorClasses.title}>Data Orchestrator</h1>
-			<div className={dataOrchestratorClasses.field}>
-				<label className={dataOrchestratorClasses.checkboxLabel}>
+		<section className={dataOrchestratorAppStyles.container}>
+			<h1 className={dataOrchestratorAppStyles.title}>Data Orchestrator</h1>
+			<div className={dataOrchestratorAppStyles.field}>
+				<label className={dataOrchestratorAppStyles.checkboxLabel}>
 					<input
 						type="checkbox"
-						className={dataOrchestratorClasses.checkbox}
+						className={dataOrchestratorAppStyles.checkbox}
 						checked={settings.isDispatchingUpdates}
 						aria-describedby={DISPATCHING_UPDATES_HINT_ID}
 						onChange={handleDispatchingUpdatesChange}
@@ -58,26 +58,26 @@ function DataOrchestratorApp(): JSX.Element {
 				</label>
 				<p
 					id={DISPATCHING_UPDATES_HINT_ID}
-					className={dataOrchestratorClasses.hint}
+					className={dataOrchestratorAppStyles.hint}
 				>
 					While stopped, the connections only receive their initial data.
 				</p>
 			</div>
 			<form
-				className={dataOrchestratorClasses.field}
+				className={dataOrchestratorAppStyles.field}
 				onSubmit={handleIntervalSubmit}
 			>
 				<label
 					htmlFor="data-orchestrator-update-interval"
-					className={dataOrchestratorClasses.label}
+					className={dataOrchestratorAppStyles.label}
 				>
 					Default update interval (ms)
 				</label>
-				<div className={dataOrchestratorClasses.intervalRow}>
+				<div className={dataOrchestratorAppStyles.intervalRow}>
 					<input
 						id="data-orchestrator-update-interval"
 						type="number"
-						className={dataOrchestratorClasses.input}
+						className={dataOrchestratorAppStyles.input}
 						min={MIN_UPDATE_INTERVAL_MS}
 						step={100}
 						value={intervalDraft}
@@ -87,7 +87,7 @@ function DataOrchestratorApp(): JSX.Element {
 					/>
 					<button
 						type="submit"
-						className={dataOrchestratorClasses.button}
+						className={dataOrchestratorAppStyles.button}
 						disabled={isApplyDisabled}
 					>
 						Apply
@@ -98,11 +98,11 @@ function DataOrchestratorApp(): JSX.Element {
 					isIntervalValid={isIntervalValid}
 				/>
 			</form>
-			<div className={dataOrchestratorClasses.field}>
-				<label className={dataOrchestratorClasses.checkboxLabel}>
+			<div className={dataOrchestratorAppStyles.field}>
+				<label className={dataOrchestratorAppStyles.checkboxLabel}>
 					<input
 						type="checkbox"
-						className={dataOrchestratorClasses.checkbox}
+						className={dataOrchestratorAppStyles.checkbox}
 						checked={settings.isVirtualizingProducts}
 						aria-describedby={VIRTUALIZING_PRODUCTS_HINT_ID}
 						onChange={handleVirtualizingProductsChange}
@@ -111,7 +111,7 @@ function DataOrchestratorApp(): JSX.Element {
 				</label>
 				<p
 					id={VIRTUALIZING_PRODUCTS_HINT_ID}
-					className={dataOrchestratorClasses.hint}
+					className={dataOrchestratorAppStyles.hint}
 				>
 					While disabled, all the product rows are rendered at once.
 				</p>
@@ -122,7 +122,7 @@ function DataOrchestratorApp(): JSX.Element {
 
 // --- STYLES ---
 
-const dataOrchestratorClasses = {
+const dataOrchestratorAppStyles = {
 	container: cn("flex flex-col gap-5"),
 	title: cn("text-2xl font-semibold text-gray-800"),
 	field: cn("flex flex-col gap-1"),
@@ -149,6 +149,8 @@ const VIRTUALIZING_PRODUCTS_HINT_ID = "data-orchestrator-virtualizing-products-h
 
 // --- COMPONENTS ---
 
+// => IntervalHint <=
+
 type IntervalHintProps = {
 	id: string;
 	isIntervalValid: boolean;
@@ -156,12 +158,12 @@ type IntervalHintProps = {
 
 function IntervalHint({ id, isIntervalValid }: IntervalHintProps): JSX.Element {
 	// --- STYLES ---
-	const classes = getClasses({ isIntervalValid });
+	const styles = intervalHintStyles({ isIntervalValid });
 
 	return (
 		<p
 			id={id}
-			className={classes.hint}
+			className={styles.hint}
 		>
 			{isIntervalValid
 				? "Used by all the connections."
@@ -170,16 +172,7 @@ function IntervalHint({ id, isIntervalValid }: IntervalHintProps): JSX.Element {
 	);
 }
 
-// --- STYLES ---
-
-type GetClassesParams = {
-	isIntervalValid: boolean;
-};
-
-function getClasses({ isIntervalValid }: GetClassesParams) {
-	const classes = {
+const intervalHintStyles = ({ isIntervalValid }: { isIntervalValid: boolean }) =>
+	({
 		hint: cn("text-xs", isIntervalValid ? "text-gray-500" : "text-red-600"),
-	};
-
-	return classes;
-}
+	}) as const;

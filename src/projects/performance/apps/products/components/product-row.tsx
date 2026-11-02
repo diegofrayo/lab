@@ -23,24 +23,24 @@ function ProductRow({ product, trends, onSelect }: ProductRowProps): JSX.Element
 	}
 
 	return (
-		<article className={productRowClasses.container}>
+		<article className={productRowStyles.container}>
 			<img
-				className={productRowClasses.photo}
+				className={productRowStyles.photo}
 				src={product.photo}
 				// Decorative: the product name is the button right next to it
 				alt=""
 				loading="lazy"
 			/>
-			<h2 className={productRowClasses.name}>
+			<h2 className={productRowStyles.name}>
 				<button
 					type="button"
-					className={productRowClasses.nameButton}
+					className={productRowStyles.nameButton}
 					onClick={handleNameClick}
 				>
 					{product.name}
 				</button>
 			</h2>
-			<dl className={productRowClasses.metrics}>
+			<dl className={productRowStyles.metrics}>
 				<ProductMetric
 					label="Price"
 					value={formatCurrency(product.price)}
@@ -68,7 +68,7 @@ function ProductRow({ product, trends, onSelect }: ProductRowProps): JSX.Element
 
 // --- STYLES ---
 
-const productRowClasses = {
+const productRowStyles = {
 	container: cn("relative flex h-18 items-center gap-3 border-b border-gray-200 px-2 hover:bg-gray-50"),
 	photo: cn("h-12 w-12 shrink-0 rounded object-cover"),
 	name: cn("min-w-0 flex-1 truncate text-sm font-medium text-gray-800"),
@@ -83,6 +83,8 @@ export default ProductRow;
 
 // --- COMPONENTS ---
 
+// => ProductMetric <=
+
 type ProductMetricProps = {
 	label: string;
 	value: string;
@@ -91,39 +93,28 @@ type ProductMetricProps = {
 	trend?: Trend | undefined;
 };
 
-const TREND_CLASSES: Record<Trend, string> = {
-	UP: "text-green-600",
-	DOWN: "text-red-600",
-	EQUAL: "text-gray-800",
-};
-
 function ProductMetric({ label, value, trend = "EQUAL" }: ProductMetricProps): JSX.Element {
 	// --- STYLES ---
-	const classes = getClasses({ trend });
+	const styles = productMetricStyles({ trend });
 
 	return (
-		<div className={classes.container}>
-			<dt className={classes.label}>{label}</dt>
-			<dd className={classes.value}>{value}</dd>
+		<div className={styles.container}>
+			<dt className={styles.label}>{label}</dt>
+			<dd className={styles.value}>{value}</dd>
 		</div>
 	);
 }
 
-// --- STYLES ---
-
-type GetClassesParams = {
-	trend: Trend;
-};
-
-function getClasses({ trend }: GetClassesParams) {
-	const classes = {
+const productMetricStyles = ({ trend }: { trend: Trend }) =>
+	({
 		container: cn("flex w-20 flex-col items-end"),
 		label: cn("text-[10px] text-gray-500 uppercase"),
-		value: cn("text-sm font-semibold tabular-nums transition-colors", TREND_CLASSES[trend]),
-	};
-
-	return classes;
-}
+		value: cn("text-sm font-semibold tabular-nums transition-colors", {
+			"text-green-600": trend === "UP",
+			"text-red-600": trend === "DOWN",
+			"text-gray-800": trend === "EQUAL",
+		}),
+	}) as const;
 
 // --- UTILS ---
 

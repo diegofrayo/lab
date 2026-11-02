@@ -20,10 +20,6 @@ type OrdersTableProps = {
 	orders: Order[];
 };
 
-const ROW_HEIGHT = 36;
-const GRID_TEMPLATE_COLUMNS =
-	"minmax(90px, 1fr) minmax(190px, 1.5fr) minmax(140px, 1.5fr) 70px 90px 100px";
-
 function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	// --- HOOKS ---
 	const table = useTable({ features, columns, data: orders, getRowId });
@@ -126,6 +122,10 @@ const classes = {
 export default OrdersTable;
 
 // --- CONSTANTS ---
+
+const ROW_HEIGHT = 36;
+const GRID_TEMPLATE_COLUMNS =
+	"minmax(90px, 1fr) minmax(190px, 1.5fr) minmax(140px, 1.5fr) 70px 90px 100px";
 
 // Stable references (module scope), so the row models are not invalidated on every render
 const features = tableFeatures({});

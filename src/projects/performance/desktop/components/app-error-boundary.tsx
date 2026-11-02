@@ -44,6 +44,8 @@ export default AppErrorBoundary;
 
 // --- COMPONENTS ---
 
+// => ErrorBoundary <=
+
 type ErrorBoundaryProps = {
 	children: ReactNode;
 	fallback: ReactNode;
@@ -71,6 +73,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 	}
 }
 
+// => AppCrashed <=
+
 type AppCrashedProps = {
 	appName: string;
 	onCloseClick: () => void;
@@ -80,24 +84,24 @@ type AppCrashedProps = {
 function AppCrashed({ appName, onCloseClick, onReloadClick }: AppCrashedProps): JSX.Element {
 	return (
 		<section
-			className={classes.container}
+			className={appCrashedStyles.container}
 			role="alert"
 		>
 			<TriangleAlert
-				className={classes.icon}
+				className={appCrashedStyles.icon}
 				aria-hidden
 			/>
-			<h2 className={classes.title}>{appName} crashed</h2>
-			<p className={classes.description}>Reload the app to try again, or close its window.</p>
-			<div className={classes.actions}>
+			<h2 className={appCrashedStyles.title}>{appName} crashed</h2>
+			<p className={appCrashedStyles.description}>Reload the app to try again, or close its window.</p>
+			<div className={appCrashedStyles.actions}>
 				<button
-					className={classes.btnReload}
+					className={appCrashedStyles.btnReload}
 					onClick={onReloadClick}
 				>
 					Reload app
 				</button>
 				<button
-					className={classes.btnClose}
+					className={appCrashedStyles.btnClose}
 					onClick={onCloseClick}
 				>
 					Close
@@ -107,9 +111,7 @@ function AppCrashed({ appName, onCloseClick, onReloadClick }: AppCrashedProps): 
 	);
 }
 
-// --- STYLES ---
-
-const classes = {
+const appCrashedStyles = {
 	container: cn("flex h-full flex-col items-center justify-center gap-3 text-center"),
 	icon: cn("h-8 w-8 text-red-500"),
 	title: cn("text-sm font-medium text-gray-800"),

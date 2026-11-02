@@ -12,27 +12,20 @@ type SocketStatusBadgeProps = {
 
 function SocketStatusBadge({ status }: SocketStatusBadgeProps): JSX.Element {
 	// --- STYLES ---
-	const classes = getClasses({ status });
+	const classes = socketStatusBadgeStyles({ status });
 
 	return <span className={classes.badge}>{SOCKET_STATUS_LABELS[status]}</span>;
 }
 
 // --- STYLES ---
 
-type GetClassesParams = {
-	status: SocketStatus;
-};
-
-function getClasses({ status }: GetClassesParams) {
-	const classes = {
+const socketStatusBadgeStyles = ({ status }: { status: SocketStatus }) =>
+	({
 		badge: cn(
 			"rounded-full px-2 py-0.5 text-xs font-medium",
 			status === "LIVE" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600",
 		),
-	};
-
-	return classes;
-}
+	}) as const;
 
 export default SocketStatusBadge;
 

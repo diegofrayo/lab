@@ -29,6 +29,8 @@ export default ProductDetailsApp;
 
 // --- COMPONENTS ---
 
+// => ProductActivity <=
+
 type ProductActivityProps = {
 	productId: string;
 	productName: string;
@@ -39,15 +41,15 @@ function ProductActivity({ productId, productName }: ProductActivityProps): JSX.
 	const { orders, status } = useProductActivitySocket({ productId });
 
 	return (
-		<section className={classes.container}>
-			<header className={classes.header}>
-				<h1 className={classes.title}>{productName}</h1>
-				<div className={classes.meta}>
-					<span className={classes.count}>{formatNumber(orders.length)} orders</span>
+		<section className={productActivityStyles.container}>
+			<header className={productActivityStyles.header}>
+				<h1 className={productActivityStyles.title}>{productName}</h1>
+				<div className={productActivityStyles.meta}>
+					<span className={productActivityStyles.count}>{formatNumber(orders.length)} orders</span>
 					<SocketStatusBadge status={status} />
 				</div>
 			</header>
-			<div className={classes.table}>
+			<div className={productActivityStyles.table}>
 				<OrdersTable orders={orders} />
 			</div>
 			{status === "RECONNECTING" && <WindowLoader text="Reconnecting" />}
@@ -55,9 +57,7 @@ function ProductActivity({ productId, productName }: ProductActivityProps): JSX.
 	);
 }
 
-// --- STYLES ---
-
-const classes = {
+const productActivityStyles = {
 	container: cn("flex h-full flex-col gap-3"),
 	header: cn("flex items-center justify-between gap-3"),
 	title: cn("truncate text-2xl font-semibold text-gray-800"),

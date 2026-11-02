@@ -15,9 +15,9 @@ function Taskbar(): JSX.Element {
 	const { openedApps } = useDesktopState();
 
 	return (
-		<nav className={taskbarClasses.taskbar}>
+		<nav className={taskbarStyles.taskbar}>
 			{Object.keys(openedApps).length === 0 ? (
-				<span className={taskbarClasses.emptyLabel}>No open apps</span>
+				<span className={taskbarStyles.emptyLabel}>No open apps</span>
 			) : (
 				Object.values(openedApps).map((openedApp) => (
 					<TaskbarButton
@@ -32,7 +32,7 @@ function Taskbar(): JSX.Element {
 
 // --- STYLES ---
 
-const taskbarClasses = {
+const taskbarStyles = {
 	taskbar: cn(
 		"flex h-12 items-center gap-1 border-t border-white/20 bg-gray-900/80 px-3 backdrop-blur-md",
 	),
@@ -42,6 +42,8 @@ const taskbarClasses = {
 export default Taskbar;
 
 // --- COMPONENTS ---
+
+// => TaskbarButton <=
 
 type TaskbarButtonProps = {
 	openedApp: OpenedApp;
@@ -56,7 +58,7 @@ const TaskbarButton = memo(function TaskbarButton({ openedApp }: TaskbarButtonPr
 	const title = getWindowTitle(openedApp);
 
 	// --- STYLES ---
-	const classes = getClasses({
+	const styles = taskbarButtonStyles({
 		isFocused: openedApp.isFocused,
 		isMinimized: openedApp.status === "MINIMIZED",
 	});
@@ -75,32 +77,22 @@ const TaskbarButton = memo(function TaskbarButton({ openedApp }: TaskbarButtonPr
 	return (
 		<button
 			id={getTaskbarButtonId(openedApp.id)}
-			className={classes.button}
+			className={styles.button}
 			aria-pressed={openedApp.isFocused}
 			onClick={handleClick}
 		>
 			<WindowIcon openedApp={openedApp} />
-			<span className={classes.title}>{title}</span>
+			<span className={styles.title}>{title}</span>
 		</button>
 	);
 });
 
-// --- STYLES ---
-
-type GetClassesParams = {
-	isFocused: boolean;
-	isMinimized: boolean;
-};
-
-function getClasses({ isFocused, isMinimized }: GetClassesParams) {
-	const classes = {
+const taskbarButtonStyles = ({ isFocused, isMinimized }: { isFocused: boolean; isMinimized: boolean }) =>
+	({
 		button: cn(
 			"flex h-8 cursor-pointer items-center gap-2 rounded px-3 text-sm transition-colors",
 			isFocused ? "bg-white/20 text-white" : "text-white/70 hover:bg-white/10 hover:text-white",
 			isMinimized && "opacity-60",
 		),
 		title: cn("max-w-40 truncate"),
-	};
-
-	return classes;
-}
+	}) as const;
