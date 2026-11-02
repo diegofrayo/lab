@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 import type { RawProductOrder, SocketStatus } from "../../../performance.types";
 import { createProductActivitySocket } from "../services/product-activity-socket.service";
@@ -43,8 +43,11 @@ export function useProductActivitySocket({
 					return;
 				}
 
-				// Every message is sorted newest first, so it goes on top of the previous ones
-				setOrders((prev) => [...newOrders, ...prev]);
+				// Every message is sorted newest first, so it goes on top of the previous ones. The new
+				// orders are non-urgent, so frequent ticks don't block dragging or typing
+				startTransition(() => {
+					setOrders((prev) => [...newOrders, ...prev]);
+				});
 			}
 
 			const unsubscribeOrders = socket.on("PRODUCT_DETAILS:ORDERS", handleOrders);

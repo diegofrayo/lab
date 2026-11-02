@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 2 of 11 solved (#1 and #4).
+**Status:** 3 of 11 solved (#1, #4 and #5).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -60,7 +60,7 @@ The desktop already follows most re-render rules: the state and actions contexts
   - pushes any render work in hidden windows to low priority
 - **Cleanup it enables:** delete `isMinimized` from `AppProps`, along with the `if (isPaused) return` branches in `use-products-socket.hook.ts` and `use-product-activity-socket.hook.ts`.
 
-### 5. Mark socket updates as non-urgent
+### 5. Mark socket updates as non-urgent ✅
 
 `rerender-transitions`, `rerender-use-deferred-value`
 

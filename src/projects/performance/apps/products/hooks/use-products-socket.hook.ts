@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 import type { RawProduct, SocketStatus } from "../../../performance.types";
 import { createProductsSocket } from "../services/products-socket.service";
@@ -35,10 +35,13 @@ export function useProductsSocket(): UseProductsSocketReturn {
 			const products = parseProducts(data);
 			if (!products) return;
 
-			setProductsState((prev) => ({
-				products,
-				trends: getProductsTrends(prev.products, products),
-			}));
+			// The updates are non-urgent, so frequent ticks don't block dragging or typing
+			startTransition(() => {
+				setProductsState((prev) => ({
+					products,
+					trends: getProductsTrends(prev.products, products),
+				}));
+			});
 		}
 
 		const unsubscribeInitialData = socket.on("PRODUCTS:INITIAL_LIST", handleInitialData);
