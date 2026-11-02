@@ -6,6 +6,9 @@ import type { RawProductOrder, SocketStatus } from "../../../performance.types";
 import { createProductActivitySocket } from "../services/product-activity-socket.service";
 import { parseOrders, type Order } from "../utils/orders-parser";
 
+// Only the latest orders are kept, so the list (and the table's row model) doesn't grow forever
+const MAX_ORDERS = 1000;
+
 type UseProductActivitySocketParams = {
 	productId: string;
 };
@@ -38,7 +41,7 @@ export function useProductActivitySocket({
 
 				if (isOrderHistory) {
 					isOrderHistory = false;
-					setOrders(newOrders);
+					setOrders(newOrders.slice(0, MAX_ORDERS));
 					setStatus("LIVE");
 					return;
 				}
@@ -46,7 +49,7 @@ export function useProductActivitySocket({
 				// Every message is sorted newest first, so it goes on top of the previous ones. The new
 				// orders are non-urgent, so frequent ticks don't block dragging or typing
 				startTransition(() => {
-					setOrders((prev) => [...newOrders, ...prev]);
+					setOrders((prev) => [...newOrders, ...prev].slice(0, MAX_ORDERS));
 				});
 			}
 

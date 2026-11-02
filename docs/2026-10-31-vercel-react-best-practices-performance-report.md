@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 8 of 11 solved (#1, #3, #4, #5, #6, #7, #8 and #9).
+**Status:** 9 of 11 solved (#1, #3, #4, #5, #6, #7, #8, #9 and #11).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -116,7 +116,7 @@ Referential stability (TanStack Virtual)
 
 ## JavaScript Performance (LOW-MEDIUM)
 
-### 11. Cap the orders list
+### 11. Cap the orders list ✅
 
 **Where:** `apps/product-details/hooks/use-product-activity-socket.hook.ts:52`
 
