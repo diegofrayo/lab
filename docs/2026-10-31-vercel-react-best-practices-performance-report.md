@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 9 of 11 solved (#1, #3, #4, #5, #6, #7, #8, #9 and #11).
+**Status:** 10 of 11 solved (#1, #3, #4, #5, #6, #7, #8, #9, #11 and #12).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -123,7 +123,7 @@ Referential stability (TanStack Virtual)
 - **Smell:** `[...newOrders, ...prev]` copies the whole array every tick, and TanStack Table rebuilds its row model over all orders. At 100 ms that's about 180k orders per hour of an open window.
 - **Fix:** cap it (for example, `.slice(0, MAX_ORDERS)`), or keep unbounded growth on purpose as a stress test.
 
-### 12. Small items
+### 12. Small items ✅
 
 - `js-cache-function-results`: `orders.length.toLocaleString("en-US")` (`apps/product-details/product-details.app.tsx:57`) builds a formatter on every render. Reuse a module-level `Intl.NumberFormat`, as the rest of the code already does.
 - `getProductTrends` (`apps/products/utils/products-trends.ts:26-33`) uses `Object.fromEntries` plus a cast for four fixed keys. An object literal is faster and needs no `as`.

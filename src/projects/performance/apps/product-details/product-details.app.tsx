@@ -7,6 +7,7 @@ import cn from "~/lib/cn";
 import SocketStatusBadge from "../../components/socket-status-badge";
 import WindowLoader from "../../desktop/components/window-loader";
 import type { AppProps } from "../../desktop/desktop.types";
+import { formatNumber } from "../../utils/formatters";
 import OrdersTable from "./components/orders-table";
 import { useProductActivitySocket } from "./hooks/use-product-activity-socket.hook";
 
@@ -52,7 +53,7 @@ function ProductActivity({ productId, productName }: ProductActivityProps): JSX.
 			<header className={classes.header}>
 				<h1 className={classes.title}>{productName}</h1>
 				<div className={classes.meta}>
-					<span className={classes.count}>{orders.length.toLocaleString("en-US")} orders</span>
+					<span className={classes.count}>{formatNumber(orders.length)} orders</span>
 					<SocketStatusBadge status={status} />
 				</div>
 			</header>
