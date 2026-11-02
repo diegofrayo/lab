@@ -15,16 +15,6 @@ function Desktop(): JSX.Element {
 	// --- HOOKS ---
 	const { openedApps } = useDesktopState();
 
-	// --- STYLES ---
-	const classes = {
-		root: cn("flex h-screen flex-col overflow-hidden"),
-		desktop: cn(
-			"relative flex-1 overflow-hidden bg-linear-to-br from-blue-900 via-blue-800 to-indigo-900",
-		),
-		iconsArea: cn("flex flex-col items-start gap-2 p-4"),
-		windowsArea: cn("pointer-events-none absolute inset-0"),
-	};
-
 	return (
 		<main className={classes.root}>
 			<section className={classes.desktop}>
@@ -49,6 +39,17 @@ function Desktop(): JSX.Element {
 		</main>
 	);
 }
+
+// --- STYLES ---
+
+const classes = {
+	root: cn("flex h-screen flex-col overflow-hidden"),
+	desktop: cn(
+		"relative flex-1 overflow-hidden bg-linear-to-br from-blue-900 via-blue-800 to-indigo-900",
+	),
+	iconsArea: cn("flex flex-col items-start gap-2 p-4"),
+	windowsArea: cn("pointer-events-none absolute inset-0"),
+};
 
 export default Desktop;
 

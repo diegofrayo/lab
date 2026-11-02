@@ -12,6 +12,18 @@ type SocketStatusBadgeProps = {
 
 function SocketStatusBadge({ status }: SocketStatusBadgeProps): JSX.Element {
 	// --- STYLES ---
+	const classes = getClasses({ status });
+
+	return <span className={classes.badge}>{SOCKET_STATUS_LABELS[status]}</span>;
+}
+
+// --- STYLES ---
+
+type GetClassesParams = {
+	status: SocketStatus;
+};
+
+function getClasses({ status }: GetClassesParams) {
 	const classes = {
 		badge: cn(
 			"rounded-full px-2 py-0.5 text-xs font-medium",
@@ -19,7 +31,7 @@ function SocketStatusBadge({ status }: SocketStatusBadgeProps): JSX.Element {
 		),
 	};
 
-	return <span className={classes.badge}>{SOCKET_STATUS_LABELS[status]}</span>;
+	return classes;
 }
 
 export default SocketStatusBadge;

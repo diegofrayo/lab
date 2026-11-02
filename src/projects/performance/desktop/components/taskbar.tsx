@@ -14,18 +14,10 @@ function Taskbar(): JSX.Element {
 	// --- HOOKS ---
 	const { openedApps } = useDesktopState();
 
-	// --- STYLES ---
-	const classes = {
-		taskbar: cn(
-			"flex h-12 items-center gap-1 border-t border-white/20 bg-gray-900/80 px-3 backdrop-blur-md",
-		),
-		emptyLabel: cn("text-xs text-white/40"),
-	};
-
 	return (
-		<nav className={classes.taskbar}>
+		<nav className={taskbarClasses.taskbar}>
 			{Object.keys(openedApps).length === 0 ? (
-				<span className={classes.emptyLabel}>No open apps</span>
+				<span className={taskbarClasses.emptyLabel}>No open apps</span>
 			) : (
 				Object.values(openedApps).map((openedApp) => (
 					<TaskbarButton
@@ -37,6 +29,15 @@ function Taskbar(): JSX.Element {
 		</nav>
 	);
 }
+
+// --- STYLES ---
+
+const taskbarClasses = {
+	taskbar: cn(
+		"flex h-12 items-center gap-1 border-t border-white/20 bg-gray-900/80 px-3 backdrop-blur-md",
+	),
+	emptyLabel: cn("text-xs text-white/40"),
+};
 
 export default Taskbar;
 
@@ -55,16 +56,10 @@ const TaskbarButton = memo(function TaskbarButton({ openedApp }: TaskbarButtonPr
 	const title = getWindowTitle(openedApp);
 
 	// --- STYLES ---
-	const classes = {
-		button: cn(
-			"flex h-8 cursor-pointer items-center gap-2 rounded px-3 text-sm transition-colors",
-			openedApp.isFocused
-				? "bg-white/20 text-white"
-				: "text-white/70 hover:bg-white/10 hover:text-white",
-			openedApp.status === "MINIMIZED" && "opacity-60",
-		),
-		title: cn("max-w-40 truncate"),
-	};
+	const classes = getClasses({
+		isFocused: openedApp.isFocused,
+		isMinimized: openedApp.status === "MINIMIZED",
+	});
 
 	// --- HANDLERS ---
 	function handleClick(): void {
@@ -89,3 +84,23 @@ const TaskbarButton = memo(function TaskbarButton({ openedApp }: TaskbarButtonPr
 		</button>
 	);
 });
+
+// --- STYLES ---
+
+type GetClassesParams = {
+	isFocused: boolean;
+	isMinimized: boolean;
+};
+
+function getClasses({ isFocused, isMinimized }: GetClassesParams) {
+	const classes = {
+		button: cn(
+			"flex h-8 cursor-pointer items-center gap-2 rounded px-3 text-sm transition-colors",
+			isFocused ? "bg-white/20 text-white" : "text-white/70 hover:bg-white/10 hover:text-white",
+			isMinimized && "opacity-60",
+		),
+		title: cn("max-w-40 truncate"),
+	};
+
+	return classes;
+}

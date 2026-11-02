@@ -67,7 +67,8 @@ const typescriptConfig = defineConfig({
 
 		"@typescript-eslint/ban-ts-comment": ["warn"],
 		"@typescript-eslint/consistent-type-imports": "error",
-		"@typescript-eslint/explicit-function-return-type": "error",
+		// The classes helpers of the components infer their return type, so their fields don't have to be listed twice
+		"@typescript-eslint/explicit-function-return-type": ["error", { allowedNames: ["getClasses"] }],
 		"@typescript-eslint/no-floating-promises": "error",
 		"@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", caughtErrors: "none" }],
 		"@typescript-eslint/no-unnecessary-type-assertion": ["error", { typesToIgnore: ["LoaderData"] }],

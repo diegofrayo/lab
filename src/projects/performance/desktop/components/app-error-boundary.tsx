@@ -78,21 +78,6 @@ type AppCrashedProps = {
 };
 
 function AppCrashed({ appName, onCloseClick, onReloadClick }: AppCrashedProps): JSX.Element {
-	// --- STYLES ---
-	const classes = {
-		container: cn("flex h-full flex-col items-center justify-center gap-3 text-center"),
-		icon: cn("h-8 w-8 text-red-500"),
-		title: cn("text-sm font-medium text-gray-800"),
-		description: cn("text-xs text-gray-500"),
-		actions: cn("flex gap-2"),
-		btnReload: cn(
-			"cursor-pointer rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-		),
-		btnClose: cn(
-			"cursor-pointer rounded bg-gray-200 px-3 py-1 text-xs font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-		),
-	};
-
 	return (
 		<section
 			className={classes.container}
@@ -121,3 +106,19 @@ function AppCrashed({ appName, onCloseClick, onReloadClick }: AppCrashedProps): 
 		</section>
 	);
 }
+
+// --- STYLES ---
+
+const classes = {
+	container: cn("flex h-full flex-col items-center justify-center gap-3 text-center"),
+	icon: cn("h-8 w-8 text-red-500"),
+	title: cn("text-sm font-medium text-gray-800"),
+	description: cn("text-xs text-gray-500"),
+	actions: cn("flex gap-2"),
+	btnReload: cn(
+		"cursor-pointer rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+	),
+	btnClose: cn(
+		"cursor-pointer rounded bg-gray-200 px-3 py-1 text-xs font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+	),
+};

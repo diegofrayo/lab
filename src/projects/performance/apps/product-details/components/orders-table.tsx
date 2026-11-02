@@ -40,20 +40,6 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	// --- STATES & REFS ---
 	const scrollElementRef = useRef<HTMLDivElement>(null);
 
-	// --- STYLES ---
-	const classes = {
-		scrollElement: cn("h-full overflow-auto rounded border border-gray-200"),
-		table: cn("grid min-w-177 text-sm"),
-		thead: cn("sticky top-0 z-10 grid bg-gray-100"),
-		headerRow: cn("grid border-b border-gray-200"),
-		th: cn("px-2 py-2 text-left text-xs font-semibold text-gray-600 uppercase"),
-		thNumeric: cn("px-2 py-2 text-right text-xs font-semibold text-gray-600 uppercase"),
-		tbody: cn("relative grid"),
-		row: cn("absolute top-0 left-0 grid w-full items-center border-b border-gray-100 hover:bg-gray-50"),
-		td: cn("truncate px-2 text-gray-800"),
-		tdNumeric: cn("truncate px-2 text-right text-gray-800 tabular-nums"),
-	};
-
 	// --- UTILS ---
 	function getVirtualRowKey(index: number): string | number {
 		return rows[index]?.id ?? index;
@@ -121,6 +107,21 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 		</div>
 	);
 }
+
+// --- STYLES ---
+
+const classes = {
+	scrollElement: cn("h-full overflow-auto rounded border border-gray-200"),
+	table: cn("grid min-w-177 text-sm"),
+	thead: cn("sticky top-0 z-10 grid bg-gray-100"),
+	headerRow: cn("grid border-b border-gray-200"),
+	th: cn("px-2 py-2 text-left text-xs font-semibold text-gray-600 uppercase"),
+	thNumeric: cn("px-2 py-2 text-right text-xs font-semibold text-gray-600 uppercase"),
+	tbody: cn("relative grid"),
+	row: cn("absolute top-0 left-0 grid w-full items-center border-b border-gray-100 hover:bg-gray-50"),
+	td: cn("truncate px-2 text-gray-800"),
+	tdNumeric: cn("truncate px-2 text-right text-gray-800 tabular-nums"),
+};
 
 export default OrdersTable;
 

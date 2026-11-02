@@ -22,14 +22,6 @@ function ProductsApp(): JSX.Element {
 	const { openApp } = useDesktopActions();
 	const isVirtualizingProducts = useDataOrchestratorSetting("isVirtualizingProducts");
 
-	// --- STYLES ---
-	const classes = {
-		container: cn("flex h-full flex-col gap-3"),
-		header: cn("flex items-center justify-between"),
-		title: cn("text-2xl font-semibold text-gray-800"),
-		list: cn("min-h-0 flex-1"),
-	};
-
 	// --- HANDLERS ---
 	function handleProductSelect(product: Product): void {
 		openApp({ appId: "PRODUCT_DETAILS", params: { product } });
@@ -72,6 +64,15 @@ function ProductsApp(): JSX.Element {
 		</section>
 	);
 }
+
+// --- STYLES ---
+
+const classes = {
+	container: cn("flex h-full flex-col gap-3"),
+	header: cn("flex items-center justify-between"),
+	title: cn("text-2xl font-semibold text-gray-800"),
+	list: cn("min-h-0 flex-1"),
+};
 
 export default ProductsApp;
 

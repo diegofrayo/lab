@@ -16,11 +16,6 @@ type PlainListProps<TItem> = {
 };
 
 function PlainList<TItem>({ items, getItemKey, renderItem }: PlainListProps<TItem>): JSX.Element {
-	// --- STYLES ---
-	const classes = {
-		scrollElement: cn("h-full overflow-auto"),
-	};
-
 	return (
 		<div className={classes.scrollElement}>
 			<ul>
@@ -31,5 +26,11 @@ function PlainList<TItem>({ items, getItemKey, renderItem }: PlainListProps<TIte
 		</div>
 	);
 }
+
+// --- STYLES ---
+
+const classes = {
+	scrollElement: cn("h-full overflow-auto"),
+};
 
 export default PlainList;

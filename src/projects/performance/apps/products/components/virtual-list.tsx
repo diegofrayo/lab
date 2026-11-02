@@ -61,13 +61,6 @@ function VirtualList<TItem>({
 		getScrollElement,
 	});
 
-	// --- STYLES ---
-	const classes = {
-		scrollElement: cn("h-full overflow-auto"),
-		inner: cn("relative w-full"),
-		item: cn("absolute top-0 left-0 w-full"),
-	};
-
 	return (
 		<div
 			ref={scrollElementRef}
@@ -95,5 +88,13 @@ function VirtualList<TItem>({
 		</div>
 	);
 }
+
+// --- STYLES ---
+
+const classes = {
+	scrollElement: cn("h-full overflow-auto"),
+	inner: cn("relative w-full"),
+	item: cn("absolute top-0 left-0 w-full"),
+};
 
 export default VirtualList;

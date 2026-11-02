@@ -22,24 +22,6 @@ function DataOrchestratorApp(): JSX.Element {
 	const isIntervalUnchanged = parsedInterval === settings.defaultUpdateIntervalMs;
 	const isApplyDisabled = !isIntervalValid || isIntervalUnchanged;
 
-	// --- STYLES ---
-	const classes = {
-		container: cn("flex flex-col gap-5"),
-		title: cn("text-2xl font-semibold text-gray-800"),
-		field: cn("flex flex-col gap-1"),
-		checkboxLabel: cn("flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-800"),
-		checkbox: cn("h-4 w-4 cursor-pointer accent-blue-600"),
-		label: cn("text-sm font-medium text-gray-800"),
-		hint: cn("text-xs text-gray-500"),
-		intervalRow: cn("flex items-center gap-2"),
-		input: cn(
-			"w-32 rounded border border-gray-300 px-2 py-1 text-sm tabular-nums focus:border-blue-600 focus:outline-none",
-		),
-		button: cn(
-			"cursor-pointer rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50",
-		),
-	};
-
 	// --- HANDLERS ---
 	function handleDispatchingUpdatesChange(e: ChangeEvent<HTMLInputElement>): void {
 		updateSettings({ isDispatchingUpdates: e.target.checked });
@@ -61,13 +43,13 @@ function DataOrchestratorApp(): JSX.Element {
 	}
 
 	return (
-		<section className={classes.container}>
-			<h1 className={classes.title}>Data Orchestrator</h1>
-			<div className={classes.field}>
-				<label className={classes.checkboxLabel}>
+		<section className={dataOrchestratorClasses.container}>
+			<h1 className={dataOrchestratorClasses.title}>Data Orchestrator</h1>
+			<div className={dataOrchestratorClasses.field}>
+				<label className={dataOrchestratorClasses.checkboxLabel}>
 					<input
 						type="checkbox"
-						className={classes.checkbox}
+						className={dataOrchestratorClasses.checkbox}
 						checked={settings.isDispatchingUpdates}
 						aria-describedby={DISPATCHING_UPDATES_HINT_ID}
 						onChange={handleDispatchingUpdatesChange}
@@ -76,26 +58,26 @@ function DataOrchestratorApp(): JSX.Element {
 				</label>
 				<p
 					id={DISPATCHING_UPDATES_HINT_ID}
-					className={classes.hint}
+					className={dataOrchestratorClasses.hint}
 				>
 					While stopped, the connections only receive their initial data.
 				</p>
 			</div>
 			<form
-				className={classes.field}
+				className={dataOrchestratorClasses.field}
 				onSubmit={handleIntervalSubmit}
 			>
 				<label
 					htmlFor="data-orchestrator-update-interval"
-					className={classes.label}
+					className={dataOrchestratorClasses.label}
 				>
 					Default update interval (ms)
 				</label>
-				<div className={classes.intervalRow}>
+				<div className={dataOrchestratorClasses.intervalRow}>
 					<input
 						id="data-orchestrator-update-interval"
 						type="number"
-						className={classes.input}
+						className={dataOrchestratorClasses.input}
 						min={MIN_UPDATE_INTERVAL_MS}
 						step={100}
 						value={intervalDraft}
@@ -105,7 +87,7 @@ function DataOrchestratorApp(): JSX.Element {
 					/>
 					<button
 						type="submit"
-						className={classes.button}
+						className={dataOrchestratorClasses.button}
 						disabled={isApplyDisabled}
 					>
 						Apply
@@ -116,11 +98,11 @@ function DataOrchestratorApp(): JSX.Element {
 					isIntervalValid={isIntervalValid}
 				/>
 			</form>
-			<div className={classes.field}>
-				<label className={classes.checkboxLabel}>
+			<div className={dataOrchestratorClasses.field}>
+				<label className={dataOrchestratorClasses.checkboxLabel}>
 					<input
 						type="checkbox"
-						className={classes.checkbox}
+						className={dataOrchestratorClasses.checkbox}
 						checked={settings.isVirtualizingProducts}
 						aria-describedby={VIRTUALIZING_PRODUCTS_HINT_ID}
 						onChange={handleVirtualizingProductsChange}
@@ -129,7 +111,7 @@ function DataOrchestratorApp(): JSX.Element {
 				</label>
 				<p
 					id={VIRTUALIZING_PRODUCTS_HINT_ID}
-					className={classes.hint}
+					className={dataOrchestratorClasses.hint}
 				>
 					While disabled, all the product rows are rendered at once.
 				</p>
@@ -137,6 +119,25 @@ function DataOrchestratorApp(): JSX.Element {
 		</section>
 	);
 }
+
+// --- STYLES ---
+
+const dataOrchestratorClasses = {
+	container: cn("flex flex-col gap-5"),
+	title: cn("text-2xl font-semibold text-gray-800"),
+	field: cn("flex flex-col gap-1"),
+	checkboxLabel: cn("flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-800"),
+	checkbox: cn("h-4 w-4 cursor-pointer accent-blue-600"),
+	label: cn("text-sm font-medium text-gray-800"),
+	hint: cn("text-xs text-gray-500"),
+	intervalRow: cn("flex items-center gap-2"),
+	input: cn(
+		"w-32 rounded border border-gray-300 px-2 py-1 text-sm tabular-nums focus:border-blue-600 focus:outline-none",
+	),
+	button: cn(
+		"cursor-pointer rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50",
+	),
+};
 
 export default DataOrchestratorApp;
 
@@ -155,9 +156,7 @@ type IntervalHintProps = {
 
 function IntervalHint({ id, isIntervalValid }: IntervalHintProps): JSX.Element {
 	// --- STYLES ---
-	const classes = {
-		hint: cn("text-xs", isIntervalValid ? "text-gray-500" : "text-red-600"),
-	};
+	const classes = getClasses({ isIntervalValid });
 
 	return (
 		<p
@@ -169,4 +168,18 @@ function IntervalHint({ id, isIntervalValid }: IntervalHintProps): JSX.Element {
 				: `It must be an integer of at least ${MIN_UPDATE_INTERVAL_MS} ms.`}
 		</p>
 	);
+}
+
+// --- STYLES ---
+
+type GetClassesParams = {
+	isIntervalValid: boolean;
+};
+
+function getClasses({ isIntervalValid }: GetClassesParams) {
+	const classes = {
+		hint: cn("text-xs", isIntervalValid ? "text-gray-500" : "text-red-600"),
+	};
+
+	return classes;
 }

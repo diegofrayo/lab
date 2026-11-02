@@ -38,16 +38,6 @@ function ProductActivity({ productId, productName }: ProductActivityProps): JSX.
 	// --- HOOKS ---
 	const { orders, status } = useProductActivitySocket({ productId });
 
-	// --- STYLES ---
-	const classes = {
-		container: cn("flex h-full flex-col gap-3"),
-		header: cn("flex items-center justify-between gap-3"),
-		title: cn("truncate text-2xl font-semibold text-gray-800"),
-		meta: cn("flex shrink-0 items-center gap-2"),
-		count: cn("text-xs text-gray-500 tabular-nums"),
-		table: cn("min-h-0 flex-1"),
-	};
-
 	return (
 		<section className={classes.container}>
 			<header className={classes.header}>
@@ -64,3 +54,14 @@ function ProductActivity({ productId, productName }: ProductActivityProps): JSX.
 		</section>
 	);
 }
+
+// --- STYLES ---
+
+const classes = {
+	container: cn("flex h-full flex-col gap-3"),
+	header: cn("flex items-center justify-between gap-3"),
+	title: cn("truncate text-2xl font-semibold text-gray-800"),
+	meta: cn("flex shrink-0 items-center gap-2"),
+	count: cn("text-xs text-gray-500 tabular-nums"),
+	table: cn("min-h-0 flex-1"),
+};

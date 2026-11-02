@@ -66,31 +66,7 @@ function Window({ openedApp }: WindowProps): JSX.Element {
 	const title = getWindowTitle(openedApp);
 
 	// --- STYLES ---
-	const classes = {
-		container: cn(
-			"pointer-events-auto absolute flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow outline-none",
-			isFocused ? "z-50 shadow-black/30" : "z-10 shadow-black/10",
-			isMinimized ? "hidden" : "flex",
-		),
-		titleBar: cn(
-			"flex items-center justify-between px-3 py-2 select-none",
-			isFocused ? "bg-gray-200" : "bg-gray-100",
-			isMaximized ? "cursor-default" : "cursor-grab",
-		),
-		titleInfo: cn("flex min-w-0 items-center gap-2 text-sm font-medium text-gray-700"),
-		title: cn("truncate"),
-		titleButtons: cn("flex items-center gap-1.5"),
-		btnClose: cn(
-			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-red-500 hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-		),
-		btnMinimize: cn(
-			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-		),
-		btnMaximize: cn(
-			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-green-500 hover:bg-green-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-		),
-		content: cn("relative flex-1 overflow-auto bg-white p-4"),
-	};
+	const classes = getClasses({ isFocused, isMinimized, isMaximized });
 
 	// --- HANDLERS ---
 	function handleTitleBarMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
@@ -212,6 +188,44 @@ function Window({ openedApp }: WindowProps): JSX.Element {
 	);
 }
 
+// --- STYLES ---
+
+type GetClassesParams = {
+	isFocused: boolean;
+	isMinimized: boolean;
+	isMaximized: boolean;
+};
+
+function getClasses({ isFocused, isMinimized, isMaximized }: GetClassesParams) {
+	const classes = {
+		container: cn(
+			"pointer-events-auto absolute flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-2xl transition-shadow outline-none",
+			isFocused ? "z-50 shadow-black/30" : "z-10 shadow-black/10",
+			isMinimized ? "hidden" : "flex",
+		),
+		titleBar: cn(
+			"flex items-center justify-between px-3 py-2 select-none",
+			isFocused ? "bg-gray-200" : "bg-gray-100",
+			isMaximized ? "cursor-default" : "cursor-grab",
+		),
+		titleInfo: cn("flex min-w-0 items-center gap-2 text-sm font-medium text-gray-700"),
+		title: cn("truncate"),
+		titleButtons: cn("flex items-center gap-1.5"),
+		btnClose: cn(
+			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-red-500 hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+		),
+		btnMinimize: cn(
+			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+		),
+		btnMaximize: cn(
+			"flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full bg-green-500 hover:bg-green-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+		),
+		content: cn("relative flex-1 overflow-auto bg-white p-4"),
+	};
+
+	return classes;
+}
+
 // Memoized so a window only re-renders when its own opened app changes (e.g. not when another window is focused)
 export default memo(Window);
 
@@ -282,13 +296,6 @@ function WindowResizeHandles({
 		},
 	});
 
-	// --- STYLES ---
-	const classes = {
-		right: cn("absolute top-0 right-0 bottom-3 w-1.5 cursor-ew-resize"),
-		bottom: cn("absolute right-3 bottom-0 left-0 h-1.5 cursor-ns-resize"),
-		bottomRight: cn("absolute right-0 bottom-0 h-3 w-3 cursor-nwse-resize"),
-	};
-
 	// --- HANDLERS ---
 	function handleHandleMouseDown(e: React.MouseEvent<HTMLDivElement>): void {
 		e.preventDefault();
@@ -304,20 +311,28 @@ function WindowResizeHandles({
 	return (
 		<>
 			<div
-				className={classes.right}
+				className={windowResizeHandlesClasses.right}
 				data-direction="RIGHT"
 				onMouseDown={handleHandleMouseDown}
 			/>
 			<div
-				className={classes.bottom}
+				className={windowResizeHandlesClasses.bottom}
 				data-direction="BOTTOM"
 				onMouseDown={handleHandleMouseDown}
 			/>
 			<div
-				className={classes.bottomRight}
+				className={windowResizeHandlesClasses.bottomRight}
 				data-direction="BOTTOM_RIGHT"
 				onMouseDown={handleHandleMouseDown}
 			/>
 		</>
 	);
 }
+
+// --- STYLES ---
+
+const windowResizeHandlesClasses = {
+	right: cn("absolute top-0 right-0 bottom-3 w-1.5 cursor-ew-resize"),
+	bottom: cn("absolute right-3 bottom-0 left-0 h-1.5 cursor-ns-resize"),
+	bottomRight: cn("absolute right-0 bottom-0 h-3 w-3 cursor-nwse-resize"),
+};

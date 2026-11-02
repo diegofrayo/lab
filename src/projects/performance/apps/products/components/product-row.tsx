@@ -17,44 +17,30 @@ type ProductRowProps = {
 };
 
 function ProductRow({ product, trends, onSelect }: ProductRowProps): JSX.Element {
-	// --- STYLES ---
-	const classes = {
-		container: cn(
-			"relative flex h-18 items-center gap-3 border-b border-gray-200 px-2 hover:bg-gray-50",
-		),
-		photo: cn("h-12 w-12 shrink-0 rounded object-cover"),
-		name: cn("min-w-0 flex-1 truncate text-sm font-medium text-gray-800"),
-		// The button covers the whole row, so clicking anywhere opens the product details
-		nameButton: cn(
-			"cursor-pointer text-left after:absolute after:inset-0 focus:outline-none focus-visible:after:ring-2 focus-visible:after:ring-blue-500 focus-visible:after:ring-inset",
-		),
-		metrics: cn("grid shrink-0 grid-cols-4 gap-3"),
-	};
-
 	// --- HANDLERS ---
 	function handleNameClick(): void {
 		onSelect(product);
 	}
 
 	return (
-		<article className={classes.container}>
+		<article className={productRowClasses.container}>
 			<img
-				className={classes.photo}
+				className={productRowClasses.photo}
 				src={product.photo}
 				// Decorative: the product name is the button right next to it
 				alt=""
 				loading="lazy"
 			/>
-			<h2 className={classes.name}>
+			<h2 className={productRowClasses.name}>
 				<button
 					type="button"
-					className={classes.nameButton}
+					className={productRowClasses.nameButton}
 					onClick={handleNameClick}
 				>
 					{product.name}
 				</button>
 			</h2>
-			<dl className={classes.metrics}>
+			<dl className={productRowClasses.metrics}>
 				<ProductMetric
 					label="Price"
 					value={formatCurrency(product.price)}
@@ -80,6 +66,19 @@ function ProductRow({ product, trends, onSelect }: ProductRowProps): JSX.Element
 	);
 }
 
+// --- STYLES ---
+
+const productRowClasses = {
+	container: cn("relative flex h-18 items-center gap-3 border-b border-gray-200 px-2 hover:bg-gray-50"),
+	photo: cn("h-12 w-12 shrink-0 rounded object-cover"),
+	name: cn("min-w-0 flex-1 truncate text-sm font-medium text-gray-800"),
+	// The button covers the whole row, so clicking anywhere opens the product details
+	nameButton: cn(
+		"cursor-pointer text-left after:absolute after:inset-0 focus:outline-none focus-visible:after:ring-2 focus-visible:after:ring-blue-500 focus-visible:after:ring-inset",
+	),
+	metrics: cn("grid shrink-0 grid-cols-4 gap-3"),
+};
+
 export default ProductRow;
 
 // --- COMPONENTS ---
@@ -100,11 +99,7 @@ const TREND_CLASSES: Record<Trend, string> = {
 
 function ProductMetric({ label, value, trend = "EQUAL" }: ProductMetricProps): JSX.Element {
 	// --- STYLES ---
-	const classes = {
-		container: cn("flex w-20 flex-col items-end"),
-		label: cn("text-[10px] text-gray-500 uppercase"),
-		value: cn("text-sm font-semibold tabular-nums transition-colors", TREND_CLASSES[trend]),
-	};
+	const classes = getClasses({ trend });
 
 	return (
 		<div className={classes.container}>
@@ -112,6 +107,22 @@ function ProductMetric({ label, value, trend = "EQUAL" }: ProductMetricProps): J
 			<dd className={classes.value}>{value}</dd>
 		</div>
 	);
+}
+
+// --- STYLES ---
+
+type GetClassesParams = {
+	trend: Trend;
+};
+
+function getClasses({ trend }: GetClassesParams) {
+	const classes = {
+		container: cn("flex w-20 flex-col items-end"),
+		label: cn("text-[10px] text-gray-500 uppercase"),
+		value: cn("text-sm font-semibold tabular-nums transition-colors", TREND_CLASSES[trend]),
+	};
+
+	return classes;
 }
 
 // --- UTILS ---

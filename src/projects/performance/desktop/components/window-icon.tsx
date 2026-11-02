@@ -14,12 +14,6 @@ function WindowIcon({ openedApp }: WindowIconProps): JSX.Element {
 	// --- COMPUTED STATES ---
 	const iconUrl = openedApp.appConfig.getWindowIconUrl?.(openedApp.params);
 
-	// --- STYLES ---
-	const classes = {
-		emoji: cn("text-base"),
-		image: cn("h-5 w-5 shrink-0 rounded-sm object-cover"),
-	};
-
 	if (iconUrl) {
 		return (
 			<img
@@ -32,5 +26,12 @@ function WindowIcon({ openedApp }: WindowIconProps): JSX.Element {
 
 	return <span className={classes.emoji}>{openedApp.appConfig.icon}</span>;
 }
+
+// --- STYLES ---
+
+const classes = {
+	emoji: cn("text-base"),
+	image: cn("h-5 w-5 shrink-0 rounded-sm object-cover"),
+};
 
 export default WindowIcon;
