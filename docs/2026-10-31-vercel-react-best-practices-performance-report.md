@@ -9,13 +9,13 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 1 of 11 solved (#4).
+**Status:** 2 of 11 solved (#1 and #4).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
 ## Bundle Size Optimization (CRITICAL)
 
-### 1. Lazy-load the apps
+### 1. Lazy-load the apps ✅
 
 `bundle-dynamic-imports`, `bundle-conditional`
 

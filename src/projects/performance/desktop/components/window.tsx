@@ -1,6 +1,14 @@
 "use client";
 
-import { Activity, useRef, type CSSProperties, type JSX, type ReactNode, type RefObject } from "react";
+import {
+	Activity,
+	Suspense,
+	useRef,
+	type CSSProperties,
+	type JSX,
+	type ReactNode,
+	type RefObject,
+} from "react";
 
 import cn from "~/lib/cn";
 
@@ -14,6 +22,7 @@ import { getMinWindowSize } from "../utils/window-size";
 import { getWindowTitle } from "../utils/window-title";
 import AppErrorBoundary from "./app-error-boundary";
 import WindowIcon from "./window-icon";
+import WindowLoader from "./window-loader";
 
 type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";
 
@@ -184,7 +193,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 						appName={title}
 						onClose={closeWindow}
 					>
-						{children}
+						<Suspense fallback={<WindowLoader text="Loading" />}>{children}</Suspense>
 					</AppErrorBoundary>
 				</Activity>
 			</section>
