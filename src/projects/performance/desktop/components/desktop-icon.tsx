@@ -15,15 +15,6 @@ function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 	// --- HOOKS ---
 	const { openApp } = useDesktopActions();
 
-	// --- STYLES ---
-	const classes = {
-		container: cn(
-			"flex w-20 cursor-pointer flex-col items-center gap-1 rounded p-2 select-none hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none",
-		),
-		icon: cn("text-4xl"),
-		label: cn("text-center text-xs font-medium text-white drop-shadow"),
-	};
-
 	// --- HANDLERS ---
 	function handleClick(): void {
 		openApp({ appId: appConfig.id });
@@ -31,15 +22,25 @@ function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 
 	return (
 		<button
-			className={classes.container}
+			className={styles.container}
 			aria-label={`Open ${appConfig.name}`}
 			onClick={handleClick}
 		>
-			<span className={classes.icon}>{appConfig.icon}</span>
-			<span className={classes.label}>{appConfig.name}</span>
+			<span className={styles.icon}>{appConfig.icon}</span>
+			<span className={styles.label}>{appConfig.name}</span>
 		</button>
 	);
 }
+
+// --- STYLES ---
+
+const styles = {
+	container: cn(
+		"flex w-20 cursor-pointer flex-col items-center gap-1 rounded p-2 select-none hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none",
+	),
+	icon: cn("text-4xl"),
+	label: cn("text-center text-xs font-medium text-white drop-shadow"),
+};
 
 // Memoized so it doesn't re-render when the desktop re-renders (e.g. on every frame of a window drag),
 // since its only prop is a static app config

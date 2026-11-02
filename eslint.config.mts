@@ -67,7 +67,10 @@ const typescriptConfig = defineConfig({
 
 		"@typescript-eslint/ban-ts-comment": ["warn"],
 		"@typescript-eslint/consistent-type-imports": "error",
-		"@typescript-eslint/explicit-function-return-type": "error",
+		"@typescript-eslint/explicit-function-return-type": [
+			"error",
+			{ allowDirectConstAssertionInArrowFunctions: true },
+		],
 		"@typescript-eslint/no-floating-promises": "error",
 		"@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", caughtErrors: "none" }],
 		"@typescript-eslint/no-unnecessary-type-assertion": ["error", { typesToIgnore: ["LoaderData"] }],

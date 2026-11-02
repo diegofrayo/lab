@@ -20,15 +20,11 @@ function ProductsApp(): JSX.Element {
 	// --- HOOKS ---
 	const { products, trends, status } = useProductsSocket();
 	const { openApp } = useDesktopActions();
-	const isVirtualizingProducts = useDataOrchestratorSetting("isVirtualizingProducts");
+	const productsListMode = useDataOrchestratorSetting("productsListMode");
 
-	// --- STYLES ---
-	const classes = {
-		container: cn("flex h-full flex-col gap-3"),
-		header: cn("flex items-center justify-between"),
-		title: cn("text-2xl font-semibold text-gray-800"),
-		list: cn("min-h-0 flex-1"),
-	};
+	// --- COMPUTED STATES ---
+	const plainListEstimatedItemSize =
+		productsListMode === "CONTENT_VISIBILITY" ? PRODUCT_ROW_HEIGHT : undefined;
 
 	// --- HANDLERS ---
 	function handleProductSelect(product: Product): void {
@@ -47,13 +43,13 @@ function ProductsApp(): JSX.Element {
 	}
 
 	return (
-		<section className={classes.container}>
-			<header className={classes.header}>
-				<h1 className={classes.title}>List of Products</h1>
+		<section className={styles.container}>
+			<header className={styles.header}>
+				<h1 className={styles.title}>List of Products</h1>
 				<SocketStatusBadge status={status} />
 			</header>
-			<div className={classes.list}>
-				{isVirtualizingProducts ? (
+			<div className={styles.list}>
+				{productsListMode === "VIRTUAL" ? (
 					<VirtualList
 						items={products}
 						itemSize={PRODUCT_ROW_HEIGHT}
@@ -63,6 +59,7 @@ function ProductsApp(): JSX.Element {
 				) : (
 					<PlainList
 						items={products}
+						estimatedItemSize={plainListEstimatedItemSize}
 						getItemKey={getProductKey}
 						renderItem={renderProduct}
 					/>
@@ -72,6 +69,15 @@ function ProductsApp(): JSX.Element {
 		</section>
 	);
 }
+
+// --- STYLES ---
+
+const styles = {
+	container: cn("flex h-full flex-col gap-3"),
+	header: cn("flex items-center justify-between"),
+	title: cn("text-2xl font-semibold text-gray-800"),
+	list: cn("min-h-0 flex-1"),
+};
 
 export default ProductsApp;
 

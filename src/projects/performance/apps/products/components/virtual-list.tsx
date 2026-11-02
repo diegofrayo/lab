@@ -61,20 +61,13 @@ function VirtualList<TItem>({
 		getScrollElement,
 	});
 
-	// --- STYLES ---
-	const classes = {
-		scrollElement: cn("h-full overflow-auto"),
-		inner: cn("relative w-full"),
-		item: cn("absolute top-0 left-0 w-full"),
-	};
-
 	return (
 		<div
 			ref={scrollElementRef}
-			className={classes.scrollElement}
+			className={styles.scrollElement}
 		>
 			<ul
-				className={classes.inner}
+				className={styles.inner}
 				style={{ height: virtualizer.getTotalSize() }}
 			>
 				{virtualizer.getVirtualItems().map((virtualItem) => {
@@ -84,7 +77,7 @@ function VirtualList<TItem>({
 					return (
 						<li
 							key={virtualItem.key}
-							className={classes.item}
+							className={styles.item}
 							style={{ height: itemSize, transform: `translateY(${virtualItem.start}px)` }}
 						>
 							{renderItem(item)}
@@ -95,5 +88,13 @@ function VirtualList<TItem>({
 		</div>
 	);
 }
+
+// --- STYLES ---
+
+const styles = {
+	scrollElement: cn("h-full overflow-auto"),
+	inner: cn("relative w-full"),
+	item: cn("absolute top-0 left-0 w-full"),
+};
 
 export default VirtualList;

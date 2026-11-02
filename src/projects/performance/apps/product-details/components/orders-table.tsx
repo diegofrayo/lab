@@ -20,10 +20,6 @@ type OrdersTableProps = {
 	orders: Order[];
 };
 
-const ROW_HEIGHT = 36;
-const GRID_TEMPLATE_COLUMNS =
-	"minmax(90px, 1fr) minmax(190px, 1.5fr) minmax(140px, 1.5fr) 70px 90px 100px";
-
 function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	// --- HOOKS ---
 	const table = useTable({ features, columns, data: orders, getRowId });
@@ -40,20 +36,6 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	// --- STATES & REFS ---
 	const scrollElementRef = useRef<HTMLDivElement>(null);
 
-	// --- STYLES ---
-	const classes = {
-		scrollElement: cn("h-full overflow-auto rounded border border-gray-200"),
-		table: cn("grid min-w-177 text-sm"),
-		thead: cn("sticky top-0 z-10 grid bg-gray-100"),
-		headerRow: cn("grid border-b border-gray-200"),
-		th: cn("px-2 py-2 text-left text-xs font-semibold text-gray-600 uppercase"),
-		thNumeric: cn("px-2 py-2 text-right text-xs font-semibold text-gray-600 uppercase"),
-		tbody: cn("relative grid"),
-		row: cn("absolute top-0 left-0 grid w-full items-center border-b border-gray-100 hover:bg-gray-50"),
-		td: cn("truncate px-2 text-gray-800"),
-		tdNumeric: cn("truncate px-2 text-right text-gray-800 tabular-nums"),
-	};
-
 	// --- UTILS ---
 	function getVirtualRowKey(index: number): string | number {
 		return rows[index]?.id ?? index;
@@ -66,20 +48,20 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	return (
 		<div
 			ref={scrollElementRef}
-			className={classes.scrollElement}
+			className={styles.scrollElement}
 		>
-			<table className={classes.table}>
-				<thead className={classes.thead}>
+			<table className={styles.table}>
+				<thead className={styles.thead}>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<tr
 							key={headerGroup.id}
-							className={classes.headerRow}
+							className={styles.headerRow}
 							style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
 						>
 							{headerGroup.headers.map((header) => (
 								<th
 									key={header.id}
-									className={NUMERIC_COLUMNS.has(header.column.id) ? classes.thNumeric : classes.th}
+									className={NUMERIC_COLUMNS.has(header.column.id) ? styles.thNumeric : styles.th}
 								>
 									{!header.isPlaceholder && <table.FlexRender header={header} />}
 								</th>
@@ -88,7 +70,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 					))}
 				</thead>
 				<tbody
-					className={classes.tbody}
+					className={styles.tbody}
 					style={{ height: virtualizer.getTotalSize() }}
 				>
 					{virtualizer.getVirtualItems().map((virtualRow) => {
@@ -98,7 +80,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 						return (
 							<tr
 								key={row.id}
-								className={classes.row}
+								className={styles.row}
 								style={{
 									gridTemplateColumns: GRID_TEMPLATE_COLUMNS,
 									height: ROW_HEIGHT,
@@ -108,7 +90,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 								{row.getAllCells().map((cell) => (
 									<td
 										key={cell.id}
-										className={NUMERIC_COLUMNS.has(cell.column.id) ? classes.tdNumeric : classes.td}
+										className={NUMERIC_COLUMNS.has(cell.column.id) ? styles.tdNumeric : styles.td}
 									>
 										<table.FlexRender cell={cell} />
 									</td>
@@ -122,9 +104,28 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	);
 }
 
+// --- STYLES ---
+
+const styles = {
+	scrollElement: cn("h-full overflow-auto rounded border border-gray-200"),
+	table: cn("grid min-w-177 text-sm"),
+	thead: cn("sticky top-0 z-10 grid bg-gray-100"),
+	headerRow: cn("grid border-b border-gray-200"),
+	th: cn("px-2 py-2 text-left text-xs font-semibold text-gray-600 uppercase"),
+	thNumeric: cn("px-2 py-2 text-right text-xs font-semibold text-gray-600 uppercase"),
+	tbody: cn("relative grid"),
+	row: cn("absolute top-0 left-0 grid w-full items-center border-b border-gray-100 hover:bg-gray-50"),
+	td: cn("truncate px-2 text-gray-800"),
+	tdNumeric: cn("truncate px-2 text-right text-gray-800 tabular-nums"),
+};
+
 export default OrdersTable;
 
 // --- CONSTANTS ---
+
+const ROW_HEIGHT = 36;
+const GRID_TEMPLATE_COLUMNS =
+	"minmax(90px, 1fr) minmax(190px, 1.5fr) minmax(140px, 1.5fr) 70px 90px 100px";
 
 // Stable references (module scope), so the row models are not invalidated on every render
 const features = tableFeatures({});

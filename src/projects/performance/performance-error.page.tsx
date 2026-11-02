@@ -18,25 +18,6 @@ type PerformanceErrorPageProps = {
  * apps are restored from `localStorage`, so besides retrying, the user can start with an empty desktop.
  */
 function PerformanceErrorPage({ error, retry }: PerformanceErrorPageProps): JSX.Element {
-	// --- STYLES ---
-	const classes = {
-		main: cn(
-			"flex h-screen items-center justify-center bg-linear-to-br from-blue-900 via-blue-800 to-indigo-900 p-6",
-		),
-		card: cn("flex w-full max-w-md flex-col gap-4 rounded-lg bg-white p-6 shadow-2xl"),
-		title: cn("text-lg font-semibold text-gray-800"),
-		message: cn(
-			"overflow-x-auto rounded bg-gray-100 p-3 font-mono text-xs whitespace-pre-wrap text-gray-700",
-		),
-		actions: cn("flex gap-2"),
-		btnRetry: cn(
-			"cursor-pointer rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-		),
-		btnReset: cn(
-			"cursor-pointer rounded bg-gray-200 px-3 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-		),
-	};
-
 	// --- HANDLERS ---
 	function handleRetryClick(): void {
 		retry();
@@ -48,22 +29,22 @@ function PerformanceErrorPage({ error, retry }: PerformanceErrorPageProps): JSX.
 	}
 
 	return (
-		<main className={classes.main}>
+		<main className={styles.main}>
 			<section
 				role="alert"
-				className={classes.card}
+				className={styles.card}
 			>
-				<h1 className={classes.title}>The desktop crashed</h1>
-				<p className={classes.message}>{error.message}</p>
-				<div className={classes.actions}>
+				<h1 className={styles.title}>The desktop crashed</h1>
+				<p className={styles.message}>{error.message}</p>
+				<div className={styles.actions}>
 					<button
-						className={classes.btnRetry}
+						className={styles.btnRetry}
 						onClick={handleRetryClick}
 					>
 						Try again
 					</button>
 					<button
-						className={classes.btnReset}
+						className={styles.btnReset}
 						onClick={handleResetClick}
 					>
 						Close all windows
@@ -73,5 +54,25 @@ function PerformanceErrorPage({ error, retry }: PerformanceErrorPageProps): JSX.
 		</main>
 	);
 }
+
+// --- STYLES ---
+
+const styles = {
+	main: cn(
+		"flex h-screen items-center justify-center bg-linear-to-br from-blue-900 via-blue-800 to-indigo-900 p-6",
+	),
+	card: cn("flex w-full max-w-md flex-col gap-4 rounded-lg bg-white p-6 shadow-2xl"),
+	title: cn("text-lg font-semibold text-gray-800"),
+	message: cn(
+		"overflow-x-auto rounded bg-gray-100 p-3 font-mono text-xs whitespace-pre-wrap text-gray-700",
+	),
+	actions: cn("flex gap-2"),
+	btnRetry: cn(
+		"cursor-pointer rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+	),
+	btnReset: cn(
+		"cursor-pointer rounded bg-gray-200 px-3 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+	),
+};
 
 export default PerformanceErrorPage;
