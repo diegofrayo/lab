@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 7 of 11 solved (#1, #3, #4, #5, #7, #8 and #9).
+**Status:** 8 of 11 solved (#1, #3, #4, #5, #6, #7, #8 and #9).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -69,7 +69,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 - **Smell:** at the minimum interval (100 ms), with virtualization off, every tick re-renders all rows at urgent priority and competes with dragging and typing.
 - **Fix:** wrap the update-path setters (`setProductsState`, `setOrders`) in `startTransition`. Keep the initial-data setter urgent. Toggling this also makes a good lab experiment.
 
-### 6. Subscribe to the setting that is used
+### 6. Subscribe to the setting that is used ✅
 
 `rerender-derived-state`
 

@@ -7,7 +7,7 @@ import cn from "~/lib/cn";
 import SocketStatusBadge from "../../components/socket-status-badge";
 import WindowLoader from "../../desktop/components/window-loader";
 import { useDesktopActions } from "../../desktop/context/desktop.hook";
-import { useDataOrchestratorSettings } from "../../hooks/use-data-orchestrator-settings.hook";
+import { useDataOrchestratorSetting } from "../../hooks/use-data-orchestrator-settings.hook";
 import PlainList from "./components/plain-list";
 import ProductRow from "./components/product-row";
 import VirtualList from "./components/virtual-list";
@@ -20,7 +20,7 @@ function ProductsApp(): JSX.Element {
 	// --- HOOKS ---
 	const { products, trends, status } = useProductsSocket();
 	const { openApp } = useDesktopActions();
-	const { settings } = useDataOrchestratorSettings();
+	const isVirtualizingProducts = useDataOrchestratorSetting("isVirtualizingProducts");
 
 	// --- STYLES ---
 	const classes = {
@@ -53,7 +53,7 @@ function ProductsApp(): JSX.Element {
 				<SocketStatusBadge status={status} />
 			</header>
 			<div className={classes.list}>
-				{settings.isVirtualizingProducts ? (
+				{isVirtualizingProducts ? (
 					<VirtualList
 						items={products}
 						itemSize={PRODUCT_ROW_HEIGHT}
