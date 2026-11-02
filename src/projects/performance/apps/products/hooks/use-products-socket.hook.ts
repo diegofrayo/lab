@@ -12,58 +12,48 @@ type ProductsState = {
 	trends: ProductsTrends;
 };
 
-type UseProductsSocketParams = {
-	// While paused, the socket is disconnected. It reconnects (and refreshes the list) when resumed
-	isPaused: boolean;
-};
-
 type UseProductsSocketReturn = ProductsState & {
 	status: SocketStatus;
 };
 
-export function useProductsSocket({ isPaused }: UseProductsSocketParams): UseProductsSocketReturn {
+export function useProductsSocket(): UseProductsSocketReturn {
 	const [productsState, setProductsState] = useState<ProductsState>({ products: [], trends: {} });
 	const [status, setStatus] = useState<SocketStatus>("CONNECTING");
 
-	useEffect(
-		function connectToProductsSocket() {
-			if (isPaused) return;
+	useEffect(function connectToProductsSocket() {
+		const socket = createProductsSocket();
 
-			const socket = createProductsSocket();
+		function handleInitialData(data: RawProduct[]): void {
+			const products = parseProducts(data);
+			if (!products) return;
 
-			function handleInitialData(data: RawProduct[]): void {
-				const products = parseProducts(data);
-				if (!products) return;
+			setProductsState({ products, trends: {} });
+			setStatus("LIVE");
+		}
 
-				setProductsState({ products, trends: {} });
-				setStatus("LIVE");
-			}
+		function handleUpdates(data: RawProduct[]): void {
+			const products = parseProducts(data);
+			if (!products) return;
 
-			function handleUpdates(data: RawProduct[]): void {
-				const products = parseProducts(data);
-				if (!products) return;
+			setProductsState((prev) => ({
+				products,
+				trends: getProductsTrends(prev.products, products),
+			}));
+		}
 
-				setProductsState((prev) => ({
-					products,
-					trends: getProductsTrends(prev.products, products),
-				}));
-			}
+		const unsubscribeInitialData = socket.on("PRODUCTS:INITIAL_LIST", handleInitialData);
+		const unsubscribeUpdates = socket.on("PRODUCTS:LIST_UPDATES", handleUpdates);
 
-			const unsubscribeInitialData = socket.on("PRODUCTS:INITIAL_LIST", handleInitialData);
-			const unsubscribeUpdates = socket.on("PRODUCTS:LIST_UPDATES", handleUpdates);
+		socket.connect();
 
-			socket.connect();
-
-			return (): void => {
-				unsubscribeInitialData();
-				unsubscribeUpdates();
-				socket.disconnect();
-				// Only a socket that was live reconnects, one still connecting keeps that status
-				setStatus((prev) => (prev === "LIVE" ? "RECONNECTING" : prev));
-			};
-		},
-		[isPaused],
-	);
+		return (): void => {
+			unsubscribeInitialData();
+			unsubscribeUpdates();
+			socket.disconnect();
+			// Only a socket that was live reconnects, one still connecting keeps that status
+			setStatus((prev) => (prev === "LIVE" ? "RECONNECTING" : prev));
+		};
+	}, []);
 
 	return { ...productsState, status };
 }

@@ -6,7 +6,7 @@ import ProductDetailsApp from "./product-details/product-details.app";
 import ProductsApp from "./products/products.app";
 
 // The apps are memoized so they don't re-render when the desktop re-renders for another window
-// (e.g. on every frame of a window drag). Their props (params and isMinimized) keep the same values in that case
+// (e.g. on every frame of a window drag). Their params keep the same reference in that case
 export const APPS_COMPONENTS: { [TAppId in AppId]: ComponentType<AppProps<TAppId>> } = {
 	PRODUCTS: memo(ProductsApp),
 	PRODUCT_DETAILS: memo(ProductDetailsApp),

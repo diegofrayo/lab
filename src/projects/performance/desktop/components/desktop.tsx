@@ -39,10 +39,7 @@ function Desktop(): JSX.Element {
 								key={openedApp.id}
 								openedApp={openedApp}
 							>
-								<AppComponent
-									params={openedApp.params}
-									isMinimized={openedApp.status === "MINIMIZED"}
-								/>
+								<AppComponent params={openedApp.params} />
 							</Window>
 						);
 					})}

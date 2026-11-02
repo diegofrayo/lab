@@ -8,8 +8,6 @@ import { parseOrders, type Order } from "../utils/orders-parser";
 
 type UseProductActivitySocketParams = {
 	productId: string;
-	// While paused, the socket is disconnected. It reconnects (and refreshes the orders) when resumed
-	isPaused: boolean;
 };
 
 type UseProductActivitySocketReturn = {
@@ -23,7 +21,6 @@ type UseProductActivitySocketReturn = {
  */
 export function useProductActivitySocket({
 	productId,
-	isPaused,
 }: UseProductActivitySocketParams): UseProductActivitySocketReturn {
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [status, setStatus] = useState<SocketStatus>("CONNECTING");
@@ -32,8 +29,6 @@ export function useProductActivitySocket({
 
 	useEffect(
 		function connectToProductActivitySocket() {
-			if (isPaused) return;
-
 			// The first message of each connection is the order history, the next ones are new orders
 			let isOrderHistory = true;
 
@@ -63,7 +58,7 @@ export function useProductActivitySocket({
 				setStatus((prev) => (prev === "LIVE" ? "RECONNECTING" : prev));
 			};
 		},
-		[socket, isPaused],
+		[socket],
 	);
 
 	return { orders, status };

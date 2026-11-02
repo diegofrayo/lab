@@ -10,7 +10,7 @@ import type { AppProps } from "../../desktop/desktop.types";
 import OrdersTable from "./components/orders-table";
 import { useProductActivitySocket } from "./hooks/use-product-activity-socket.hook";
 
-function ProductDetailsApp({ params, isMinimized }: AppProps<"PRODUCT_DETAILS">): JSX.Element {
+function ProductDetailsApp({ params }: AppProps<"PRODUCT_DETAILS">): JSX.Element {
 	// --- COMPUTED STATES ---
 	const { id: productId, name: productName } = params.product;
 
@@ -20,7 +20,6 @@ function ProductDetailsApp({ params, isMinimized }: AppProps<"PRODUCT_DETAILS">)
 			key={productId}
 			productId={productId}
 			productName={productName}
-			isMinimized={isMinimized}
 		/>
 	);
 }
@@ -30,14 +29,13 @@ export default ProductDetailsApp;
 // --- COMPONENTS ---
 
 type ProductActivityProps = {
-	isMinimized: boolean;
 	productId: string;
 	productName: string;
 };
 
-function ProductActivity({ isMinimized, productId, productName }: ProductActivityProps): JSX.Element {
+function ProductActivity({ productId, productName }: ProductActivityProps): JSX.Element {
 	// --- HOOKS ---
-	const { orders, status } = useProductActivitySocket({ productId, isPaused: isMinimized });
+	const { orders, status } = useProductActivitySocket({ productId });
 
 	// --- STYLES ---
 	const classes = {

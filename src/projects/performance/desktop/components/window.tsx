@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type CSSProperties, type JSX, type ReactNode, type RefObject } from "react";
+import { Activity, useRef, type CSSProperties, type JSX, type ReactNode, type RefObject } from "react";
 
 import cn from "~/lib/cn";
 
@@ -138,7 +138,6 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 		};
 	}
 
-	// A minimized window is hidden instead of unmounted, so its app keeps its state
 	return (
 		<div
 			ref={containerRef}
@@ -178,12 +177,16 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 				</div>
 			</header>
 			<section className={classes.content}>
-				<AppErrorBoundary
-					appName={title}
-					onClose={closeWindow}
-				>
-					{children}
-				</AppErrorBoundary>
+				{/* A minimized window is hidden instead of unmounted, so its app keeps its state. Activity
+				also cleans up the app's effects (e.g. sockets) while hidden and runs them again on restore */}
+				<Activity mode={isMinimized ? "hidden" : "visible"}>
+					<AppErrorBoundary
+						appName={title}
+						onClose={closeWindow}
+					>
+						{children}
+					</AppErrorBoundary>
+				</Activity>
 			</section>
 			{isResizable ? (
 				<WindowResizeHandles
