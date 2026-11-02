@@ -12,7 +12,8 @@ import cn from "~/lib/cn";
  */
 
 type VirtualListProps<TItem> = {
-	estimatedItemSize: number;
+	// Every item must have this height. Items are not measured, so the size has to be known up front
+	itemSize: number;
 	items: TItem[];
 
 	// Optional props
@@ -24,7 +25,7 @@ type VirtualListProps<TItem> = {
 };
 
 function VirtualList<TItem>({
-	estimatedItemSize,
+	itemSize,
 	items,
 	overscan = 5,
 	getItemKey,
@@ -45,7 +46,7 @@ function VirtualList<TItem>({
 	const virtualizer = useVirtualizer({
 		count: items.length,
 		overscan,
-		estimateSize: getEstimatedItemSize,
+		estimateSize: getItemSize,
 		getItemKey: getVirtualItemKey,
 		getScrollElement,
 	});
@@ -58,8 +59,8 @@ function VirtualList<TItem>({
 	};
 
 	// --- UTILS ---
-	function getEstimatedItemSize(): number {
-		return estimatedItemSize;
+	function getItemSize(): number {
+		return itemSize;
 	}
 
 	function getScrollElement(): HTMLDivElement | null {
@@ -82,10 +83,8 @@ function VirtualList<TItem>({
 					return (
 						<li
 							key={virtualItem.key}
-							ref={virtualizer.measureElement}
-							data-index={virtualItem.index}
 							className={classes.item}
-							style={{ transform: `translateY(${virtualItem.start}px)` }}
+							style={{ height: itemSize, transform: `translateY(${virtualItem.start}px)` }}
 						>
 							{renderItem(item)}
 						</li>

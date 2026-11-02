@@ -56,7 +56,7 @@ function ProductsApp(): JSX.Element {
 				{settings.isVirtualizingProducts ? (
 					<VirtualList
 						items={products}
-						estimatedItemSize={PRODUCT_ROW_HEIGHT}
+						itemSize={PRODUCT_ROW_HEIGHT}
 						getItemKey={getProductKey}
 						renderItem={renderProduct}
 					/>

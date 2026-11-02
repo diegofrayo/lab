@@ -32,7 +32,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	const virtualizer = useVirtualizer({
 		count: rows.length,
 		overscan: 10,
-		estimateSize: getEstimatedRowSize,
+		estimateSize: getRowSize,
 		getItemKey: getVirtualRowKey,
 		getScrollElement,
 	});
@@ -98,8 +98,6 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 						return (
 							<tr
 								key={row.id}
-								ref={virtualizer.measureElement}
-								data-index={virtualRow.index}
 								className={classes.row}
 								style={{
 									gridTemplateColumns: GRID_TEMPLATE_COLUMNS,
@@ -154,6 +152,6 @@ function getRowId(order: Order): string {
 	return order.id;
 }
 
-function getEstimatedRowSize(): number {
+function getRowSize(): number {
 	return ROW_HEIGHT;
 }

@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 4 of 11 solved (#1, #4, #5 and #8).
+**Status:** 5 of 11 solved (#1, #4, #5, #8 and #9).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -99,7 +99,7 @@ Referential stability (TanStack Virtual)
 
 ## Rendering Performance (MEDIUM)
 
-### 9. Drop `measureElement` for fixed-height rows
+### 9. Drop `measureElement` for fixed-height rows ✅
 
 **Where:** `apps/products/components/virtual-list.tsx:82`, `apps/product-details/components/orders-table.tsx:101`
 
