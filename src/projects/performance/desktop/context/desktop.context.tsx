@@ -189,10 +189,12 @@ function getRestoredStatus(app: OpenedApp): OpenedApp["status"] {
 	return app.status;
 }
 
+// Only the focused apps are copied, so the other ones keep their reference and their memoized
+// components (windows and taskbar buttons) don't re-render
 function unfocusAllApps(apps: OpenedApps): OpenedApps {
 	return Object.fromEntries(
-		Object.entries(apps).map(([appId, appConfig]) => {
-			return [appId, { ...appConfig, isFocused: false }];
+		Object.entries(apps).map(([appId, openedApp]) => {
+			return [appId, openedApp.isFocused ? { ...openedApp, isFocused: false } : openedApp];
 		}),
 	);
 }

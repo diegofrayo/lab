@@ -7,8 +7,7 @@ import cn from "~/lib/cn";
 import SocketStatusBadge from "../../components/socket-status-badge";
 import WindowLoader from "../../desktop/components/window-loader";
 import { useDesktopActions } from "../../desktop/context/desktop.hook";
-import type { AppProps } from "../../desktop/desktop.types";
-import { useDataOrchestratorSettings } from "../../hooks/use-data-orchestrator-settings.hook";
+import { useDataOrchestratorSetting } from "../../hooks/use-data-orchestrator-settings.hook";
 import PlainList from "./components/plain-list";
 import ProductRow from "./components/product-row";
 import VirtualList from "./components/virtual-list";
@@ -17,11 +16,11 @@ import type { Product } from "./utils/products-parser";
 
 const PRODUCT_ROW_HEIGHT = 72;
 
-function ProductsApp({ isMinimized }: AppProps): JSX.Element {
+function ProductsApp(): JSX.Element {
 	// --- HOOKS ---
-	const { products, trends, status } = useProductsSocket({ isPaused: isMinimized });
+	const { products, trends, status } = useProductsSocket();
 	const { openApp } = useDesktopActions();
-	const { settings } = useDataOrchestratorSettings();
+	const isVirtualizingProducts = useDataOrchestratorSetting("isVirtualizingProducts");
 
 	// --- STYLES ---
 	const classes = {
@@ -54,10 +53,10 @@ function ProductsApp({ isMinimized }: AppProps): JSX.Element {
 				<SocketStatusBadge status={status} />
 			</header>
 			<div className={classes.list}>
-				{settings.isVirtualizingProducts ? (
+				{isVirtualizingProducts ? (
 					<VirtualList
 						items={products}
-						estimatedItemSize={PRODUCT_ROW_HEIGHT}
+						itemSize={PRODUCT_ROW_HEIGHT}
 						getItemKey={getProductKey}
 						renderItem={renderProduct}
 					/>

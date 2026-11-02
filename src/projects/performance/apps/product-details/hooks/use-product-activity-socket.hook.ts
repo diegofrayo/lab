@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 import type { RawProductOrder, SocketStatus } from "../../../performance.types";
 import { createProductActivitySocket } from "../services/product-activity-socket.service";
 import { parseOrders, type Order } from "../utils/orders-parser";
 
+// Only the latest orders are kept, so the list (and the table's row model) doesn't grow forever
+const MAX_ORDERS = 1000;
+
 type UseProductActivitySocketParams = {
 	productId: string;
-	// While paused, the socket is disconnected. It reconnects (and refreshes the orders) when resumed
-	isPaused: boolean;
 };
 
 type UseProductActivitySocketReturn = {
@@ -23,7 +24,6 @@ type UseProductActivitySocketReturn = {
  */
 export function useProductActivitySocket({
 	productId,
-	isPaused,
 }: UseProductActivitySocketParams): UseProductActivitySocketReturn {
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [status, setStatus] = useState<SocketStatus>("CONNECTING");
@@ -32,8 +32,6 @@ export function useProductActivitySocket({
 
 	useEffect(
 		function connectToProductActivitySocket() {
-			if (isPaused) return;
-
 			// The first message of each connection is the order history, the next ones are new orders
 			let isOrderHistory = true;
 
@@ -43,13 +41,16 @@ export function useProductActivitySocket({
 
 				if (isOrderHistory) {
 					isOrderHistory = false;
-					setOrders(newOrders);
+					setOrders(newOrders.slice(0, MAX_ORDERS));
 					setStatus("LIVE");
 					return;
 				}
 
-				// Every message is sorted newest first, so it goes on top of the previous ones
-				setOrders((prev) => [...newOrders, ...prev]);
+				// Every message is sorted newest first, so it goes on top of the previous ones. The new
+				// orders are non-urgent, so frequent ticks don't block dragging or typing
+				startTransition(() => {
+					setOrders((prev) => [...newOrders, ...prev].slice(0, MAX_ORDERS));
+				});
 			}
 
 			const unsubscribeOrders = socket.on("PRODUCT_DETAILS:ORDERS", handleOrders);
@@ -63,7 +64,7 @@ export function useProductActivitySocket({
 				setStatus((prev) => (prev === "LIVE" ? "RECONNECTING" : prev));
 			};
 		},
-		[socket, isPaused],
+		[socket],
 	);
 
 	return { orders, status };

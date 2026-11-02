@@ -1,13 +1,12 @@
 "use client";
 
-import type { ComponentType, JSX } from "react";
+import type { JSX } from "react";
 
 import cn from "~/lib/cn";
-import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
 import { useDesktopState } from "../context/desktop.hook";
-import type { AppConfig, AppIdWithoutParams, AppProps } from "../desktop.types";
+import type { AppConfig, AppIdWithoutParams } from "../desktop.types";
 import DesktopIcon from "./desktop-icon";
 import Taskbar from "./taskbar";
 import Window from "./window";
@@ -30,22 +29,12 @@ function Desktop(): JSX.Element {
 		<main className={classes.root}>
 			<section className={classes.desktop}>
 				<div className={classes.windowsArea}>
-					{Object.values(openedApps).map((openedApp) => {
-						// TS can't relate the component to the params of the same app, but both come from the same app id
-						const AppComponent = APPS_COMPONENTS[openedApp.appConfig.id] as ComponentType<AppProps>;
-
-						return (
-							<Window
-								key={openedApp.id}
-								openedApp={openedApp}
-							>
-								<AppComponent
-									params={openedApp.params}
-									isMinimized={openedApp.status === "MINIMIZED"}
-								/>
-							</Window>
-						);
-					})}
+					{Object.values(openedApps).map((openedApp) => (
+						<Window
+							key={openedApp.id}
+							openedApp={openedApp}
+						/>
+					))}
 				</div>
 				<div className={classes.iconsArea}>
 					{DESKTOP_APPS.map((appConfig) => (

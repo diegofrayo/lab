@@ -4,7 +4,7 @@ import type { JSX } from "react";
 
 import cn from "~/lib/cn";
 
-import { clearOpenedApps } from "./desktop";
+import { clearOpenedApps } from "./desktop/utils/opened-apps-storage";
 
 type PerformanceErrorPageProps = {
 	error: Error & { digest?: string };

@@ -15,6 +15,17 @@ export function useDataOrchestratorSettings(): UseDataOrchestratorSettingsReturn
 	return { settings, updateSettings };
 }
 
+// Every setting is a primitive, so the component only re-renders when the selected setting changes
+export function useDataOrchestratorSetting<TKey extends keyof DataOrchestratorSettings>(
+	key: TKey,
+): DataOrchestratorSettings[TKey] {
+	function getSettingSnapshot(): DataOrchestratorSettings[TKey] {
+		return dataOrchestrator.getSettings()[key];
+	}
+
+	return useSyncExternalStore(subscribe, getSettingSnapshot, getSettingSnapshot);
+}
+
 // --- UTILS ---
 
 function subscribe(listener: () => void): () => void {

@@ -54,8 +54,6 @@ export type AppConfig<TAppId extends AppId = AppId> = {
 
 export type AppProps<TAppId extends AppId = AppId> = {
 	params: AppParams<TAppId>;
-	// Minimized apps stay mounted (to keep their state) but must stop their background work (e.g. sockets)
-	isMinimized: boolean;
 };
 
 export type AppsRepository = {

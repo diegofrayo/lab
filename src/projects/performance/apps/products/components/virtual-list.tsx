@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import type { JSX } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -10,9 +10,9 @@ import cn from "~/lib/cn";
  * The only place that knows about TanStack Virtual. Consumers pass plain items and a render
  * function, so the virtualization library can be swapped without touching them.
  */
-
 type VirtualListProps<TItem> = {
-	estimatedItemSize: number;
+	// Every item must have this height. Items are not measured, so the size has to be known up front
+	itemSize: number;
 	items: TItem[];
 
 	// Optional props
@@ -24,7 +24,7 @@ type VirtualListProps<TItem> = {
 };
 
 function VirtualList<TItem>({
-	estimatedItemSize,
+	itemSize,
 	items,
 	overscan = 5,
 	getItemKey,
@@ -33,11 +33,30 @@ function VirtualList<TItem>({
 	// --- STATES & REFS ---
 	const scrollElementRef = useRef<HTMLDivElement>(null);
 
+	// --- UTILS ---
+	function getScrollElement(): HTMLDivElement | null {
+		return scrollElementRef.current;
+	}
+
+	// TanStack Virtual rebuilds its measurements when `estimateSize` changes, so it only changes with the size
+	const getItemSize = useCallback((): number => {
+		return itemSize;
+	}, [itemSize]);
+
+	// TanStack Virtual rebuilds its measurements when `getItemKey` changes, so it only changes with the items
+	const getVirtualItemKey = useCallback(
+		(index: number): string | number => {
+			const item = items[index];
+			return item === undefined ? index : getItemKey(item);
+		},
+		[items, getItemKey],
+	);
+
 	// --- HOOKS ---
 	const virtualizer = useVirtualizer({
 		count: items.length,
 		overscan,
-		estimateSize: getEstimatedItemSize,
+		estimateSize: getItemSize,
 		getItemKey: getVirtualItemKey,
 		getScrollElement,
 	});
@@ -48,20 +67,6 @@ function VirtualList<TItem>({
 		inner: cn("relative w-full"),
 		item: cn("absolute top-0 left-0 w-full"),
 	};
-
-	// --- UTILS ---
-	function getEstimatedItemSize(): number {
-		return estimatedItemSize;
-	}
-
-	function getVirtualItemKey(index: number): string | number {
-		const item = items[index];
-		return item === undefined ? index : getItemKey(item);
-	}
-
-	function getScrollElement(): HTMLDivElement | null {
-		return scrollElementRef.current;
-	}
 
 	return (
 		<div
@@ -79,10 +84,8 @@ function VirtualList<TItem>({
 					return (
 						<li
 							key={virtualItem.key}
-							ref={virtualizer.measureElement}
-							data-index={virtualItem.index}
 							className={classes.item}
-							style={{ transform: `translateY(${virtualItem.start}px)` }}
+							style={{ height: itemSize, transform: `translateY(${virtualItem.start}px)` }}
 						>
 							{renderItem(item)}
 						</li>
