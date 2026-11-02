@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import type { JSX } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -34,6 +34,14 @@ function VirtualList<TItem>({
 	const scrollElementRef = useRef<HTMLDivElement>(null);
 
 	// --- HOOKS ---
+	// TanStack Virtual rebuilds its measurements when `getItemKey` changes, so it only changes with the items
+	const getVirtualItemKey = useCallback(
+		(index: number): string | number => {
+			const item = items[index];
+			return item === undefined ? index : getItemKey(item);
+		},
+		[items, getItemKey],
+	);
 	const virtualizer = useVirtualizer({
 		count: items.length,
 		overscan,
@@ -52,11 +60,6 @@ function VirtualList<TItem>({
 	// --- UTILS ---
 	function getEstimatedItemSize(): number {
 		return estimatedItemSize;
-	}
-
-	function getVirtualItemKey(index: number): string | number {
-		const item = items[index];
-		return item === undefined ? index : getItemKey(item);
 	}
 
 	function getScrollElement(): HTMLDivElement | null {

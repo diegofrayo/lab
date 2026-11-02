@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 3 of 11 solved (#1, #4 and #5).
+**Status:** 4 of 11 solved (#1, #4, #5 and #8).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -88,7 +88,7 @@ Referential stability (related: `rerender-memo`)
 - **Fix:** copy only the apps whose `isFocused` actually changes.
 - **Catch:** to get real wins, `Window` would also need `memo`, and that only works if `Desktop` stops passing a fresh `children` element. Let `Window` render the `AppComponent` itself.
 
-### 8. Stabilize the virtualizer's `getItemKey`
+### 8. Stabilize the virtualizer's `getItemKey` ✅
 
 Referential stability (TanStack Virtual)
 
