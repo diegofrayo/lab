@@ -9,8 +9,17 @@ export function getMinWindowSize(appConfig: AppConfig): WindowSize {
 	return appConfig.minWindowSize ?? DEFAULT_MIN_WINDOW_SIZE;
 }
 
-// The configured size is used only when it's not smaller than the min size
+// The configured size is used as is for non-resizable apps; otherwise, only when it's not smaller than the min size
 export function getInitialWindowSize(appConfig: AppConfig): WindowSize {
+	const isResizable = appConfig.isResizable ?? true;
+
+	if (!isResizable && appConfig.windowConfig) {
+		return {
+			width: appConfig.windowConfig.width,
+			height: appConfig.windowConfig.height,
+		};
+	}
+
 	const minWindowSize = getMinWindowSize(appConfig);
 
 	return {

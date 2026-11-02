@@ -1,4 +1,4 @@
-import type { JSX, ReactNode } from "react";
+import type { CSSProperties, JSX, ReactNode } from "react";
 
 import cn from "~/lib/cn";
 
@@ -9,18 +9,38 @@ import cn from "~/lib/cn";
 
 type PlainListProps<TItem> = {
 	items: TItem[];
+	// When set, the browser skips the layout and paint of the off-screen items
+	// (`content-visibility: auto`), using this size as their placeholder height
+	estimatedItemSize?: number | undefined;
 
 	// Render functions
 	getItemKey: (item: TItem) => string;
 	renderItem: (item: TItem) => ReactNode;
 };
 
-function PlainList<TItem>({ items, getItemKey, renderItem }: PlainListProps<TItem>): JSX.Element {
+function PlainList<TItem>({
+	items,
+	estimatedItemSize,
+	getItemKey,
+	renderItem,
+}: PlainListProps<TItem>): JSX.Element {
+	// --- COMPUTED STATES ---
+	const isSkippingOffscreenItems = estimatedItemSize !== undefined;
+	const itemStyle: CSSProperties | undefined = isSkippingOffscreenItems
+		? { containIntrinsicSize: `auto ${estimatedItemSize}px` }
+		: undefined;
+
 	return (
 		<div className={styles.scrollElement}>
 			<ul>
 				{items.map((item) => (
-					<li key={getItemKey(item)}>{renderItem(item)}</li>
+					<li
+						key={getItemKey(item)}
+						className={isSkippingOffscreenItems ? styles.offscreenSkippableItem : undefined}
+						style={itemStyle}
+					>
+						{renderItem(item)}
+					</li>
 				))}
 			</ul>
 		</div>
@@ -31,6 +51,7 @@ function PlainList<TItem>({ items, getItemKey, renderItem }: PlainListProps<TIte
 
 const styles = {
 	scrollElement: cn("h-full overflow-auto"),
+	offscreenSkippableItem: cn("[content-visibility:auto]"),
 };
 
 export default PlainList;

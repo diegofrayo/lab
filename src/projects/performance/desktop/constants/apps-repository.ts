@@ -27,15 +27,11 @@ export const APPS_REPOSITORY: AppsRepository = {
 		icon: "🎛️",
 		isMaximizable: false,
 		isResizable: false,
-		minWindowSize: {
-			width: 360,
-			height: 280,
-		},
 		windowConfig: {
 			x: 0,
 			y: 0,
-			width: 420,
-			height: 320,
+			width: 350,
+			height: 460,
 		},
 	},
 };

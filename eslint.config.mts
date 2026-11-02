@@ -67,7 +67,6 @@ const typescriptConfig = defineConfig({
 
 		"@typescript-eslint/ban-ts-comment": ["warn"],
 		"@typescript-eslint/consistent-type-imports": "error",
-		// The classes helpers of the components infer their return type, so their fields don't have to be listed twice
 		"@typescript-eslint/explicit-function-return-type": [
 			"error",
 			{ allowDirectConstAssertionInArrowFunctions: true },

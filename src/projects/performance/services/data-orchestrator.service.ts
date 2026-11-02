@@ -24,13 +24,16 @@ export type DataSource<TData> = {
 	getUpdates: (previousData: TData) => TData;
 };
 
+// How the products list renders its rows: all of them, all of them with the off-screen ones skipped
+// by the browser (`content-visibility`), or only the visible ones
+export type ProductsListMode = "PLAIN" | "CONTENT_VISIBILITY" | "VIRTUAL";
+
 export type DataOrchestratorSettings = {
 	// While false, the connections only receive their initial data
 	isDispatchingUpdates: boolean;
 	// Used by all the connections
 	defaultUpdateIntervalMs: number;
-	// While false, the products list renders all its rows at once
-	isVirtualizingProducts: boolean;
+	productsListMode: ProductsListMode;
 };
 
 type Connection = {
@@ -61,7 +64,7 @@ class DataOrchestrator {
 	private settings: DataOrchestratorSettings = {
 		isDispatchingUpdates: true,
 		defaultUpdateIntervalMs: DEFAULT_UPDATE_INTERVAL_MS,
-		isVirtualizingProducts: true,
+		productsListMode: "VIRTUAL",
 	};
 	private settingsListeners = new Set<() => void>();
 

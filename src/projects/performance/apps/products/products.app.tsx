@@ -20,7 +20,11 @@ function ProductsApp(): JSX.Element {
 	// --- HOOKS ---
 	const { products, trends, status } = useProductsSocket();
 	const { openApp } = useDesktopActions();
-	const isVirtualizingProducts = useDataOrchestratorSetting("isVirtualizingProducts");
+	const productsListMode = useDataOrchestratorSetting("productsListMode");
+
+	// --- COMPUTED STATES ---
+	const plainListEstimatedItemSize =
+		productsListMode === "CONTENT_VISIBILITY" ? PRODUCT_ROW_HEIGHT : undefined;
 
 	// --- HANDLERS ---
 	function handleProductSelect(product: Product): void {
@@ -45,7 +49,7 @@ function ProductsApp(): JSX.Element {
 				<SocketStatusBadge status={status} />
 			</header>
 			<div className={styles.list}>
-				{isVirtualizingProducts ? (
+				{productsListMode === "VIRTUAL" ? (
 					<VirtualList
 						items={products}
 						itemSize={PRODUCT_ROW_HEIGHT}
@@ -55,6 +59,7 @@ function ProductsApp(): JSX.Element {
 				) : (
 					<PlainList
 						items={products}
+						estimatedItemSize={plainListEstimatedItemSize}
 						getItemKey={getProductKey}
 						renderItem={renderProduct}
 					/>

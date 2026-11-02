@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 10 of 11 solved (#1, #3, #4, #5, #6, #7, #8, #9, #11 and #12).
+**Status:** 11 of 12 solved (#1, #3, #4, #5, #6, #7, #8, #9, #10, #11 and #12).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -106,7 +106,7 @@ Referential stability (TanStack Virtual)
 - **Smell:** product rows are `h-18` (72px) and order rows use `ROW_HEIGHT`, yet both attach `ref={virtualizer.measureElement}`. That adds a ResizeObserver plus `getBoundingClientRect` for every mounted row.
 - **Fix:** drop the ref when the size is known up front.
 
-### 10. Add a `content-visibility` list mode to compare
+### 10. Add a `content-visibility` list mode to compare ✅
 
 `rendering-content-visibility`
 

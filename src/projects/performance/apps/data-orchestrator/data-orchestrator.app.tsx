@@ -6,7 +6,7 @@ import type { JSX } from "react";
 import cn from "~/lib/cn";
 
 import { useDataOrchestratorSettings } from "../../hooks/use-data-orchestrator-settings.hook";
-import { MIN_UPDATE_INTERVAL_MS } from "../../services/data-orchestrator.service";
+import { MIN_UPDATE_INTERVAL_MS, type ProductsListMode } from "../../services/data-orchestrator.service";
 
 // The orchestrator doesn't belong to this window, so minimizing it doesn't pause anything
 function DataOrchestratorApp(): JSX.Element {
@@ -27,8 +27,11 @@ function DataOrchestratorApp(): JSX.Element {
 		updateSettings({ isDispatchingUpdates: e.target.checked });
 	}
 
-	function handleVirtualizingProductsChange(e: ChangeEvent<HTMLInputElement>): void {
-		updateSettings({ isVirtualizingProducts: e.target.checked });
+	function handleProductsListModeChange(e: ChangeEvent<HTMLInputElement>): void {
+		const option = PRODUCTS_LIST_MODE_OPTIONS.find(({ value }) => value === e.target.value);
+		if (!option) return;
+
+		updateSettings({ productsListMode: option.value });
 	}
 
 	function handleIntervalChange(e: ChangeEvent<HTMLInputElement>): void {
@@ -98,24 +101,35 @@ function DataOrchestratorApp(): JSX.Element {
 					isIntervalValid={isIntervalValid}
 				/>
 			</form>
-			<div className={dataOrchestratorAppStyles.field}>
-				<label className={dataOrchestratorAppStyles.checkboxLabel}>
-					<input
-						type="checkbox"
-						className={dataOrchestratorAppStyles.checkbox}
-						checked={settings.isVirtualizingProducts}
-						aria-describedby={VIRTUALIZING_PRODUCTS_HINT_ID}
-						onChange={handleVirtualizingProductsChange}
-					/>
-					Virtualize the products list
-				</label>
+			<fieldset
+				className={dataOrchestratorAppStyles.field}
+				aria-describedby={PRODUCTS_LIST_MODE_HINT_ID}
+			>
+				<legend className={dataOrchestratorAppStyles.legend}>Products list mode</legend>
+				{PRODUCTS_LIST_MODE_OPTIONS.map((option) => (
+					<label
+						key={option.value}
+						className={dataOrchestratorAppStyles.checkboxLabel}
+					>
+						<input
+							type="radio"
+							name="data-orchestrator-products-list-mode"
+							className={dataOrchestratorAppStyles.checkbox}
+							value={option.value}
+							checked={settings.productsListMode === option.value}
+							onChange={handleProductsListModeChange}
+						/>
+						{option.label}
+					</label>
+				))}
 				<p
-					id={VIRTUALIZING_PRODUCTS_HINT_ID}
+					id={PRODUCTS_LIST_MODE_HINT_ID}
 					className={dataOrchestratorAppStyles.hint}
 				>
-					While disabled, all the product rows are rendered at once.
+					Plain renders all the rows, content-visibility lets the browser skip the off-screen ones, and
+					virtualized only mounts the visible ones.
 				</p>
-			</div>
+			</fieldset>
 		</section>
 	);
 }
@@ -129,6 +143,7 @@ const dataOrchestratorAppStyles = {
 	checkboxLabel: cn("flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-800"),
 	checkbox: cn("h-4 w-4 cursor-pointer accent-blue-600"),
 	label: cn("text-sm font-medium text-gray-800"),
+	legend: cn("mb-1 text-sm font-medium text-gray-800"),
 	hint: cn("text-xs text-gray-500"),
 	intervalRow: cn("flex items-center gap-2"),
 	input: cn(
@@ -145,7 +160,13 @@ export default DataOrchestratorApp;
 
 const DISPATCHING_UPDATES_HINT_ID = "data-orchestrator-dispatching-updates-hint";
 const UPDATE_INTERVAL_HINT_ID = "data-orchestrator-update-interval-hint";
-const VIRTUALIZING_PRODUCTS_HINT_ID = "data-orchestrator-virtualizing-products-hint";
+const PRODUCTS_LIST_MODE_HINT_ID = "data-orchestrator-products-list-mode-hint";
+
+const PRODUCTS_LIST_MODE_OPTIONS: { value: ProductsListMode; label: string }[] = [
+	{ value: "PLAIN", label: "Plain" },
+	{ value: "CONTENT_VISIBILITY", label: "content-visibility" },
+	{ value: "VIRTUAL", label: "Virtualized" },
+];
 
 // --- COMPONENTS ---
 
