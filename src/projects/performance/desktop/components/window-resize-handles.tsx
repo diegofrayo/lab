@@ -84,17 +84,17 @@ function WindowResizeHandles({
 	return (
 		<>
 			<div
-				className={classes.right}
+				className={styles.right}
 				data-direction="RIGHT"
 				onMouseDown={handleHandleMouseDown}
 			/>
 			<div
-				className={classes.bottom}
+				className={styles.bottom}
 				data-direction="BOTTOM"
 				onMouseDown={handleHandleMouseDown}
 			/>
 			<div
-				className={classes.bottomRight}
+				className={styles.bottomRight}
 				data-direction="BOTTOM_RIGHT"
 				onMouseDown={handleHandleMouseDown}
 			/>
@@ -104,7 +104,7 @@ function WindowResizeHandles({
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	right: cn("absolute top-0 right-0 bottom-3 w-1.5 cursor-ew-resize"),
 	bottom: cn("absolute right-3 bottom-0 left-0 h-1.5 cursor-ns-resize"),
 	bottomRight: cn("absolute right-0 bottom-0 h-3 w-3 cursor-nwse-resize"),

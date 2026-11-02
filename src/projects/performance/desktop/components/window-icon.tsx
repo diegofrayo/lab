@@ -17,19 +17,19 @@ function WindowIcon({ openedApp }: WindowIconProps): JSX.Element {
 	if (iconUrl) {
 		return (
 			<img
-				className={classes.image}
+				className={styles.image}
 				src={iconUrl}
 				alt=""
 			/>
 		);
 	}
 
-	return <span className={classes.emoji}>{openedApp.appConfig.icon}</span>;
+	return <span className={styles.emoji}>{openedApp.appConfig.icon}</span>;
 }
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	emoji: cn("text-base"),
 	image: cn("h-5 w-5 shrink-0 rounded-sm object-cover"),
 };

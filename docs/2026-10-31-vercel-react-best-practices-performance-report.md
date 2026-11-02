@@ -144,5 +144,5 @@ Referential stability (TanStack Virtual)
 
 ## Not reported
 
-- `rendering-hoist-jsx`: the `classes = { cn(...) }` objects inside components could be hoisted, but that's the project convention and the cost is tiny.
+- `rendering-hoist-jsx`: the `classes = { cn(...) }` objects inside components could be hoisted, but that's the project convention and the cost is tiny. ✅
 - `client-passive-event-listeners`: passive listeners only matter for touch and wheel events, not the `mousemove` used here.

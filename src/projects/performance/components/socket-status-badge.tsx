@@ -12,9 +12,9 @@ type SocketStatusBadgeProps = {
 
 function SocketStatusBadge({ status }: SocketStatusBadgeProps): JSX.Element {
 	// --- STYLES ---
-	const classes = socketStatusBadgeStyles({ status });
+	const styles = socketStatusBadgeStyles({ status });
 
-	return <span className={classes.badge}>{SOCKET_STATUS_LABELS[status]}</span>;
+	return <span className={styles.badge}>{SOCKET_STATUS_LABELS[status]}</span>;
 }
 
 // --- STYLES ---

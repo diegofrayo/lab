@@ -22,19 +22,19 @@ function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 
 	return (
 		<button
-			className={classes.container}
+			className={styles.container}
 			aria-label={`Open ${appConfig.name}`}
 			onClick={handleClick}
 		>
-			<span className={classes.icon}>{appConfig.icon}</span>
-			<span className={classes.label}>{appConfig.name}</span>
+			<span className={styles.icon}>{appConfig.icon}</span>
+			<span className={styles.label}>{appConfig.name}</span>
 		</button>
 	);
 }
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	container: cn(
 		"flex w-20 cursor-pointer flex-col items-center gap-1 rounded p-2 select-none hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none",
 	),

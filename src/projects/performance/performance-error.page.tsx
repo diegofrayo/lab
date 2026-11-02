@@ -29,22 +29,22 @@ function PerformanceErrorPage({ error, retry }: PerformanceErrorPageProps): JSX.
 	}
 
 	return (
-		<main className={classes.main}>
+		<main className={styles.main}>
 			<section
 				role="alert"
-				className={classes.card}
+				className={styles.card}
 			>
-				<h1 className={classes.title}>The desktop crashed</h1>
-				<p className={classes.message}>{error.message}</p>
-				<div className={classes.actions}>
+				<h1 className={styles.title}>The desktop crashed</h1>
+				<p className={styles.message}>{error.message}</p>
+				<div className={styles.actions}>
 					<button
-						className={classes.btnRetry}
+						className={styles.btnRetry}
 						onClick={handleRetryClick}
 					>
 						Try again
 					</button>
 					<button
-						className={classes.btnReset}
+						className={styles.btnReset}
 						onClick={handleResetClick}
 					>
 						Close all windows
@@ -57,7 +57,7 @@ function PerformanceErrorPage({ error, retry }: PerformanceErrorPageProps): JSX.
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	main: cn(
 		"flex h-screen items-center justify-center bg-linear-to-br from-blue-900 via-blue-800 to-indigo-900 p-6",
 	),

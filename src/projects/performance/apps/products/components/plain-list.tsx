@@ -17,7 +17,7 @@ type PlainListProps<TItem> = {
 
 function PlainList<TItem>({ items, getItemKey, renderItem }: PlainListProps<TItem>): JSX.Element {
 	return (
-		<div className={classes.scrollElement}>
+		<div className={styles.scrollElement}>
 			<ul>
 				{items.map((item) => (
 					<li key={getItemKey(item)}>{renderItem(item)}</li>
@@ -29,7 +29,7 @@ function PlainList<TItem>({ items, getItemKey, renderItem }: PlainListProps<TIte
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	scrollElement: cn("h-full overflow-auto"),
 };
 

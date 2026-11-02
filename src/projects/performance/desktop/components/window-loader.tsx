@@ -11,13 +11,13 @@ type WindowLoaderProps = {
 function WindowLoader({ text }: WindowLoaderProps): JSX.Element {
 	return (
 		<div
-			className={classes.backdrop}
+			className={styles.backdrop}
 			role="status"
 			aria-live="polite"
 		>
-			<div className={classes.content}>
-				<span className={classes.spinner} />
-				<span className={classes.text}>{text}</span>
+			<div className={styles.content}>
+				<span className={styles.spinner} />
+				<span className={styles.text}>{text}</span>
 			</div>
 		</div>
 	);
@@ -25,7 +25,7 @@ function WindowLoader({ text }: WindowLoaderProps): JSX.Element {
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	backdrop: cn("absolute inset-0 z-10 flex items-center justify-center bg-white/40 backdrop-blur-sm"),
 	content: cn("flex flex-col items-center gap-3"),
 	spinner: cn("h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"),

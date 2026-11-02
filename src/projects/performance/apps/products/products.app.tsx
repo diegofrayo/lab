@@ -39,12 +39,12 @@ function ProductsApp(): JSX.Element {
 	}
 
 	return (
-		<section className={classes.container}>
-			<header className={classes.header}>
-				<h1 className={classes.title}>List of Products</h1>
+		<section className={styles.container}>
+			<header className={styles.header}>
+				<h1 className={styles.title}>List of Products</h1>
 				<SocketStatusBadge status={status} />
 			</header>
-			<div className={classes.list}>
+			<div className={styles.list}>
 				{isVirtualizingProducts ? (
 					<VirtualList
 						items={products}
@@ -67,7 +67,7 @@ function ProductsApp(): JSX.Element {
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	container: cn("flex h-full flex-col gap-3"),
 	header: cn("flex items-center justify-between"),
 	title: cn("text-2xl font-semibold text-gray-800"),

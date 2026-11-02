@@ -48,20 +48,20 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 	return (
 		<div
 			ref={scrollElementRef}
-			className={classes.scrollElement}
+			className={styles.scrollElement}
 		>
-			<table className={classes.table}>
-				<thead className={classes.thead}>
+			<table className={styles.table}>
+				<thead className={styles.thead}>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<tr
 							key={headerGroup.id}
-							className={classes.headerRow}
+							className={styles.headerRow}
 							style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
 						>
 							{headerGroup.headers.map((header) => (
 								<th
 									key={header.id}
-									className={NUMERIC_COLUMNS.has(header.column.id) ? classes.thNumeric : classes.th}
+									className={NUMERIC_COLUMNS.has(header.column.id) ? styles.thNumeric : styles.th}
 								>
 									{!header.isPlaceholder && <table.FlexRender header={header} />}
 								</th>
@@ -70,7 +70,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 					))}
 				</thead>
 				<tbody
-					className={classes.tbody}
+					className={styles.tbody}
 					style={{ height: virtualizer.getTotalSize() }}
 				>
 					{virtualizer.getVirtualItems().map((virtualRow) => {
@@ -80,7 +80,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 						return (
 							<tr
 								key={row.id}
-								className={classes.row}
+								className={styles.row}
 								style={{
 									gridTemplateColumns: GRID_TEMPLATE_COLUMNS,
 									height: ROW_HEIGHT,
@@ -90,7 +90,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 								{row.getAllCells().map((cell) => (
 									<td
 										key={cell.id}
-										className={NUMERIC_COLUMNS.has(cell.column.id) ? classes.tdNumeric : classes.td}
+										className={NUMERIC_COLUMNS.has(cell.column.id) ? styles.tdNumeric : styles.td}
 									>
 										<table.FlexRender cell={cell} />
 									</td>
@@ -106,7 +106,7 @@ function OrdersTable({ orders }: OrdersTableProps): JSX.Element {
 
 // --- STYLES ---
 
-const classes = {
+const styles = {
 	scrollElement: cn("h-full overflow-auto rounded border border-gray-200"),
 	table: cn("grid min-w-177 text-sm"),
 	thead: cn("sticky top-0 z-10 grid bg-gray-100"),
