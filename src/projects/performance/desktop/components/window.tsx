@@ -2,18 +2,20 @@
 
 import {
 	Activity,
+	memo,
 	Suspense,
 	useRef,
+	type ComponentType,
 	type CSSProperties,
 	type JSX,
-	type ReactNode,
 	type RefObject,
 } from "react";
 
 import cn from "~/lib/cn";
+import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
 import { useDesktopActions } from "../context/desktop.hook";
-import type { OpenedApp } from "../desktop.types";
+import type { AppProps, OpenedApp } from "../desktop.types";
 import { usePointerDrag } from "../hooks/use-pointer-drag.hook";
 import { useWindowDrag } from "../hooks/use-window-drag.hook";
 import { useWindowKeyboardFocus } from "../hooks/use-window-keyboard-focus.hook";
@@ -39,10 +41,9 @@ type ResizeSize = {
 
 type WindowProps = {
 	openedApp: OpenedApp;
-	children: ReactNode;
 };
 
-function Window({ openedApp, children }: WindowProps): JSX.Element {
+function Window({ openedApp }: WindowProps): JSX.Element {
 	// --- HOOKS ---
 	const { closeApp, minimizeApp, maximizeApp, restoreApp, focusApp } = useDesktopActions();
 	const { containerRef, startDrag } = useWindowDrag({
@@ -193,7 +194,7 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 						appName={title}
 						onClose={closeWindow}
 					>
-						<Suspense fallback={<WindowLoader text="Loading" />}>{children}</Suspense>
+						<WindowApp openedApp={openedApp} />
 					</AppErrorBoundary>
 				</Activity>
 			</section>
@@ -211,9 +212,26 @@ function Window({ openedApp, children }: WindowProps): JSX.Element {
 	);
 }
 
-export default Window;
+// Memoized so a window only re-renders when its own opened app changes (e.g. not when another window is focused)
+export default memo(Window);
 
 // --- COMPONENTS ---
+
+type WindowAppProps = {
+	openedApp: OpenedApp;
+};
+
+function WindowApp({ openedApp }: WindowAppProps): JSX.Element {
+	// TS can't relate the component to the params of the same app, but both come from the same app id
+	const AppComponent = APPS_COMPONENTS[openedApp.appConfig.id] as ComponentType<AppProps>;
+
+	// The apps are lazy-loaded, so the loader is shown while the app's code is downloading
+	return (
+		<Suspense fallback={<WindowLoader text="Loading" />}>
+			<AppComponent params={openedApp.params} />
+		</Suspense>
+	);
+}
 
 type WindowResizeHandlesProps = {
 	appId: string;

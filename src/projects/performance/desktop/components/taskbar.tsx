@@ -1,6 +1,6 @@
 "use client";
 
-import type { JSX } from "react";
+import { memo, type JSX } from "react";
 
 import cn from "~/lib/cn";
 
@@ -46,7 +46,8 @@ type TaskbarButtonProps = {
 	openedApp: OpenedApp;
 };
 
-function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
+// Memoized so a button only re-renders when its own opened app changes (e.g. not when another window is focused)
+const TaskbarButton = memo(function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 	// --- HOOKS ---
 	const { minimizeApp, restoreApp, focusApp } = useDesktopActions();
 
@@ -87,4 +88,4 @@ function TaskbarButton({ openedApp }: TaskbarButtonProps): JSX.Element {
 			<span className={classes.title}>{title}</span>
 		</button>
 	);
-}
+});
