@@ -9,7 +9,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 **Summary:** 11 findings (3 bundle, 4 re-render, 2 rendering, 2 JavaScript) plus 3 small items.
 
-**Status:** 6 of 11 solved (#1, #4, #5, #7, #8 and #9).
+**Status:** 7 of 11 solved (#1, #3, #4, #5, #7, #8 and #9).
 
 **Suggested order:** #4 → #1 → #5 → #8 / #9 → #7. #4 and #1 have the most impact. #5, #8 and #9 are small and easy to measure in the profiler.
 
@@ -36,7 +36,7 @@ The desktop already follows most re-render rules: the state and actions contexts
 
 - **Fix:** after #1, call `import("./product-details/product-details.app")` on `onMouseEnter` / `onFocus` of the row button, so the chunk is ready by the time the user clicks.
 
-### 3. Avoid the barrel import in the error page
+### 3. Avoid the barrel import in the error page ✅
 
 `bundle-barrel-imports`
 
