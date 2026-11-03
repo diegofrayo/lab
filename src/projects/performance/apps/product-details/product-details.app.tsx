@@ -1,6 +1,6 @@
 "use client";
 
-import type { JSX } from "react";
+import { type JSX } from "react";
 
 import cn from "~/lib/cn";
 
@@ -45,6 +45,10 @@ function ProductActivity({ productId, productName }: ProductActivityProps): JSX.
 			<header className={productActivityStyles.header}>
 				<h1 className={productActivityStyles.title}>{productName}</h1>
 				<div className={productActivityStyles.meta}>
+					{/*
+          <ExpensiveText />
+					<MemoizedExpensiveText />
+          */}
 					<span className={productActivityStyles.count}>{formatNumber(orders.length)} orders</span>
 					<SocketStatusBadge status={status} />
 				</div>
@@ -65,3 +69,47 @@ const productActivityStyles = {
 	count: cn("text-xs text-gray-500 tabular-nums"),
 	table: cn("min-h-0 flex-1"),
 };
+
+/*
+// => ExpensiveText <=
+
+function ExpensiveText(): JSX.Element {
+	// --- COMPUTED STATES ---
+	// Upper bound for the prime search, a random integer between 1_000_000 and 2_000_000 (inclusive)
+	const PRIMES_LIMIT = Math.floor(Math.random() * (2_000_000 - 1_000_000 + 1)) + 1_000_000;
+	// Intentionally not memoized: the calculation runs on every render
+	const primesCount = countPrimes(PRIMES_LIMIT);
+
+	return <span className={expensiveTextStyles.text}>{formatNumber(primesCount)} primes</span>;
+}
+
+const MemoizedExpensiveText = memo(ExpensiveText);
+
+const expensiveTextStyles = {
+	text: cn("text-xs text-gray-500 tabular-nums"),
+};
+
+// --- UTILS ---
+
+// Naive trial division (no sieve) to keep the main thread busy
+function countPrimes(limit: number): number {
+	let count = 0;
+
+	for (let candidate = 2; candidate <= limit; candidate += 1) {
+		let isPrime = true;
+
+		for (let divisor = 2; divisor * divisor <= candidate; divisor += 1) {
+			if (candidate % divisor === 0) {
+				isPrime = false;
+				break;
+			}
+		}
+
+		if (isPrime) {
+			count += 1;
+		}
+	}
+
+	return count;
+}
+*/
