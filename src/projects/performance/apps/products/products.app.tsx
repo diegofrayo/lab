@@ -6,15 +6,13 @@ import cn from "~/lib/cn";
 
 import SocketStatusBadge from "../../components/socket-status-badge";
 import WindowLoader from "../../desktop/components/window-loader";
-import { useDesktopActions } from "../../desktop/context/desktop.hook";
+import { useDesktopActions } from "../../desktop/context/desktop.hooks";
 import { useDataOrchestratorSetting } from "../../hooks/use-data-orchestrator-settings.hook";
 import PlainList from "./components/plain-list";
 import ProductRow from "./components/product-row";
 import VirtualList from "./components/virtual-list";
 import { useProductsSocket } from "./hooks/use-products-socket.hook";
 import type { Product } from "./utils/products-parser";
-
-const PRODUCT_ROW_HEIGHT = 72;
 
 function ProductsApp(): JSX.Element {
 	// --- HOOKS ---
@@ -80,6 +78,10 @@ const styles = {
 };
 
 export default ProductsApp;
+
+// --- CONSTANTS ---
+
+const PRODUCT_ROW_HEIGHT = 72;
 
 // --- UTILS ---
 

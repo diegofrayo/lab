@@ -4,7 +4,7 @@ import { memo, type JSX } from "react";
 
 import cn from "~/lib/cn";
 
-import { useDesktopActions, useDesktopState } from "../context/desktop.hook";
+import { useDesktopActions, useDesktopState } from "../context/desktop.hooks";
 import type { OpenedApp } from "../desktop.types";
 import { getTaskbarButtonId } from "../utils/taskbar-button-id";
 import { getWindowTitle } from "../utils/window-title";

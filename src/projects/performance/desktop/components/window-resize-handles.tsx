@@ -4,7 +4,7 @@ import { useRef, type JSX, type RefObject } from "react";
 
 import cn from "~/lib/cn";
 
-import { useDesktopActions } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hooks";
 import { usePointerDrag } from "../hooks/use-pointer-drag.hook";
 
 type ResizeDirection = "RIGHT" | "BOTTOM" | "BOTTOM_RIGHT";

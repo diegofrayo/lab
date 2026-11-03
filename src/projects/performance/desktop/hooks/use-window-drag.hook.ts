@@ -2,7 +2,7 @@
 
 import { useRef, type MouseEvent as ReactMouseEvent, type RefObject } from "react";
 
-import { useDesktopActions } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hooks";
 import type { OpenedApp } from "../desktop.types";
 import { usePointerDrag } from "./use-pointer-drag.hook";
 

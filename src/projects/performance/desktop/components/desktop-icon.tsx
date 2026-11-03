@@ -4,7 +4,7 @@ import { memo, type JSX } from "react";
 
 import cn from "~/lib/cn";
 
-import { useDesktopActions } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hooks";
 import type { AppConfig, AppIdWithoutParams } from "../desktop.types";
 
 type DesktopIconProps = {
@@ -22,19 +22,19 @@ function DesktopIcon({ appConfig }: DesktopIconProps): JSX.Element {
 
 	return (
 		<button
-			className={styles.container}
+			className={desktopIconStyles.container}
 			aria-label={`Open ${appConfig.name}`}
 			onClick={handleClick}
 		>
-			<span className={styles.icon}>{appConfig.icon}</span>
-			<span className={styles.label}>{appConfig.name}</span>
+			<span className={desktopIconStyles.icon}>{appConfig.icon}</span>
+			<span className={desktopIconStyles.label}>{appConfig.name}</span>
 		</button>
 	);
 }
 
 // --- STYLES ---
 
-const styles = {
+const desktopIconStyles = {
 	container: cn(
 		"flex w-20 cursor-pointer flex-col items-center gap-1 rounded p-2 select-none hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:outline-none",
 	),

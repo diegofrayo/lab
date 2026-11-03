@@ -5,7 +5,7 @@ import type { JSX } from "react";
 import cn from "~/lib/cn";
 
 import { APPS_REPOSITORY } from "../constants/apps-repository";
-import { useDesktopState } from "../context/desktop.hook";
+import { useDesktopState } from "../context/desktop.hooks";
 import type { AppConfig, AppIdWithoutParams } from "../desktop.types";
 import DesktopIcon from "./desktop-icon";
 import Taskbar from "./taskbar";

@@ -5,7 +5,7 @@ import { Activity, memo, Suspense, type ComponentType, type CSSProperties, type 
 import cn from "~/lib/cn";
 import { APPS_COMPONENTS } from "~/projects/performance/apps";
 
-import { useDesktopActions } from "../context/desktop.hook";
+import { useDesktopActions } from "../context/desktop.hooks";
 import type { AppProps, OpenedApp } from "../desktop.types";
 import { useWindowDrag } from "../hooks/use-window-drag.hook";
 import { useWindowKeyboardFocus } from "../hooks/use-window-keyboard-focus.hook";
@@ -152,7 +152,7 @@ function Window({ openedApp }: WindowProps): JSX.Element {
 					</AppErrorBoundary>
 				</Activity>
 			</section>
-			{isResizable ? (
+			{isResizable && (
 				<WindowResizeHandles
 					appId={id}
 					containerRef={containerRef}
@@ -161,7 +161,7 @@ function Window({ openedApp }: WindowProps): JSX.Element {
 					minWidth={minWindowSize.width}
 					minHeight={minWindowSize.height}
 				/>
-			) : null}
+			)}
 		</div>
 	);
 }
