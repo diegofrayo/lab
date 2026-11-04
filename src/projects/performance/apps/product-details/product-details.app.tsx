@@ -1,6 +1,6 @@
 "use client";
 
-import { type JSX } from "react";
+import { memo, type JSX } from "react";
 
 import cn from "~/lib/cn";
 
@@ -45,10 +45,8 @@ function ProductActivity({ productId, productName }: ProductActivityProps): JSX.
 			<header className={productActivityStyles.header}>
 				<h1 className={productActivityStyles.title}>{productName}</h1>
 				<div className={productActivityStyles.meta}>
-					{/*
-          <ExpensiveText />
+					{/* <ExpensiveText /> */}
 					<MemoizedExpensiveText />
-          */}
 					<span className={productActivityStyles.count}>{formatNumber(orders.length)} orders</span>
 					<SocketStatusBadge status={status} />
 				</div>
@@ -70,7 +68,6 @@ const productActivityStyles = {
 	table: cn("min-h-0 flex-1"),
 };
 
-/*
 // => ExpensiveText <=
 
 function ExpensiveText(): JSX.Element {
@@ -86,7 +83,7 @@ function ExpensiveText(): JSX.Element {
 const MemoizedExpensiveText = memo(ExpensiveText);
 
 const expensiveTextStyles = {
-	text: cn("text-xs text-gray-500 tabular-nums"),
+	text: cn("hidden text-xs text-gray-500 tabular-nums"),
 };
 
 // --- UTILS ---
@@ -112,4 +109,3 @@ function countPrimes(limit: number): number {
 
 	return count;
 }
-*/
