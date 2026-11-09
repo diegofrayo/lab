@@ -1,6 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
+import { useSelector } from "@tanstack/react-form";
 
 import Form from "../../components/form";
 import { useTSFStep } from "../../hooks/use-form-step";
@@ -12,7 +13,7 @@ import type { Step1Values, TSFValidationRules } from "../../utils/types";
 function Step1(): JSX.Element {
 	// --- HOOKS ---
 	const { form, onSubmit } = useTSFStep({ inputNames: STEP_1_INPUT_NAMES });
-	const isValidating = form.state.isValidating;
+	const isValidating = useSelector(form.atom, (state) => state.isValidating);
 
 	return (
 		<Form onSubmit={onSubmit}>
@@ -27,8 +28,8 @@ function Step1(): JSX.Element {
 							label="Name"
 							name={field.name}
 							status={getTSFFieldStatus(field)}
-							message={field.state.meta.errors[0]}
-							value={field.state.value}
+							message={field.meta.errors[0]?.message}
+							value={field.value}
 							onBlur={field.handleBlur}
 							onChange={(event) => field.handleChange(event.target.value)}
 						/>
@@ -38,11 +39,6 @@ function Step1(): JSX.Element {
 				<form.Field
 					name="email"
 					validators={ValidationRules.email}
-					listeners={{
-						onChange: (field) => {
-							form.setFieldMeta("email", { ...field.fieldApi.getMeta(), isValidating: true });
-						},
-					}}
 				>
 					{(field) => {
 						const emailStatus = getTSFFieldStatus(field);
@@ -53,10 +49,10 @@ function Step1(): JSX.Element {
 								label="Email"
 								name={field.name}
 								status={emailStatus}
-								message={emailStatus === "valid" ? "Email available" : field.state.meta.errors[0]}
-								isLoading={field.state.meta.isValidating}
+								message={emailStatus === "valid" ? "Email available" : field.meta.errors[0]?.message}
+								isLoading={field.meta.isValidating}
 								loadingLabel="Checking email availability"
-								value={field.state.value}
+								value={field.value}
 								onBlur={field.handleBlur}
 								onChange={(event) => field.handleChange(event.target.value)}
 							/>
@@ -77,10 +73,12 @@ function Step1(): JSX.Element {
 								label="Username"
 								name={field.name}
 								status={usernameStatus}
-								message={usernameStatus === "valid" ? "Username available" : field.state.meta.errors[0]}
-								isLoading={field.state.meta.isValidating}
+								message={
+									usernameStatus === "valid" ? "Username available" : field.meta.errors[0]?.message
+								}
+								isLoading={field.meta.isValidating}
 								loadingLabel="Checking username availability"
-								value={field.state.value}
+								value={field.value}
 								onBlur={field.handleBlur}
 								onChange={(event) => field.handleChange(event.target.value)}
 							/>
@@ -99,19 +97,25 @@ export default Step1;
 // --- VALIDATION RULES ---
 
 const ValidationRules = {
-	name: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.name),
-	},
-	email: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.email),
-		onChangeAsync: validateEmailAvailability,
-		onChangeAsyncDebounceMs: 500,
-	},
-	username: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.username),
-		onChangeAsync: validateUsernameAvailability,
-		onChangeAsyncDebounceMs: 500,
-	},
+	name: [{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.name) }],
+	email: [
+		{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.email) },
+		{
+			triggers: ["change"],
+			run: validateEmailAvailability,
+			triggerDebounceMs: 500,
+			bailIfInvalid: true,
+		},
+	],
+	username: [
+		{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.username) },
+		{
+			triggers: ["change"],
+			run: validateUsernameAvailability,
+			triggerDebounceMs: 500,
+			bailIfInvalid: true,
+		},
+	],
 } satisfies TSFValidationRules<Step1Values>;
 
 async function validateEmailAvailability({ value }: { value: string }): Promise<string | undefined> {

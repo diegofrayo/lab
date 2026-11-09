@@ -214,11 +214,11 @@ export function getRHFFieldStatus<Values extends FieldValues>({
 
 export function getTSFFieldStatus(field: AnyFieldApi): FieldStatus {
 	return getFieldStatus({
-		hasError: field.state.meta.errors.length > 0,
-		hasValue: hasFieldValue(field.state.value),
-		isFormSubmitted: field.form.state.isSubmitted,
-		isTouched: field.state.meta.isTouched,
-		isValidating: field.state.meta.isValidating,
+		hasError: field.meta.errors.length > 0,
+		hasValue: hasFieldValue(field.value),
+		isFormSubmitted: field.form.state.isSubmitSuccessful,
+		isTouched: field.meta.isTouched,
+		isValidating: field.meta.isValidating,
 	});
 }
 

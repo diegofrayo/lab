@@ -68,7 +68,7 @@ export function useTSFStep<K extends FormInputName>(params: UseFormStepParams<K>
 	}
 
 	// --- COMPUTED STATES ---
-	const formValues = useSelector(form.store, (state) => state.values);
+	const formValues = useSelector(form.atom, (state) => state.values);
 
 	// --- EFFECTS ---
 	usePersistInputs(formValues);

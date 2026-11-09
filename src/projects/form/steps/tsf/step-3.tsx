@@ -20,7 +20,7 @@ import type { Step3Values, TSFValidationRules } from "../../utils/types";
 function Step3(): JSX.Element {
 	// --- HOOKS ---
 	const { form, onSubmit } = useTSFStep({ inputNames: STEP_3_INPUT_NAMES });
-	const hasCollegeDegree = useSelector(form.store, (state) => Boolean(state.values.hasCollegeDegree));
+	const hasCollegeDegree = useSelector(form.atom, (state) => Boolean(state.values.hasCollegeDegree));
 
 	return (
 		<Form onSubmit={onSubmit}>
@@ -34,7 +34,7 @@ function Step3(): JSX.Element {
 							<Checkbox
 								id="hasCollegeDegree"
 								name={field.name}
-								checked={field.state.value}
+								checked={field.value}
 								onBlur={field.handleBlur}
 								onCheckedChange={(checked) => {
 									field.handleChange(checked);
@@ -63,8 +63,8 @@ function Step3(): JSX.Element {
 								label="College name"
 								name={field.name}
 								status={getTSFFieldStatus(field)}
-								message={field.state.meta.errors[0]}
-								value={field.state.value ?? ""}
+								message={field.meta.errors[0]?.message}
+								value={field.value ?? ""}
 								onBlur={field.handleBlur}
 								onChange={(event) => field.handleChange(event.target.value)}
 							/>
@@ -83,13 +83,16 @@ export default Step3;
 // --- VALIDATION RULES ---
 
 const ValidationRules = {
-	hasCollegeDegree: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.hasCollegeDegree),
-	},
-	collegeName: {
-		onChangeListenTo: ["hasCollegeDegree"] as (keyof Step3Values)[],
-		onChange: createTSFValidatorFromCustomValidation<Step3Values["collegeName"], Step3Values>(
-			CustomValidations.step3.collegeName,
-		),
-	},
+	hasCollegeDegree: [
+		{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.hasCollegeDegree) },
+	],
+	collegeName: [
+		{
+			triggers: ["change"],
+			watchFields: ["hasCollegeDegree"],
+			run: createTSFValidatorFromCustomValidation<Step3Values["collegeName"], Step3Values>(
+				CustomValidations.step3.collegeName,
+			),
+		},
+	],
 } satisfies TSFValidationRules<Step3Values>;

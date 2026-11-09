@@ -23,7 +23,7 @@ import type { Step4Values, TSFValidationRules } from "../../utils/types";
 function Step4(): JSX.Element {
 	// --- HOOKS ---
 	const { form, onSubmit } = useTSFStep({ inputNames: STEP_4_INPUT_NAMES, isFinalStep: true });
-	const stillStudying = useSelector(form.store, (state) => state.values.stillStudying);
+	const stillStudying = useSelector(form.atom, (state) => state.values.stillStudying);
 
 	return (
 		<Form onSubmit={onSubmit}>
@@ -39,8 +39,8 @@ function Step4(): JSX.Element {
 							type="date"
 							name={field.name}
 							status={getTSFFieldStatus(field)}
-							message={field.state.meta.errors[0]}
-							value={toHtmlDateValue(field.state.value)}
+							message={field.meta.errors[0]?.message}
+							value={toHtmlDateValue(field.value)}
 							placeholder="yyyy/mm/dd"
 							onBlur={field.handleBlur}
 							onChange={(event) => field.handleChange(fromHtmlDateValue(event.target.value))}
@@ -74,7 +74,7 @@ function Step4(): JSX.Element {
 									name={field.name}
 									status={stillStudyingStatus}
 									items={STILL_STUDYING_OPTIONS}
-									value={field.state.value ?? null}
+									value={field.value ?? null}
 									onBlur={field.handleBlur}
 									onValueChange={handleStillStudyingChange}
 								/>
@@ -95,9 +95,9 @@ function Step4(): JSX.Element {
 								type="date"
 								name={field.name}
 								status={getTSFFieldStatus(field)}
-								message={field.state.meta.errors[0]}
+								message={field.meta.errors[0]?.message}
 								placeholder="yyyy/mm/dd"
-								value={toHtmlDateValue(field.state.value || "")}
+								value={toHtmlDateValue(field.value || "")}
 								onBlur={field.handleBlur}
 								onChange={(event) => field.handleChange(fromHtmlDateValue(event.target.value))}
 							/>
@@ -115,18 +115,21 @@ export default Step4;
 // --- VALIDATION RULES ---
 
 const ValidationRules = {
-	startDate: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.startDate),
-	},
-	stillStudying: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.stillStudying),
-	},
-	endDate: {
-		onChangeListenTo: ["stillStudying", "startDate"] as (keyof Step4Values)[],
-		onChange: createTSFValidatorFromCustomValidation<Step4Values["endDate"], Step4Values>(
-			CustomValidations.step4.endDate,
-		),
-	},
+	startDate: [
+		{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.startDate) },
+	],
+	stillStudying: [
+		{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.stillStudying) },
+	],
+	endDate: [
+		{
+			triggers: ["change"],
+			watchFields: ["stillStudying", "startDate"],
+			run: createTSFValidatorFromCustomValidation<Step4Values["endDate"], Step4Values>(
+				CustomValidations.step4.endDate,
+			),
+		},
+	],
 } satisfies TSFValidationRules<Step4Values>;
 
 const STILL_STUDYING_OPTIONS: RadioGroupOption<boolean>[] = [

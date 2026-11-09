@@ -1,11 +1,5 @@
 import type { BaseSyntheticEvent } from "react";
-import type {
-	DeepKeys,
-	DeepValue,
-	FieldAsyncValidateOrFn,
-	FieldValidateOrFn,
-	FieldValidators,
-} from "@tanstack/react-form";
+import type { DeepKeys, DeepValue, FieldValidators } from "@tanstack/react-form";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import type { z } from "zod";
 
@@ -60,27 +54,10 @@ export type FieldStatus = "neutral" | "valid" | "invalid";
 
 export type FormScope = "rhf" | "tsf";
 
-type TSFSyncValidator<T, K extends DeepKeys<T>> = undefined | FieldValidateOrFn<T, K, DeepValue<T, K>>;
-type TSFAsyncValidator<T, K extends DeepKeys<T>> =
-	undefined | FieldAsyncValidateOrFn<T, K, DeepValue<T, K>>;
-
 /**
  * The `validators` of every TanStack Form field in a step, keyed by field name.
- * Use it with `satisfies` so a misspelled option (e.g. `onChangeAsyncDebounce`) fails to compile.
+ * Use it with `satisfies` so a misspelled option (e.g. `triggerDebounce`) fails to compile.
  */
 export type TSFValidationRules<T> = {
-	[K in keyof T & DeepKeys<T>]?: FieldValidators<
-		T,
-		K,
-		DeepValue<T, K>,
-		TSFSyncValidator<T, K>,
-		TSFSyncValidator<T, K>,
-		TSFAsyncValidator<T, K>,
-		TSFSyncValidator<T, K>,
-		TSFAsyncValidator<T, K>,
-		TSFSyncValidator<T, K>,
-		TSFAsyncValidator<T, K>,
-		TSFSyncValidator<T, K>,
-		TSFAsyncValidator<T, K>
-	>;
+	[K in keyof T & DeepKeys<T>]?: FieldValidators<T, K, DeepValue<T, K>>;
 };

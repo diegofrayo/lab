@@ -35,10 +35,10 @@ function Step2(): JSX.Element {
 								label="State"
 								name={field.name}
 								status={getTSFFieldStatus(field)}
-								message={field.state.meta.errors[0]}
+								message={field.meta.errors[0]?.message}
 								items={stateOptions}
 								placeholder="Select a state"
-								value={field.state.value || null}
+								value={field.value || null}
 								onBlur={field.handleBlur}
 								onValueChange={handleValueChange}
 							/>
@@ -56,11 +56,11 @@ function Step2(): JSX.Element {
 							label="City"
 							name={field.name}
 							status={getTSFFieldStatus(field)}
-							message={field.state.meta.errors[0]}
+							message={field.meta.errors[0]?.message}
 							items={cityOptions}
 							placeholder="Select a city"
 							disabled={isCityDisabled}
-							value={field.state.value || null}
+							value={field.value || null}
 							onBlur={field.handleBlur}
 							onValueChange={(value) => field.handleChange(value ?? "")}
 						/>
@@ -97,10 +97,6 @@ function useStep2Form() {
 // --- VALIDATION RULES ---
 
 const ValidationRules = {
-	state: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.state),
-	},
-	city: {
-		onChange: createTSFValidatorFromInputShape(formSchema.shape.city),
-	},
+	state: [{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.state) }],
+	city: [{ triggers: ["change"], run: createTSFValidatorFromInputShape(formSchema.shape.city) }],
 } satisfies TSFValidationRules<Step2Values>;
